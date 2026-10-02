@@ -1,14 +1,6 @@
-import type { GraphEdge } from "@/types/graph";
+import type { Graph } from "@/lib/graph/types";
 
-type GraphVisualizationProps = {
-	vertices: number[];
-	edges: GraphEdge[];
-};
-
-export function GraphVisualization({
-	vertices,
-	edges,
-}: GraphVisualizationProps) {
+export function GraphVisualization({ vertices, edges }: Graph) {
 	if (!vertices.length) {
 		return (
 			<p className="py-12 text-center text-sm text-muted-foreground">

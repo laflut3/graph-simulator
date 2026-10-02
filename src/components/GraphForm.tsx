@@ -1,25 +1,31 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { GraphEdge } from "@/types/graph";
+import type { Graph, GraphEdge, GraphError } from "@/lib/graph/types";
 
 type GraphFormProps = {
-	vertices: number[];
-	edges: GraphEdge[];
-	onAddVertex: (vertex: number) => string | null;
-	onAddEdge: (first: number, second: number) => string | null;
+	graph: Graph;
+	onAddVertex: (vertex: number) => GraphError | null;
+	onAddEdge: (first: number, second: number) => GraphError | null;
 	onRemoveVertex: (vertex: number) => void;
 	onRemoveEdge: (edge: GraphEdge) => void;
 };
 
+const errorMessages: Record<GraphError, string> = {
+	"invalid-vertex": "Saisissez un entier positif ou nul.",
+	"duplicate-vertex": "Ce sommet existe déjà.",
+	"invalid-edge": "Choisissez deux sommets différents.",
+	"duplicate-edge": "Cette arête existe déjà.",
+};
+
 export function GraphForm({
-	vertices,
-	edges,
+	graph,
 	onAddVertex,
 	onAddEdge,
 	onRemoveVertex,
 	onRemoveEdge,
 }: GraphFormProps) {
+	const { vertices, edges } = graph;
 	const [vertexName, setVertexName] = useState("5");
 	const [edgeFirst, setEdgeFirst] = useState("1");
 	const [edgeSecond, setEdgeSecond] = useState("2");
@@ -41,18 +47,19 @@ export function GraphForm({
 	function addVertex(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const vertex = Number(vertexName);
-		if (!/^\d+$/.test(vertexName) || !Number.isSafeInteger(vertex)) {
-			setVertexError("Saisissez un entier positif ou nul.");
+		if (!/^\d+$/.test(vertexName)) {
+			setVertexError(errorMessages["invalid-vertex"]);
 			return;
 		}
 		const error = onAddVertex(vertex);
-		setVertexError(error ?? "");
+		setVertexError(error ? errorMessages[error] : "");
 		if (!error) setVertexName(String(Math.max(0, ...vertices, vertex) + 1));
 	}
 
 	function addEdge(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		setEdgeError(onAddEdge(Number(firstValue), Number(secondValue)) ?? "");
+		const error = onAddEdge(Number(firstValue), Number(secondValue));
+		setEdgeError(error ? errorMessages[error] : "");
 	}
 
 	return (

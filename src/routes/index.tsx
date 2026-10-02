@@ -2,62 +2,30 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GraphForm } from "@/components/GraphForm";
 import { GraphVisualization } from "@/components/GraphVisualization";
-import type { GraphEdge } from "@/types/graph";
+import { addEdge, removeEdge } from "@/lib/graph/edges";
+import { createGraph } from "@/lib/graph/create";
+import type { GraphEdge } from "@/lib/graph/types";
+import { addVertex, removeVertex } from "@/lib/graph/vertices";
 
 function HomePage() {
-	const [vertices, setVertices] = useState([1, 2, 3, 4]);
-	const [edges, setEdges] = useState<GraphEdge[]>([
-		{ first: 1, second: 2 },
-		{ first: 1, second: 3 },
-	]);
+	const [graph, setGraph] = useState(createGraph);
 
-	const addVertex = (vertex: number) => {
-		if (vertices.includes(vertex)) return "Ce sommet existe déjà.";
-		setVertices((current) => [...current, vertex].sort((a, b) => a - b));
-		return null;
+	const handleAddVertex = (vertex: number) => {
+		const result = addVertex(graph, vertex);
+		if (!result.error) setGraph(result.graph);
+		return result.error;
 	};
 
-	const addEdge = (first: number, second: number) => {
-		if (
-			!vertices.includes(first) ||
-			!vertices.includes(second) ||
-			first === second
-		) {
-			return "Choisissez deux sommets différents.";
-		}
-		if (
-			edges.some(
-				(edge) =>
-					(edge.first === first && edge.second === second) ||
-					(edge.first === second && edge.second === first),
-			)
-		) {
-			return "Cette arête existe déjà.";
-		}
-
-		setEdges((current) =>
-			[
-				...current,
-				{ first: Math.min(first, second), second: Math.max(first, second) },
-			].sort((a, b) => a.first - b.first || a.second - b.second),
-		);
-		return null;
+	const handleAddEdge = (first: number, second: number) => {
+		const result = addEdge(graph, first, second);
+		if (!result.error) setGraph(result.graph);
+		return result.error;
 	};
 
-	const removeVertex = (vertex: number) => {
-		setVertices((current) => current.filter((item) => item !== vertex));
-		setEdges((current) =>
-			current.filter((edge) => edge.first !== vertex && edge.second !== vertex),
-		);
-	};
-
-	const removeEdge = (edge: GraphEdge) => {
-		setEdges((current) =>
-			current.filter(
-				(item) => item.first !== edge.first || item.second !== edge.second,
-			),
-		);
-	};
+	const handleRemoveVertex = (vertex: number) =>
+		setGraph((current) => removeVertex(current, vertex));
+	const handleRemoveEdge = (edge: GraphEdge) =>
+		setGraph((current) => removeEdge(current, edge));
 
 	return (
 		<main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-12 text-foreground sm:px-10 sm:py-16">
@@ -74,14 +42,15 @@ function HomePage() {
 					</p>
 				</div>
 			</header>
+
 			<GraphForm
-				vertices={vertices}
-				edges={edges}
-				onAddVertex={addVertex}
-				onAddEdge={addEdge}
-				onRemoveVertex={removeVertex}
-				onRemoveEdge={removeEdge}
+				graph={graph}
+				onAddVertex={handleAddVertex}
+				onAddEdge={handleAddEdge}
+				onRemoveVertex={handleRemoveVertex}
+				onRemoveEdge={handleRemoveEdge}
 			/>
+
 			<section
 				aria-labelledby="graph-title"
 				className="mt-16 border-t border-border pt-8"
@@ -91,10 +60,10 @@ function HomePage() {
 						Graphe
 					</h2>
 					<span className="text-xs text-muted-foreground">
-						{vertices.length} sommets · {edges.length} arêtes
+						{graph.vertices.length} sommets · {graph.edges.length} arêtes
 					</span>
 				</div>
-				<GraphVisualization vertices={vertices} edges={edges} />
+				<GraphVisualization {...graph} />
 			</section>
 		</main>
 	);
