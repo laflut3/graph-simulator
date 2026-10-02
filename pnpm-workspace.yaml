@@ -1,0 +1,4 @@
+allowBuilds:
+  esbuild: true
+  lightningcss: true
+  ws: set this to true or false
