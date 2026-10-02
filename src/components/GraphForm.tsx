@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Graph, GraphEdge, GraphError } from "@/lib/graph/types";
@@ -44,7 +44,7 @@ export function GraphForm({
 		? edgeSecond
 		: String(otherVertices[0] ?? "");
 
-	function addVertex(event: FormEvent<HTMLFormElement>) {
+	function addVertex(event: SubmitEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const vertex = Number(vertexName);
 		if (!/^\d+$/.test(vertexName)) {
@@ -56,7 +56,7 @@ export function GraphForm({
 		if (!error) setVertexName(String(Math.max(0, ...vertices, vertex) + 1));
 	}
 
-	function addEdge(event: FormEvent<HTMLFormElement>) {
+	function addEdge(event: SubmitEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const error = onAddEdge(Number(firstValue), Number(secondValue));
 		setEdgeError(error ? errorMessages[error] : "");
