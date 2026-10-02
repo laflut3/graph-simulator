@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GraphVisualization } from "@/components/GraphVisualization";
 import {
 	Select,
 	SelectContent,
@@ -143,25 +144,30 @@ function GraphForm() {
 						</span>
 					</div>
 
-					<div className="min-h-20 border-b border-border pb-6 font-mono text-lg leading-8 sm:text-xl">
-						<span className="text-muted-foreground">V = &#123;</span>{" "}
+					<div className="flex min-h-20 flex-wrap items-center gap-x-1 gap-y-2 border-b border-border pb-6 font-mono text-lg leading-8 sm:text-xl">
+						<span className="text-muted-foreground">V = &#123;</span>
 						{vertices.length === 0 ? (
 							<span className="text-muted-foreground">∅</span>
 						) : (
 							vertices.map((vertex, index) => (
-								<span key={vertex} className="inline-flex items-center">
-									<span>{vertex}</span>
-									<Button
-										type="button"
-										variant="ghost"
-										size="icon-xs"
-										className="mx-0.5 inline-flex align-middle text-muted-foreground hover:text-destructive"
-										aria-label={`Retirer le sommet ${vertex}`}
-										title={`Retirer le sommet ${vertex}`}
-										onClick={() => removeVertex(vertex)}
-									>
-										×
-									</Button>
+								<span
+									key={vertex}
+									className="inline-flex items-center whitespace-nowrap"
+								>
+									<span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-0.5 pl-2 pr-1">
+										<span>{vertex}</span>
+										<Button
+											type="button"
+											variant="ghost"
+											size="icon-xs"
+											className="size-5 rounded-sm text-xs leading-none text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:text-destructive"
+											aria-label={`Supprimer le sommet ${vertex}`}
+											title={`Supprimer le sommet ${vertex}`}
+											onClick={() => removeVertex(vertex)}
+										>
+											×
+										</Button>
+									</span>
 									{index < vertices.length - 1 ? <span>,</span> : null}
 								</span>
 							))
@@ -207,30 +213,32 @@ function GraphForm() {
 						</span>
 					</div>
 
-					<div className="min-h-20 border-b border-border pb-6 font-mono text-lg leading-8 sm:text-xl">
-						<span className="text-muted-foreground">E = &#123;</span>{" "}
+					<div className="flex min-h-20 flex-wrap items-center gap-x-1 gap-y-2 border-b border-border pb-6 font-mono text-lg leading-8 sm:text-xl">
+						<span className="text-muted-foreground">E = &#123;</span>
 						{edges.length === 0 ? (
 							<span className="text-muted-foreground">∅</span>
 						) : (
 							edges.map((edge, index) => (
 								<span
 									key={edgeKey(edge.first, edge.second)}
-									className="inline-flex items-center"
+									className="inline-flex items-center whitespace-nowrap"
 								>
-									<span>
-										&#123;{edge.first}, {edge.second}&#125;
+									<span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-0.5 pl-2 pr-1">
+										<span>
+											&#123;{edge.first}, {edge.second}&#125;
+										</span>
+										<Button
+											type="button"
+											variant="ghost"
+											size="icon-xs"
+											className="size-5 rounded-sm text-xs leading-none text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:text-destructive"
+											aria-label={`Supprimer l’arête ${edge.first}–${edge.second}`}
+											title={`Supprimer l’arête ${edge.first}–${edge.second}`}
+											onClick={() => removeEdge(edge)}
+										>
+											×
+										</Button>
 									</span>
-									<Button
-										type="button"
-										variant="ghost"
-										size="icon-xs"
-										className="mx-0.5 inline-flex align-middle text-muted-foreground hover:text-destructive"
-										aria-label={`Retirer l’arête ${edge.first}–${edge.second}`}
-										title={`Retirer l’arête ${edge.first}–${edge.second}`}
-										onClick={() => removeEdge(edge)}
-									>
-										×
-									</Button>
 									{index < edges.length - 1 ? <span>,</span> : null}
 								</span>
 							))
@@ -290,6 +298,8 @@ function GraphForm() {
 					</form>
 				</section>
 			</div>
+
+			<GraphVisualization vertices={vertices} edges={edges} />
 		</main>
 	);
 }

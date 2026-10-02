@@ -1,19 +1,12 @@
 # Graph Simulator
 
-Application frontend React avec Vite et TanStack Router. Elle ne contient ni serveur applicatif ni base de données.
+Application web pour créer et visualiser des graphes non orientés à partir de leurs sommets et de leurs arêtes.
 
-## Développement
+## Lancer le projet
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## Production
-
-```bash
-pnpm build
-pnpm preview
-```
-
-Le build statique est généré dans `dist/`. Sur Vercel, sélectionne le preset **Vite** ; la commande de build est `pnpm build` et le dossier de sortie est `dist`.
+Ouvrez l’adresse indiquée dans le terminal.
