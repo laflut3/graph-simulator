@@ -27,6 +27,8 @@ function SimulatorPage() {
 		steps: GraphConstructionStep[];
 		index: number;
 		playing: boolean;
+		debugMode: boolean;
+		representation: GraphRepresentation;
 	} | null>(null);
 	const [configMessage, setConfigMessage] = useState("");
 	const [configError, setConfigError] = useState("");
@@ -37,15 +39,22 @@ function SimulatorPage() {
 		() => analyzeGraph({ vertices, edges }),
 		[vertices, edges],
 	);
-	const runRepresentation = (selected: GraphRepresentation) => {
+	const runRepresentation = (
+		selected: GraphRepresentation,
+		debugMode = false,
+	) => {
 		setRepresentation(selected);
 		setSelectedVertex(null);
 		setConstruction({
 			steps: buildGraphFromRepresentation(graph, selected),
 			index: 0,
-			playing: true,
+			playing: !debugMode,
+			debugMode,
+			representation: selected,
 		});
 	};
+	const debugRepresentation = (selected: GraphRepresentation) =>
+		runRepresentation(selected, true);
 
 	useEffect(() => {
 		if (!construction?.playing) return;
@@ -61,6 +70,19 @@ function SimulatorPage() {
 
 	const currentStep = construction?.steps[construction.index];
 	const displayedGraph = currentStep?.graph ?? graph;
+	const stepConstruction = (direction: -1 | 1) => {
+		setConstruction((run) => {
+			if (!run) return null;
+			return {
+				...run,
+				playing: false,
+				index: Math.max(
+					0,
+					Math.min(run.steps.length - 1, run.index + direction),
+				),
+			};
+		});
+	};
 
 	const handleExport = () => {
 		const fileName =
@@ -219,18 +241,62 @@ function SimulatorPage() {
 								Étape {construction.index + 1} / {construction.steps.length}
 							</p>
 						</div>
-						<div className="flex gap-2">
+						<div className="flex flex-wrap gap-2">
+							{construction.debugMode ? (
+								<>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										disabled={construction.index === 0}
+										onClick={() => stepConstruction(-1)}
+									>
+										Précédent
+									</Button>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										disabled={
+											construction.index >= construction.steps.length - 1
+										}
+										onClick={() => stepConstruction(1)}
+									>
+										Suivant
+									</Button>
+								</>
+							) : (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={() =>
+										setConstruction((run) =>
+											run ? { ...run, playing: !run.playing } : null,
+										)
+									}
+								>
+									{construction.playing ? "Pause" : "Reprendre"}
+								</Button>
+							)}
 							<Button
 								type="button"
-								variant="outline"
+								variant={construction.debugMode ? "default" : "outline"}
 								size="sm"
+								aria-pressed={construction.debugMode}
 								onClick={() =>
 									setConstruction((run) =>
-										run ? { ...run, playing: !run.playing } : null,
+										run
+											? {
+													...run,
+													debugMode: !run.debugMode,
+													playing: run.debugMode,
+												}
+											: null,
 									)
 								}
 							>
-								{construction.playing ? "Pause" : "Reprendre"}
+								{construction.debugMode ? "Debug activé" : "Mode debug"}
 							</Button>
 							<Button
 								type="button"
@@ -260,6 +326,15 @@ function SimulatorPage() {
 						selected={representation}
 						onSelect={setRepresentation}
 						onPlay={runRepresentation}
+						onDebug={debugRepresentation}
+						execution={
+							construction && currentStep
+								? {
+										representation: construction.representation,
+										codeLine: currentStep.codeLine,
+									}
+								: undefined
+						}
 					/>
 				</div>
 				{!construction && (

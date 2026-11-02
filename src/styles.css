@@ -84,6 +84,13 @@ body {
   --construction-active-foreground: #080a10;
 }
 
+.construction-code-active {
+	border-left: 2px solid var(--construction-active);
+	background: color-mix(in srgb, var(--construction-active) 14%, transparent);
+	color: var(--construction-active);
+	font-weight: 600;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

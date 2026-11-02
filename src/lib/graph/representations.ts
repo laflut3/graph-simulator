@@ -39,8 +39,40 @@ export type GraphConstructionStep = {
 	graph: Graph;
 	title: string;
 	description: string;
+	codeLine: number;
 	currentVertex?: Vertex;
 	currentEdge?: Graph["edges"][number];
+};
+
+export const representationPseudocode: Record<
+	GraphRepresentation,
+	{ id: string; code: string }[]
+> = {
+	"neighbor-list": [
+		{ id: "initialize", code: "G' ← (∅, ∅)" },
+		{ id: "vertices-loop", code: "pour chaque sommet u de V :" },
+		{ id: "add-vertex", code: "  ajouter u à G'.V" },
+		{ id: "neighbors-vertices-loop", code: "pour chaque sommet u de V :" },
+		{ id: "neighbors-loop", code: "  pour chaque v de voisins[u] :" },
+		{ id: "deduplicate", code: "    si {u, v} n'est pas encore traité :" },
+		{ id: "add-edge", code: "      ajouter {u, v} à G'.E" },
+	],
+	"adjacency-matrix": [
+		{ id: "initialize", code: "G' ← (∅, ∅)" },
+		{ id: "vertices-loop", code: "pour chaque sommet u de V :" },
+		{ id: "add-vertex", code: "  ajouter u à G'.V" },
+		{ id: "rows-loop", code: "pour i de 1 à |V| :" },
+		{ id: "columns-loop", code: "  pour j de i + 1 à |V| :" },
+		{ id: "test-edge", code: "    si A[i, j] = 1 :" },
+		{ id: "add-edge", code: "      ajouter {vᵢ, vⱼ} à G'.E" },
+	],
+	"edge-list": [
+		{ id: "initialize", code: "G' ← (∅, ∅)" },
+		{ id: "vertices-loop", code: "pour chaque sommet u de V :" },
+		{ id: "add-vertex", code: "  ajouter u à G'.V" },
+		{ id: "edges-loop", code: "pour chaque arête {u, v} de E :" },
+		{ id: "add-edge", code: "  ajouter {u, v} à G'.E" },
+	],
 };
 
 export function buildGraphFromRepresentation(
@@ -59,11 +91,13 @@ export function buildGraphFromRepresentation(
 		description: string,
 		currentVertex?: Vertex,
 		currentEdge?: Graph["edges"][number],
+		codeLine = 0,
 	) => {
 		steps.push({
 			graph: snapshot(),
 			title,
 			description,
+			codeLine,
 			currentVertex,
 			currentEdge,
 		});
@@ -79,6 +113,8 @@ export function buildGraphFromRepresentation(
 			`Ajouter ${vertex}`,
 			`Le sommet ${vertex} est ajouté au dessin.`,
 			vertex,
+			undefined,
+			2,
 		);
 	}
 
@@ -90,6 +126,7 @@ export function buildGraphFromRepresentation(
 				`La paire {${edge.first}, ${edge.second}} de la liste devient une arête.`,
 				edge.second,
 				edge,
+				4,
 			);
 		}
 	} else if (representation === "neighbor-list") {
@@ -107,6 +144,7 @@ export function buildGraphFromRepresentation(
 					`${neighbor} apparaît dans la liste de voisins de ${vertex} ; l’arête est ajoutée une seule fois.`,
 					vertex,
 					edge,
+					6,
 				);
 			}
 		}
@@ -125,12 +163,15 @@ export function buildGraphFromRepresentation(
 						`A[${first}, ${second}] = 1 : on crée cette arête.`,
 						second,
 						edge,
+						6,
 					);
 				} else {
 					addStep(
 						`Lire A[${first}, ${second}]`,
 						`A[${first}, ${second}] = 0 : aucune arête à dessiner.`,
 						first,
+						undefined,
+						5,
 					);
 				}
 			}

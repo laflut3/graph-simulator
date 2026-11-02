@@ -28,7 +28,7 @@ const copy: Record<
 			},
 			{
 				title: "Représentations et algorithmes",
-				body: "À droite du dessin (ou dessous sur petit écran), choisissez les listes de voisins, la matrice d’adjacence ou la liste d’arêtes. Le bouton ▶ associé à chaque vue efface temporairement le dessin, puis reconstruit le graphe sommet par sommet et arête par arête selon cette représentation. L’élément en cours de création est mis en bleu. La complexité affichée est celle de cette construction : Θ(|V| + |E|) pour les listes de voisins et la liste d’arêtes, Θ(|V|²) pour la matrice. Les autres algorithmes sont à venir.",
+				body: "À droite du dessin (ou dessous sur petit écran), choisissez les listes de voisins, la matrice d’adjacence ou la liste d’arêtes. Le bouton ▶ associé à chaque vue efface temporairement le dessin, puis reconstruit le graphe sommet par sommet et arête par arête selon cette représentation. La ligne du pseudo-code correspondant à l’étape et l’élément en cours sont mis en bleu. Le bouton « pas » lance le mode debug : utilisez Précédent et Suivant pour parcourir les étapes manuellement. La complexité affichée est celle de cette construction : Θ(|V| + |E|) pour les listes de voisins et la liste d’arêtes, Θ(|V|²) pour la matrice. Les autres algorithmes sont à venir.",
 			},
 			{
 				title: "Importer et télécharger",
@@ -60,7 +60,7 @@ const copy: Record<
 			},
 			{
 				title: "Representations and algorithms",
-				body: "Beside the drawing (or below it on small screens), choose the neighbor lists, adjacency matrix, or edge list. The ▶ button for each view temporarily clears the drawing, then rebuilds the graph vertex by vertex and edge by edge using that representation. The element currently being created is highlighted in blue. The displayed complexity is for this construction: Θ(|V| + |E|) for neighbor lists and edge lists, and Θ(|V|²) for the matrix. Other algorithms are coming soon.",
+				body: "Beside the drawing (or below it on small screens), choose the neighbor lists, adjacency matrix, or edge list. The ▶ button for each view temporarily clears the drawing, then rebuilds the graph vertex by vertex and edge by edge using that representation. The pseudo-code line for the current step and the element being created are highlighted in blue. The “pas” button starts debug mode; use Previous and Next to move through steps manually. The displayed complexity is for this construction: Θ(|V| + |E|) for neighbor lists and edge lists, and Θ(|V|²) for the matrix. Other algorithms are coming soon.",
 			},
 			{
 				title: "Import and download",

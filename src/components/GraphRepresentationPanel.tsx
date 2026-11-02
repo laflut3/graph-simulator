@@ -6,6 +6,7 @@ import {
 	type GraphRepresentation,
 	graphRepresentationName,
 	representationComplexity,
+	representationPseudocode,
 } from "@/lib/graph/representations";
 import type { Graph } from "@/lib/graph/types";
 
@@ -14,6 +15,8 @@ type Props = {
 	selected: GraphRepresentation;
 	onSelect: (representation: GraphRepresentation) => void;
 	onPlay: (representation: GraphRepresentation) => void;
+	onDebug: (representation: GraphRepresentation) => void;
+	execution?: { representation: GraphRepresentation; codeLine: number };
 };
 
 const representations: GraphRepresentation[] = [
@@ -27,6 +30,8 @@ export function GraphRepresentationPanel({
 	selected,
 	onSelect,
 	onPlay,
+	onDebug,
+	execution,
 }: Props) {
 	const vertices = graph.vertices;
 	const edges = graph.edges;
@@ -84,6 +89,15 @@ export function GraphRepresentationPanel({
 										className={`grid size-7 place-items-center rounded-r-md text-[10px] transition-colors hover:bg-muted ${active ? "text-foreground" : "text-muted-foreground"}`}
 									>
 										▶
+									</button>
+									<button
+										type="button"
+										aria-label={`Démarrer en mode pas à pas depuis ${graphRepresentationName(representation)}`}
+										title="Mode debug pas à pas"
+										onClick={() => onDebug(representation)}
+										className={`grid size-7 place-items-center rounded-r-md px-1 text-[9px] font-semibold transition-colors hover:bg-muted ${active ? "text-foreground" : "text-muted-foreground"}`}
+									>
+										pas
 									</button>
 								</div>
 							);
@@ -183,6 +197,37 @@ export function GraphRepresentationPanel({
 					</ol>
 				)}
 			</div>
+			{execution && (
+				<section
+					aria-label="Pseudo-code de l’exécution"
+					className="border-t border-border px-4 py-4 sm:px-5"
+				>
+					<div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+						<h4 className="text-xs font-medium">Pseudo-code exécuté</h4>
+						<span className="text-[11px] text-muted-foreground">
+							{graphRepresentationName(execution.representation)}
+						</span>
+					</div>
+					<ol className="max-h-48 space-y-0.5 overflow-y-auto rounded-lg bg-muted/30 p-2 font-mono text-[11px]">
+						{representationPseudocode[execution.representation].map(
+							({ id, code }, index) => (
+								<li
+									key={`${execution.representation}-${id}`}
+									aria-current={
+										index === execution.codeLine ? "step" : undefined
+									}
+									className={`rounded px-2 py-1 ${index === execution.codeLine ? "construction-code-active" : "text-muted-foreground"}`}
+								>
+									<span className="mr-3 inline-block w-4 text-right opacity-60">
+										{index + 1}
+									</span>
+									{code}
+								</li>
+							),
+						)}
+					</ol>
+				</section>
+			)}
 
 			<footer className="border-t border-border px-4 py-3 sm:px-5">
 				<p className="text-xs text-muted-foreground">
