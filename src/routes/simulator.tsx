@@ -33,6 +33,12 @@ function loadSavedGraph() {
 
 export function SimulatorPage() {
 	const [language] = useLanguage();
+	const [compactLayout, setCompactLayout] = useState(
+		() => window.matchMedia("(max-width: 1023px)").matches,
+	);
+	const [editorOpen, setEditorOpen] = useState(
+		() => !window.matchMedia("(max-width: 1023px)").matches,
+	);
 	const [graph, setGraph] = useState(loadSavedGraph);
 	const [selectedVertex, setSelectedVertex] = useState<Vertex | null>(null);
 	const [representation, setRepresentation] =
@@ -47,6 +53,15 @@ export function SimulatorPage() {
 	const [configMessage, setConfigMessage] = useState("");
 	const [configError, setConfigError] = useState("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	useEffect(() => {
+		const media = window.matchMedia("(max-width: 1023px)");
+		const updateLayout = () => {
+			setCompactLayout(media.matches);
+			setEditorOpen(!media.matches);
+		};
+		media.addEventListener("change", updateLayout);
+		return () => media.removeEventListener("change", updateLayout);
+	}, []);
 	useEffect(() => {
 		try {
 			window.localStorage.setItem(savedGraphKey, serializeGraphConfig(graph));
@@ -184,11 +199,11 @@ export function SimulatorPage() {
 
 	return (
 		<main className="w-full px-4 py-8 text-foreground sm:px-8 sm:py-10 lg:px-10 lg:py-12">
-			<header className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6 sm:mb-12">
+			<header className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-5 sm:mb-12 sm:gap-4 sm:pb-6">
 				<h1 className="text-2xl font-medium tracking-tight">
 					{text(language, "Simulator", "Simulateur")}
 				</h1>
-				<div className="flex flex-wrap gap-2">
+				<div className="flex flex-wrap gap-2 sm:gap-3">
 					<input
 						ref={fileInputRef}
 						type="file"
@@ -204,11 +219,19 @@ export function SimulatorPage() {
 					<Button
 						type="button"
 						variant="outline"
+						className="min-h-10 gap-2 px-3 text-xs sm:text-sm"
 						onClick={() => fileInputRef.current?.click()}
 					>
+						<TransferIcon direction="upload" />
 						{text(language, "Import JSON", "Importer JSON")}
 					</Button>
-					<Button type="button" variant="outline" onClick={handleExport}>
+					<Button
+						type="button"
+						variant="outline"
+						className="min-h-10 gap-2 px-3 text-xs sm:text-sm"
+						onClick={handleExport}
+					>
+						<TransferIcon direction="download" />
 						{text(language, "Export JSON", "Exporter JSON")}
 					</Button>
 				</div>
@@ -227,26 +250,36 @@ export function SimulatorPage() {
 				)}
 			</header>
 
-			<GraphForm
-				graph={graph}
-				onGraphTypeChange={(patch) => {
-					setConstruction(null);
-					setSelectedVertex(null);
-					setGraph((current) => updateGraphType(current, patch));
-				}}
-				onGraphNameChange={(name) => {
-					setConstruction(null);
-					setGraph((current) => ({ ...current, nom: name }));
-				}}
-				onAddVertex={handleAddVertex}
-				onAddEdge={handleAddEdge}
-				onRemoveVertex={handleRemoveVertex}
-				onRemoveEdge={handleRemoveEdge}
-			/>
+			<details
+				open={!compactLayout || editorOpen}
+				onToggle={(event) => setEditorOpen(event.currentTarget.open)}
+				className="mb-6 sm:mb-10"
+			>
+				<summary className="mb-4 flex min-h-12 cursor-pointer list-none items-center justify-between rounded-xl border border-border bg-muted/20 px-4 text-sm font-medium marker:hidden lg:hidden [&::-webkit-details-marker]:hidden">
+					{text(language, "Edit graph", "Modifier le graphe")}
+					<EditIcon />
+				</summary>
+				<GraphForm
+					graph={graph}
+					onGraphTypeChange={(patch) => {
+						setConstruction(null);
+						setSelectedVertex(null);
+						setGraph((current) => updateGraphType(current, patch));
+					}}
+					onGraphNameChange={(name) => {
+						setConstruction(null);
+						setGraph((current) => ({ ...current, nom: name }));
+					}}
+					onAddVertex={handleAddVertex}
+					onAddEdge={handleAddEdge}
+					onRemoveVertex={handleRemoveVertex}
+					onRemoveEdge={handleRemoveEdge}
+				/>
+			</details>
 
 			<section
 				aria-labelledby="graph-title"
-				className="mt-12 border-t border-border pt-8"
+				className="mt-7 border-t border-border pt-6 sm:mt-12 sm:pt-8"
 			>
 				<div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
 					<h2 id="graph-title" className="text-sm font-medium">
@@ -385,6 +418,44 @@ export function SimulatorPage() {
 				)}
 			</section>
 		</main>
+	);
+}
+
+function TransferIcon({ direction }: { direction: "upload" | "download" }) {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth="1.6"
+			className="size-4"
+		>
+			{direction === "upload" ? (
+				<path d="M10 13V3m0 0L6.5 6.5M10 3l3.5 3.5M4 12v4h12v-4" />
+			) : (
+				<path d="M10 3v10m0 0 3.5-3.5M10 13 6.5 9.5M4 13v3h12v-3" />
+			)}
+		</svg>
+	);
+}
+
+function EditIcon() {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth="1.5"
+			className="size-4 text-muted-foreground"
+		>
+			<path d="m12.5 4.5 3 3M4 16l3.2-.7 8.6-8.6a1.6 1.6 0 0 0-2.3-2.3l-8.6 8.6L4 16Z" />
+		</svg>
 	);
 }
 

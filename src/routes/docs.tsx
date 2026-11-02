@@ -102,7 +102,7 @@ const copy: Record<
 		sections: [
 			{
 				title: "Créer un graphe",
-				body: "Choisissez l’orientation et la pondération, puis donnez un nom au graphe. Un changement de type confirmé restaure l’exemple A–D en conservant son nom. Ajoutez ensuite des sommets et reliez-les ; les graphes pondérés demandent un poids numérique. Les graphes orientés acceptent aussi les boucles réflexives, comme A → A.",
+				body: "Choisissez l’orientation et la pondération, puis donnez un nom au graphe. Un changement de type confirmé restaure l’exemple A–D en conservant son nom. Ajoutez ensuite des sommets et reliez-les ; les graphes pondérés demandent un poids numérique. Les graphes orientés acceptent aussi les boucles réflexives, comme A → A. Sur téléphone, ouvrez « Modifier le graphe » pour afficher les commandes et gardez le dessin visible par défaut.",
 			},
 			{
 				title: "Lire la visualisation",
@@ -138,7 +138,7 @@ const copy: Record<
 		sections: [
 			{
 				title: "Create a graph",
-				body: "Choose the orientation and weighting, then name the graph. Confirming a type change restores the A–D sample graph and keeps its name. Add vertices and connect them; weighted graphs ask for a numeric weight. Directed graphs also allow reflexive loops such as A → A.",
+				body: "Choose the orientation and weighting, then name the graph. Confirming a type change restores the A–D sample graph and keeps its name. Add vertices and connect them; weighted graphs ask for a numeric weight. Directed graphs also allow reflexive loops such as A → A. On phones, open “Edit graph” to show the controls; the drawing stays visible by default.",
 			},
 			{
 				title: "Read the visualization",

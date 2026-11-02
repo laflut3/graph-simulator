@@ -115,7 +115,7 @@ export function GraphRepresentationPanel({
 										type="button"
 										aria-pressed={active}
 										onClick={() => onSelect(representation)}
-										className={`h-9 rounded-lg px-3 text-xs font-medium transition-colors ${active ? "bg-muted text-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`}
+										className={`h-10 rounded-lg px-2.5 text-xs font-medium transition-colors sm:h-9 sm:px-3 ${active ? "bg-muted text-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`}
 									>
 										{label}
 									</button>
@@ -132,7 +132,7 @@ export function GraphRepresentationPanel({
 											`Lancer ${graphRepresentationName(representation, language)}`,
 										)}
 										onClick={() => onPlay(representation)}
-										className="grid size-9 place-items-center rounded-lg border border-transparent text-muted-foreground transition-colors hover:border-border hover:bg-muted/70 hover:text-foreground"
+										className="grid size-10 place-items-center rounded-lg border border-transparent text-muted-foreground transition-colors hover:border-border hover:bg-muted/70 hover:text-foreground sm:size-9"
 									>
 										<svg
 											aria-hidden="true"
@@ -156,7 +156,7 @@ export function GraphRepresentationPanel({
 											"Déboguer pas à pas",
 										)}
 										onClick={() => onDebug(representation)}
-										className="grid size-9 place-items-center rounded-lg border border-blue-500/15 bg-blue-500/5 text-blue-600 transition-colors hover:border-blue-500/30 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-400/10"
+										className="grid size-10 place-items-center rounded-lg border border-blue-500/15 bg-blue-500/5 text-blue-600 transition-colors hover:border-blue-500/30 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-400/10 sm:size-9"
 									>
 										<DebugBugIcon />
 									</button>

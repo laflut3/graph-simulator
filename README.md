@@ -12,6 +12,7 @@ A browser-based tool for creating and exploring directed or undirected graphs, w
 - Import and export JSON configurations.
 - Light, dark, and system themes.
 - Installable PWA with an offline app shell.
+- Mobile layout keeps the graph in view, folds editing controls away until needed, and keeps PWA navigation reachable with device safe areas respected.
 - English by default, with French available in the language menu.
 
 ## Routes

@@ -28,12 +28,12 @@ export function HomePage() {
 					)}
 				</p>
 				<div className="mt-7 flex flex-wrap justify-center gap-3">
-					<Button asChild size="lg">
+					<Button asChild size="lg" className="min-h-11">
 						<Link to="/$locale/$page" params={{ locale, page: "simulator" }}>
 							{text(language, "Open simulator", "Ouvrir le simulateur")}
 						</Link>
 					</Button>
-					<Button asChild variant="outline" size="lg">
+					<Button asChild variant="outline" size="lg" className="min-h-11">
 						<Link to="/$locale/$page" params={{ locale, page: "docs" }}>
 							{text(language, "Read the guide", "Lire la documentation")}
 						</Link>

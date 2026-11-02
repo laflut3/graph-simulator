@@ -220,7 +220,7 @@ export function GraphForm({
 											type="button"
 											variant="ghost"
 											size="icon-xs"
-											className="size-6 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+											className="size-10 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:size-7"
 											aria-label={text(
 												language,
 												`Remove vertex ${vertex}`,
@@ -258,7 +258,8 @@ export function GraphForm({
 								)}
 								maxLength={32}
 							/>
-							<Button type="submit" className="rounded-md">
+							<Button type="submit" className="min-h-10 gap-2 rounded-md px-3">
+								<PlusIcon />
 								{text(language, "Add", "Ajouter")}
 							</Button>
 						</div>
@@ -311,7 +312,7 @@ export function GraphForm({
 											type="button"
 											variant="ghost"
 											size="icon-xs"
-											className="size-6 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+											className="size-10 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive sm:size-7"
 											aria-label={text(
 												language,
 												`Remove edge ${edge.first}–${edge.second}`,
@@ -339,7 +340,7 @@ export function GraphForm({
 						>
 							<select
 								aria-label={text(language, "First vertex", "Premier sommet")}
-								className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
+								className="h-11 min-w-0 rounded-md border border-input bg-background px-3 text-sm sm:h-9"
 								value={firstValue}
 								onChange={(event) => setEdgeFirst(event.target.value)}
 								disabled={vertices.length < (graph.directed ? 1 : 2)}
@@ -355,7 +356,7 @@ export function GraphForm({
 							</span>
 							<select
 								aria-label={text(language, "Second vertex", "Second sommet")}
-								className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
+								className="h-11 min-w-0 rounded-md border border-input bg-background px-3 text-sm sm:h-9"
 								value={secondValue}
 								onChange={(event) => setEdgeSecond(event.target.value)}
 								disabled={vertices.length < (graph.directed ? 1 : 2)}
@@ -378,9 +379,10 @@ export function GraphForm({
 							)}
 							<Button
 								type="submit"
-								className="rounded-md"
+								className="min-h-10 gap-2 rounded-md px-3"
 								disabled={vertices.length < (graph.directed ? 1 : 2)}
 							>
+								<PlusIcon />
 								{text(language, "Add", "Ajouter")}
 							</Button>
 						</div>
@@ -394,5 +396,21 @@ export function GraphForm({
 				</section>
 			</div>
 		</div>
+	);
+}
+
+function PlusIcon() {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 16 16"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeWidth="1.6"
+			className="size-4"
+		>
+			<path d="M8 3v10M3 8h10" />
+		</svg>
 	);
 }

@@ -36,8 +36,49 @@
 
 body {
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100svh;
   margin: 0;
+}
+
+.safe-header {
+	padding-top: max(1rem, env(safe-area-inset-top));
+	padding-left: max(1rem, env(safe-area-inset-left));
+	padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+@media (min-width: 640px) {
+	.safe-header {
+		padding-right: max(2rem, env(safe-area-inset-right));
+		padding-left: max(2rem, env(safe-area-inset-left));
+	}
+}
+
+@media (min-width: 1024px) {
+	.safe-header {
+		padding-right: max(2.5rem, env(safe-area-inset-right));
+		padding-left: max(2.5rem, env(safe-area-inset-left));
+	}
+}
+
+.safe-footer {
+	padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
+}
+
+@media (max-width: 639px) {
+	.safe-cookie {
+		right: max(0.75rem, env(safe-area-inset-right));
+		bottom: max(0.75rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+		left: max(0.75rem, env(safe-area-inset-left));
+	}
+}
+
+@media (display-mode: standalone) and (max-width: 767px) {
+	.pwa-header {
+		position: sticky;
+		top: 0;
+		z-index: 40;
+		background: var(--background);
+	}
 }
 
 @theme inline {
