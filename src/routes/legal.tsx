@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createPageHead } from "@/lib/seo";
 
 function LegalPage() {
 	return (
@@ -136,4 +137,13 @@ function LegalPage() {
 	);
 }
 
-export const Route = createFileRoute("/legal")({ component: LegalPage });
+export const Route = createFileRoute("/legal")({
+	head: () =>
+		createPageHead({
+			title: "Informations légales | Graph Simulator",
+			description:
+				"Mentions légales, politique de confidentialité et informations sur les cookies de Graph Simulator.",
+			path: "/legal",
+		}),
+	component: LegalPage,
+});

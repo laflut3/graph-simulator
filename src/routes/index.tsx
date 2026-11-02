@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { createPageHead } from "@/lib/seo";
 
 function HomePage() {
 	return (
@@ -27,4 +28,13 @@ function HomePage() {
 	);
 }
 
-export const Route = createFileRoute("/")({ component: HomePage });
+export const Route = createFileRoute("/")({
+	head: () =>
+		createPageHead({
+			title: "Simulateur de graphes en ligne | Graph Simulator",
+			description:
+				"Créez un graphe non orienté, ajoutez des sommets et des arêtes, puis explorez ses composantes, ses cycles et ses représentations.",
+			path: "/",
+		}),
+	component: HomePage,
+});

@@ -1,4 +1,38 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"redirects": [
+		{
+			"source": "/docs/",
+			"destination": "/docs",
+			"permanent": true
+		},
+		{
+			"source": "/legal/",
+			"destination": "/legal",
+			"permanent": true
+		},
+		{
+			"source": "/simulator/",
+			"destination": "/simulator",
+			"permanent": true
+		}
+	],
+	"rewrites": [
+		{
+			"source": "/docs",
+			"destination": "/docs/index.html"
+		},
+		{
+			"source": "/legal",
+			"destination": "/legal/index.html"
+		},
+		{
+			"source": "/simulator",
+			"destination": "/simulator/index.html"
+		},
+		{
+			"source": "/(.*)",
+			"destination": "/index.html"
+		}
+	]
 }

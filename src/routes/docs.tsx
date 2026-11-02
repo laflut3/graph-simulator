@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { createPageHead } from "@/lib/seo";
 
 type Language = "fr" | "en";
 type Section = { title: string; body: string };
@@ -200,4 +201,13 @@ function DocsPage() {
 	);
 }
 
-export const Route = createFileRoute("/docs")({ component: DocsPage });
+export const Route = createFileRoute("/docs")({
+	head: () =>
+		createPageHead({
+			title: "Documentation du simulateur de graphes | Graph Simulator",
+			description:
+				"Apprenez à créer un graphe non orienté, lire sa matrice d’adjacence et ses listes de voisins, et comprendre ses composantes et cycles.",
+			path: "/docs",
+		}),
+	component: DocsPage,
+});
