@@ -6,7 +6,7 @@ import {
 	text,
 	useLanguage,
 } from "@/lib/i18n";
-import { createPageHead } from "@/lib/seo";
+import { createLocalizedPageHead } from "@/lib/seo";
 
 export function HomePage() {
 	const [language] = useLanguage();
@@ -46,18 +46,15 @@ export function HomePage() {
 
 export const Route = createFileRoute("/")({
 	beforeLoad: () => {
-		const language: Language =
-			window.localStorage.getItem("graph-simulator-language") === "fr"
-				? "fr"
-				: "en";
+		let language: Language = "en";
+		try {
+			if (window.localStorage.getItem("graph-simulator-language") === "fr")
+				language = "fr";
+		} catch {
+			// Default to English when browser storage is unavailable.
+		}
 		throw redirect({ href: `/${localeFromLanguage(language)}/` });
 	},
-	head: () =>
-		createPageHead({
-			title: "Simulateur de graphes en ligne | Graph Simulator",
-			description:
-				"Créez un graphe orienté ou non orienté, ajoutez des poids et explorez ses composantes, ses cycles et ses représentations.",
-			path: "/",
-		}),
+	head: () => createLocalizedPageHead("home", "en", "/en-us/"),
 	component: HomePage,
 });

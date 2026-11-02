@@ -1,18 +1,26 @@
 # Graph Simulator
 
-> A free, browser-based tool for creating and exploring directed or undirected graphs.
+> A free, browser-based graph theory simulator for creating, visualizing, and studying graphs.
 
-Create word- or letter-labeled vertices, connect them, inspect components and cycles, and compare neighbor lists, adjacency matrices, and edge lists. JSON files are processed in the browser.
+Graph Simulator lets learners create directed or undirected, weighted or unweighted graphs. Add named vertices and edges, including directed self-loops; inspect connected components and simple cycles; compare neighbor lists, adjacency matrices, and edge lists; and follow representation-building algorithms step by step. Graphs and imported JSON files stay in the browser.
+
+The site is available in English and French. Each language has a stable URL. The interactive simulator and its documentation are public pages; legal information is available separately.
 
 ## Pages
 
 - English home: https://graph.fleothing.com/en-us/
-- English simulator: https://graph.fleothing.com/en-us/simulator
+- English interactive simulator: https://graph.fleothing.com/en-us/simulator
 - English documentation: https://graph.fleothing.com/en-us/docs
 - French home: https://graph.fleothing.com/fr-fr/
-- French simulator: https://graph.fleothing.com/fr-fr/simulator
+- French interactive simulator: https://graph.fleothing.com/fr-fr/simulator
 - French documentation: https://graph.fleothing.com/fr-fr/docs
-- Legal information: https://graph.fleothing.com/en-us/legal and https://graph.fleothing.com/fr-fr/legal
+- English legal information: https://graph.fleothing.com/en-us/legal
+- French legal information: https://graph.fleothing.com/fr-fr/legal
+
+## Discovery
+
+- Sitemap: https://graph.fleothing.com/sitemap.xml
+- Robots policy: https://graph.fleothing.com/robots.txt
 
 ## Project
 

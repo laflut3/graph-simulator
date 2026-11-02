@@ -56,7 +56,9 @@ If `oriente` or `pondere` is omitted, it defaults to `false`. For directed graph
 
 ## SEO and deployment
 
-The production domain is `graph.fleothing.com`, hosted on Vercel. The build script creates localized HTML entry pages for the English and French routes, with route-specific titles, descriptions, canonical URLs, and `hreflang` links. The simulator is marked `noindex`. `public/sitemap.xml` lists the public home, documentation, and legal pages; `public/robots.txt` points crawlers to the sitemap, and `public/llms.txt` summarizes the site.
+The production domain is `graph.fleothing.com`, hosted on Vercel. `src/lib/seo-content.json` is the shared source for localized page titles and descriptions; TanStack Router adds the matching canonical, reciprocal `hreflang`, social metadata, and JSON-LD to each route. `public/sitemap.xml` lists every English and French page with its language alternates. `public/robots.txt` points crawlers to the sitemap, and `public/llms.txt` provides a plain-text site summary for compatible assistants. The simulator is indexable because it is the main public feature.
+
+The root URL uses the browser's saved language when available and defaults to English. Localized URLs remain directly accessible and are listed separately for crawlers. Vercel rewrites only the declared localized routes to the Vite app shell.
 
 To submit the site to Google, verify `graph.fleothing.com` as a Domain property in [Google Search Console](https://search.google.com/search-console) using the DNS TXT record Google provides. Then submit `https://graph.fleothing.com/sitemap.xml` under **Sitemaps**. Submission helps Google discover pages but does not guarantee indexing.
 

@@ -17,7 +17,6 @@ import {
 import type { GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
 import { type Language, text, useLanguage } from "@/lib/i18n";
-import { createPageHead } from "@/lib/seo";
 
 const savedGraphKey = "graph-simulator-graph-v1";
 
@@ -473,13 +472,5 @@ export const Route = createFileRoute("/simulator")({
 			},
 		});
 	},
-	head: () =>
-		createPageHead({
-			title: "Simulateur de graphes interactif | Graph Simulator",
-			description:
-				"Construisez un graphe dans votre navigateur et visualisez ses représentations, composantes connexes et cycles.",
-			path: "/simulator",
-			robots: "noindex, follow",
-		}),
 	component: SimulatorPage,
 });

@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://graph.fleothing.com/en-us/</loc><xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/"/><xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/"/></url>
-  <url><loc>https://graph.fleothing.com/en-us/docs</loc><xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/docs"/><xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/docs"/></url>
-  <url><loc>https://graph.fleothing.com/en-us/legal</loc><xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/legal"/><xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/legal"/></url>
+  <url>
+    <loc>https://graph.fleothing.com/en-us/</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/fr-fr/</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/en-us/docs</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/docs" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/docs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/docs" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/fr-fr/docs</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/docs" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/docs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/docs" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/en-us/legal</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/legal" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/legal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/legal" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/fr-fr/legal</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/legal" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/legal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/legal" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/en-us/simulator</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/simulator" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/simulator" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/simulator" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/fr-fr/simulator</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/simulator" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/simulator" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/simulator" />
+  </url>
 </urlset>

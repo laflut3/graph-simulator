@@ -6,7 +6,6 @@ import {
 	text,
 	useLanguage,
 } from "@/lib/i18n";
-import { createPageHead } from "@/lib/seo";
 
 type Section = { title: string; body: string };
 const graphExamples = [
@@ -311,12 +310,5 @@ export const Route = createFileRoute("/docs")({
 			params: { locale: localeFromLanguage(language), page: "docs" },
 		});
 	},
-	head: () =>
-		createPageHead({
-			title: "Documentation du simulateur de graphes | Graph Simulator",
-			description:
-				"Apprenez à créer des graphes orientés ou non orientés, pondérés ou non, et à lire leurs représentations, composantes et cycles.",
-			path: "/docs",
-		}),
 	component: DocsPage,
 });

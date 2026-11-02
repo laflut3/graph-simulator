@@ -87,7 +87,7 @@ export function SiteLayout() {
 		} catch {
 			// The URL still determines the language when storage is unavailable.
 		}
-		document.documentElement.lang = language;
+		document.documentElement.lang = language === "en" ? "en-US" : "fr-FR";
 	}, [language]);
 
 	useEffect(() => {

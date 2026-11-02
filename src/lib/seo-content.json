@@ -1,0 +1,42 @@
+{
+	"siteName": "Graph Simulator",
+	"author": "Léo Torres",
+	"pages": {
+		"en": {
+			"home": {
+				"title": "Free Online Graph Simulator | Graph Theory",
+				"description": "Create directed or undirected graphs online. Add weights, visualize graph representations, and explore connected components and cycles."
+			},
+			"simulator": {
+				"title": "Interactive Graph Simulator | Graph Simulator",
+				"description": "Build and edit a graph in your browser. Explore neighbor lists, adjacency matrices, edge lists, components, and cycles."
+			},
+			"docs": {
+				"title": "Graph Simulator Guide | Graph Theory Documentation",
+				"description": "Learn how to build directed and weighted graphs, read graph representations, inspect components and cycles, and import or export JSON."
+			},
+			"legal": {
+				"title": "Privacy & Legal Information | Graph Simulator",
+				"description": "Read the privacy, local storage, cookie, publisher, and hosting information for Graph Simulator."
+			}
+		},
+		"fr": {
+			"home": {
+				"title": "Simulateur de graphes en ligne | Théorie des graphes",
+				"description": "Créez des graphes orientés ou non orientés. Ajoutez des poids, visualisez leurs représentations, composantes connexes et cycles."
+			},
+			"simulator": {
+				"title": "Simulateur de graphes interactif | Graph Simulator",
+				"description": "Créez et modifiez un graphe dans votre navigateur. Explorez listes de voisins, matrices, arêtes, composantes et cycles."
+			},
+			"docs": {
+				"title": "Guide du simulateur de graphes | Théorie des graphes",
+				"description": "Apprenez à créer des graphes orientés et pondérés, lire leurs représentations, étudier composantes et cycles, et gérer les fichiers JSON."
+			},
+			"legal": {
+				"title": "Confidentialité et informations légales | Graph Simulator",
+				"description": "Consultez les informations sur la confidentialité, le stockage local, les cookies, l’éditeur et l’hébergement de Graph Simulator."
+			}
+		}
+	}
+}

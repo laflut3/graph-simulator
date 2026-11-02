@@ -1,6 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { type Language, localeFromLanguage, useLanguage } from "@/lib/i18n";
-import { createPageHead } from "@/lib/seo";
 
 export function LegalPage() {
 	const [language] = useLanguage();
@@ -116,11 +115,5 @@ export const Route = createFileRoute("/legal")({
 			params: { locale: localeFromLanguage(language), page: "legal" },
 		});
 	},
-	head: () =>
-		createPageHead({
-			title: "Legal information | Graph Simulator",
-			description: "Legal and privacy information for Graph Simulator.",
-			path: "/legal",
-		}),
 	component: LegalPage,
 });
