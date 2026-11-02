@@ -19,8 +19,19 @@ type InstallPromptEvent = Event & {
 	userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
+function loadTheme(): Theme {
+	try {
+		const theme = window.localStorage.getItem("graph-simulator-theme");
+		if (theme === "light" || theme === "dark" || theme === "system")
+			return theme;
+	} catch {
+		// Keep the app usable when browser storage is unavailable.
+	}
+	return "system";
+}
+
 export function SiteLayout() {
-	const [theme, setTheme] = useState<Theme>("system");
+	const [theme, setTheme] = useState<Theme>(loadTheme);
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
@@ -28,7 +39,11 @@ export function SiteLayout() {
 	const language: Language = pathname.startsWith("/fr-fr") ? "fr" : "en";
 	const locale = localeFromLanguage(language);
 	const setLanguage = (nextLanguage: Language) => {
-		window.localStorage.setItem("graph-simulator-language", nextLanguage);
+		try {
+			window.localStorage.setItem("graph-simulator-language", nextLanguage);
+		} catch {
+			// The destination URL still keeps the selected language.
+		}
 		const suffix = pathname.replace(/^\/(?:en-us|fr-fr)/, "");
 		if (!suffix || suffix === "/") {
 			window.location.assign(`/${localeFromLanguage(nextLanguage)}/`);
@@ -76,14 +91,6 @@ export function SiteLayout() {
 	}, [language]);
 
 	useEffect(() => {
-		const savedTheme = window.localStorage.getItem("graph-simulator-theme");
-		if (
-			savedTheme === "system" ||
-			savedTheme === "light" ||
-			savedTheme === "dark"
-		) {
-			setTheme(savedTheme);
-		}
 		if (!window.sessionStorage.getItem("graph-simulator-cookie-notice")) {
 			setCookieNoticeOpen(true);
 		}
@@ -102,7 +109,11 @@ export function SiteLayout() {
 		};
 		applyTheme();
 		if (theme === "system") colorScheme.addEventListener("change", applyTheme);
-		window.localStorage.setItem("graph-simulator-theme", theme);
+		try {
+			window.localStorage.setItem("graph-simulator-theme", theme);
+		} catch {
+			// The selected theme still applies for this session.
+		}
 		return () => colorScheme.removeEventListener("change", applyTheme);
 	}, [theme]);
 
