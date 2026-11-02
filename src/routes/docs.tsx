@@ -27,7 +27,7 @@ const copy: Record<
 			},
 			{
 				title: "Représentations et algorithmes",
-				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes. ▶ reconstruit le graphe ; l’icône debug avance une instruction à la fois. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Le pseudo-code et l’élément en cours sont surlignés. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
+				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes. ▶ reconstruit le graphe ; l’icône debug avance une instruction à la fois. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Le pseudo-code, l’élément du dessin et son entrée dans la représentation sont surlignés en bleu. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
 			},
 			{
 				title: "Importer et télécharger",
@@ -63,7 +63,7 @@ const copy: Record<
 			},
 			{
 				title: "Representations and algorithms",
-				body: "Choose neighbor lists, the matrix, or the edge list. ▶ rebuilds the graph; the bug icon advances one instruction at a time. The trace shows every loop check, condition branch, and return to a loop. The pseudocode and current element are highlighted. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
+				body: "Choose neighbor lists, the matrix, or the edge list. ▶ rebuilds the graph; the bug icon advances one instruction at a time. The trace shows every loop check, condition branch, and return to a loop. The pseudocode, current graph element, and its representation entry are highlighted in blue. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
 			},
 			{
 				title: "Import and download",

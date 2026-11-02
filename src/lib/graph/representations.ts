@@ -210,6 +210,7 @@ export function buildGraphFromRepresentation(
 						: `Tester la boucle des voisins : v = ${neighbor}`,
 					4,
 					vertex,
+					{ first: vertex, second: neighbor },
 				);
 				const key = edgeKey(vertex, neighbor);
 				if (seen.has(key)) {
@@ -219,6 +220,7 @@ export function buildGraphFromRepresentation(
 							: `Condition fausse : {${vertex}, ${neighbor}} existe déjà ; ignorer`,
 						5,
 						vertex,
+						{ first: vertex, second: neighbor },
 					);
 				} else {
 					seen.add(key);
@@ -228,6 +230,7 @@ export function buildGraphFromRepresentation(
 							: `Condition vraie : {${vertex}, ${neighbor}} est nouvelle`,
 						5,
 						vertex,
+						{ first: vertex, second: neighbor },
 					);
 					const edge = { first: vertex, second: neighbor };
 					built.edges.push(edge);
@@ -246,6 +249,7 @@ export function buildGraphFromRepresentation(
 						: `Retour à la boucle des voisins pour u = ${vertex}`,
 					4,
 					vertex,
+					{ first: vertex, second: neighbor },
 				);
 			}
 			addStep(

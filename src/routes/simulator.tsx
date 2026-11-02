@@ -368,6 +368,8 @@ export function SimulatorPage() {
 								? {
 										representation: construction.representation,
 										codeLine: currentStep.codeLine,
+										currentVertex: currentStep.currentVertex,
+										currentEdge: currentStep.currentEdge,
 									}
 								: undefined
 						}

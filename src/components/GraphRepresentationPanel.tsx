@@ -17,7 +17,12 @@ type Props = {
 	onSelect: (representation: GraphRepresentation) => void;
 	onPlay: (representation: GraphRepresentation) => void;
 	onDebug: (representation: GraphRepresentation) => void;
-	execution?: { representation: GraphRepresentation; codeLine: number };
+	execution?: {
+		representation: GraphRepresentation;
+		codeLine: number;
+		currentVertex?: string;
+		currentEdge?: Graph["edges"][number];
+	};
 };
 
 const representations: GraphRepresentation[] = [
@@ -63,6 +68,12 @@ export function GraphRepresentationPanel({
 		() => createNeighborLists({ vertices, edges }),
 		[vertices, edges],
 	);
+	const currentVertex = execution?.currentVertex;
+	const currentEdge = execution?.currentEdge;
+	const isCurrentEdge = (first: string, second: string) =>
+		currentEdge !== undefined &&
+		((currentEdge.first === first && currentEdge.second === second) ||
+			(currentEdge.first === second && currentEdge.second === first));
 
 	return (
 		<section
@@ -163,15 +174,42 @@ export function GraphRepresentationPanel({
 						{vertices.map((vertex) => (
 							<li
 								key={vertex}
-								className="flex min-w-0 gap-2 rounded-md px-2 py-1.5 even:bg-muted/40"
+								aria-current={currentVertex === vertex ? "step" : undefined}
+								className={`flex min-w-0 gap-2 rounded-md px-2 py-1.5 even:bg-muted/40 ${currentVertex === vertex ? "construction-item-active" : ""}`}
 							>
-								<span className="min-w-12 truncate font-mono font-medium">
+								<span
+									className={`min-w-12 truncate font-mono font-medium ${currentVertex === vertex ? "text-[var(--construction-active)]" : ""}`}
+								>
 									{vertex}
 								</span>
 								<span className="break-all text-muted-foreground">
-									{neighbors.get(vertex)?.length
-										? `{${neighbors.get(vertex)?.join(", ")}}`
-										: "∅"}
+									{neighbors.get(vertex)?.length ? (
+										<>
+											&#123;
+											{neighbors.get(vertex)?.map((neighbor, index) => (
+												<span key={neighbor}>
+													{index > 0 && ", "}
+													<span
+														aria-current={
+															isCurrentEdge(vertex, neighbor)
+																? "step"
+																: undefined
+														}
+														className={
+															isCurrentEdge(vertex, neighbor)
+																? "rounded-sm bg-blue-500/15 px-0.5 text-[var(--construction-active)]"
+																: ""
+														}
+													>
+														{neighbor}
+													</span>
+												</span>
+											))}
+											&#125;
+										</>
+									) : (
+										"∅"
+									)}
 								</span>
 							</li>
 						))}
@@ -192,7 +230,7 @@ export function GraphRepresentationPanel({
 										<th
 											scope="col"
 											key={vertex}
-											className="min-w-8 px-2 py-2 font-medium"
+											className={`min-w-8 px-2 py-2 font-medium ${currentVertex === vertex || currentEdge?.first === vertex || currentEdge?.second === vertex ? "construction-item-active" : ""}`}
 										>
 											{vertex}
 										</th>
@@ -204,18 +242,40 @@ export function GraphRepresentationPanel({
 									<tr key={vertex} className="border-t border-border">
 										<th
 											scope="row"
-											className="sticky left-0 bg-muted/80 px-2 py-2 font-medium"
+											aria-current={
+												currentVertex === vertex ||
+												currentEdge?.first === vertex ||
+												currentEdge?.second === vertex
+													? "step"
+													: undefined
+											}
+											className={`sticky left-0 bg-muted/80 px-2 py-2 font-medium ${currentVertex === vertex || currentEdge?.first === vertex || currentEdge?.second === vertex ? "construction-item-active" : ""}`}
 										>
 											{vertex}
 										</th>
-										{matrix[row].map((value, column) => (
-											<td
-												key={`${vertex}-${vertices[column]}`}
-												className={`px-2 py-2 ${value ? "font-semibold text-foreground" : "text-muted-foreground/60"}`}
-											>
-												{value}
-											</td>
-										))}
+										{matrix[row].map((value, column) => {
+											const columnVertex = vertices[column];
+											const currentCell =
+												columnVertex !== undefined &&
+												isCurrentEdge(vertex, columnVertex);
+											const currentVertexCell =
+												currentEdge === undefined &&
+												currentVertex === vertex &&
+												currentVertex === columnVertex;
+											return (
+												<td
+													key={`${vertex}-${columnVertex}`}
+													aria-current={
+														currentCell || currentVertexCell
+															? "step"
+															: undefined
+													}
+													className={`px-2 py-2 ${currentCell || currentVertexCell ? "construction-item-active" : value ? "font-semibold text-foreground" : "text-muted-foreground/60"}`}
+												>
+													{value}
+												</td>
+											);
+										})}
 									</tr>
 								))}
 							</tbody>
@@ -228,7 +288,10 @@ export function GraphRepresentationPanel({
 							edges.map(({ first, second }, index) => (
 								<li
 									key={`${first}-${second}`}
-									className="flex gap-3 rounded-md px-2 py-1.5 even:bg-muted/40"
+									aria-current={
+										isCurrentEdge(first, second) ? "step" : undefined
+									}
+									className={`flex gap-3 rounded-md px-2 py-1.5 even:bg-muted/40 ${isCurrentEdge(first, second) ? "construction-item-active" : ""}`}
 								>
 									<span className="font-mono text-muted-foreground">
 										{index + 1}.

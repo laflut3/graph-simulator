@@ -7,7 +7,7 @@ A browser-based tool for creating and exploring simple undirected graphs. Add na
 - Vertices can use letters, words, or short labels.
 - View vertex degree, connected components, simple cycles, and selected-vertex details.
 - Compare neighbor lists, adjacency matrices, and edge lists.
-- Animate each representation's construction or debug it instruction by instruction. The trace shows loop checks, condition branches, and returns to loops.
+- Animate each representation's construction or debug it instruction by instruction. The trace shows loop checks, condition branches, and returns to loops; the active graph element and representation entry are highlighted in blue.
 - Import and export JSON configurations.
 - Light, dark, and system themes.
 - Installable PWA with an offline app shell.
