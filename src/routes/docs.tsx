@@ -15,7 +15,7 @@ const copy: Record<
 		sections: [
 			{
 				title: "Créer un graphe",
-				body: "Ajoutez des sommets avec un nom ou un mot. Choisissez deux sommets pour ajouter une arête. Les listes montrent les éléments présents ; le bouton × les supprime.",
+				body: "Donnez un nom au graphe, puis ajoutez des sommets avec un nom ou un mot. Choisissez deux sommets pour ajouter une arête. Les listes montrent les éléments présents ; le bouton × les supprime.",
 			},
 			{
 				title: "Lire la visualisation",
@@ -24,6 +24,10 @@ const copy: Record<
 			{
 				title: "Composantes et cycles",
 				body: "Une composante connexe regroupe les sommets que l’on peut atteindre les uns depuis les autres. Le degré d’un sommet compte ses arêtes. Un cycle simple revient à son départ sans repasser par un sommet intermédiaire.",
+			},
+			{
+				title: "Représentations et algorithmes",
+				body: "À côté du dessin (ou dessous sur petit écran), choisissez les listes de voisins, la matrice d’adjacence ou la liste d’arêtes ; les listes de voisins sont affichées par défaut. La matrice est symétrique, sa diagonale est nulle et la somme d’une ligne donne le degré du sommet. Pour tester une arête, les coûts sont O(deg(u)) en listes de voisins, O(|E|) en liste d’arêtes et O(1) en matrice. Le stockage demande Θ(|V| + |E|), Θ(|E|) et Θ(|V|²) respectivement. Les visualisations d’algorithmes pas à pas sont à venir.",
 			},
 			{
 				title: "Importer et télécharger",
@@ -43,7 +47,7 @@ const copy: Record<
 		sections: [
 			{
 				title: "Create a graph",
-				body: "Add vertices using names or words. Choose two vertices to add an edge. The lists show the current elements; use × to remove one.",
+				body: "Name the graph, then add vertices using names or words. Choose two vertices to add an edge. The lists show the current elements; use × to remove one.",
 			},
 			{
 				title: "Read the visualization",
@@ -52,6 +56,10 @@ const copy: Record<
 			{
 				title: "Components and cycles",
 				body: "A connected component groups vertices that can reach one another. A vertex’s degree counts its edges. A simple cycle returns to its starting vertex without revisiting an intermediate vertex.",
+			},
+			{
+				title: "Representations and algorithms",
+				body: "Beside the drawing (or below it on small screens), choose the neighbor lists, adjacency matrix, or edge list; neighbor lists are shown by default. The matrix is symmetric, has a zero diagonal, and each row sum gives the vertex degree. Testing an edge takes O(deg(u)) with neighbor lists, O(|E|) with an edge list, and O(1) with a matrix. Storage takes Θ(|V| + |E|), Θ(|E|), and Θ(|V|²), respectively. Step-by-step algorithm visualizations are coming soon.",
 			},
 			{
 				title: "Import and download",

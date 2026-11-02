@@ -1,0 +1,133 @@
+import type { GraphAnalysis } from "@/lib/graph/analyze";
+import type { Vertex } from "@/lib/graph/types";
+
+type Props = {
+	analysis: GraphAnalysis;
+	selectedVertex: Vertex | null;
+	onSelectVertex: (vertex: Vertex | null) => void;
+};
+
+export function GraphInsights({
+	analysis,
+	selectedVertex,
+	onSelectVertex,
+}: Props) {
+	const componentIndex = analysis.components.findIndex((component) =>
+		component.includes(selectedVertex ?? ""),
+	);
+	const selectedComponent = analysis.components[componentIndex] ?? [];
+	const cyclesForVertex = analysis.cycles.filter((cycle) =>
+		cycle.includes(selectedVertex ?? ""),
+	);
+	const listVertices = (vertices: Vertex[]) => vertices.join(", ");
+
+	return (
+		<div className="-mx-4 grid gap-3 px-4 md:grid-cols-2 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10">
+			<section
+				aria-label="Composantes connexes"
+				className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5"
+			>
+				<div className="flex items-baseline justify-between gap-3">
+					<h2 className="text-sm font-medium">Composantes connexes</h2>
+					<span className="font-mono text-xs text-muted-foreground">
+						{analysis.components.length}
+					</span>
+				</div>
+				<ul className="mt-3 max-h-36 space-y-1.5 overflow-y-auto text-sm text-muted-foreground">
+					{analysis.components.map((component, index) => (
+						<li
+							key={JSON.stringify(component)}
+							className={
+								index === componentIndex ? "font-medium text-foreground" : ""
+							}
+						>
+							<span className="mr-2 font-mono text-xs">C{index + 1}</span>
+							&#123;{listVertices(component)}&#125;
+						</li>
+					))}
+				</ul>
+			</section>
+			<section
+				aria-label="Cycles simples"
+				className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5"
+			>
+				<div className="flex items-baseline justify-between gap-3">
+					<h2 className="text-sm font-medium">Cycles simples</h2>
+					<span className="font-mono text-xs text-muted-foreground">
+						{analysis.cycles.length}
+					</span>
+				</div>
+				{analysis.cycles.length ? (
+					<ul className="mt-3 max-h-36 space-y-1.5 overflow-y-auto text-sm text-muted-foreground">
+						{analysis.cycles.map((cycle) => (
+							<li
+								key={JSON.stringify(cycle)}
+								className={
+									cyclesForVertex.includes(cycle)
+										? "font-medium text-foreground"
+										: ""
+								}
+							>
+								{cycle.join(" → ")} → {cycle[0]}
+							</li>
+						))}
+					</ul>
+				) : (
+					<p className="mt-3 text-sm text-muted-foreground">
+						Aucun cycle dans ce graphe.
+					</p>
+				)}
+			</section>
+
+			{selectedVertex !== null && (
+				<section
+					aria-live="polite"
+					className="col-span-full rounded-xl border border-primary/30 bg-background p-4 sm:p-5"
+				>
+					<div className="flex items-start justify-between gap-4">
+						<div>
+							<p className="font-mono text-xs text-muted-foreground">
+								SOMMET SÉLECTIONNÉ
+							</p>
+							<h2 className="mt-1 text-lg font-medium">{selectedVertex}</h2>
+						</div>
+						<button
+							type="button"
+							onClick={() => onSelectVertex(null)}
+							className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-muted"
+							aria-label="Fermer les détails du sommet"
+						>
+							Fermer
+						</button>
+					</div>
+					<div className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
+						<div>
+							<p className="text-xs text-muted-foreground">Degré</p>
+							<p className="mt-1">{analysis.degree.get(selectedVertex) ?? 0}</p>
+						</div>
+						<div>
+							<p className="text-xs text-muted-foreground">
+								Composante C{componentIndex + 1}
+							</p>
+							<p className="mt-1">
+								&#123;{listVertices(selectedComponent)}&#125;
+							</p>
+						</div>
+						<div>
+							<p className="text-xs text-muted-foreground">
+								Cycles contenant ce sommet
+							</p>
+							<p className="mt-1">
+								{cyclesForVertex.length
+									? cyclesForVertex
+											.map((cycle) => `${cycle.join(" → ")} → ${cycle[0]}`)
+											.join(" ; ")
+									: "Aucun"}
+							</p>
+						</div>
+					</div>
+				</section>
+			)}
+		</div>
+	);
+}

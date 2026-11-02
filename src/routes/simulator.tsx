@@ -1,22 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { type ChangeEvent, useMemo, useRef, useState } from "react";
 import { GraphForm } from "@/components/GraphForm";
+import { GraphInsights } from "@/components/GraphInsights";
+import { GraphRepresentationPanel } from "@/components/GraphRepresentationPanel";
 import { GraphVisualization } from "@/components/GraphVisualization";
 import { Button } from "@/components/ui/button";
 import { analyzeGraph } from "@/lib/graph/analyze";
 import { createGraph } from "@/lib/graph/create";
 import { addEdge, removeEdge } from "@/lib/graph/edges";
 import { parseGraphConfig, serializeGraphConfig } from "@/lib/graph/io";
+import type { GraphRepresentation } from "@/lib/graph/representations";
 import type { GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
 
 function SimulatorPage() {
 	const [graph, setGraph] = useState(createGraph);
 	const [selectedVertex, setSelectedVertex] = useState<Vertex | null>(null);
+	const [representation, setRepresentation] =
+		useState<GraphRepresentation>("neighbor-list");
 	const [configMessage, setConfigMessage] = useState("");
 	const [configError, setConfigError] = useState("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const analysis = useMemo(() => analyzeGraph(graph), [graph]);
+	const vertices = graph.vertices;
+	const edges = graph.edges;
+	const analysis = useMemo(
+		() => analyzeGraph({ vertices, edges }),
+		[vertices, edges],
+	);
 
 	const handleExport = () => {
 		const fileName =
@@ -111,10 +121,7 @@ function SimulatorPage() {
 						G = [V, E]
 					</h1>
 					<div className="text-right">
-						<p className="text-sm font-medium">{graph.nom}</p>
-						<p className="mt-1 text-xs text-muted-foreground">
-							Graphe non orienté simple
-						</p>
+						<p className="text-sm font-medium">Graphe non orienté simple</p>
 					</div>
 				</div>
 				<p className="mt-3 min-h-5 text-sm text-destructive" role="alert">
@@ -130,6 +137,9 @@ function SimulatorPage() {
 
 			<GraphForm
 				graph={graph}
+				onGraphNameChange={(name) =>
+					setGraph((current) => ({ ...current, nom: name }))
+				}
 				onAddVertex={handleAddVertex}
 				onAddEdge={handleAddEdge}
 				onRemoveVertex={handleRemoveVertex}
@@ -148,8 +158,20 @@ function SimulatorPage() {
 						{graph.vertices.length} sommets · {graph.edges.length} arêtes
 					</span>
 				</div>
-				<GraphVisualization
-					{...graph}
+				<div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+					<GraphVisualization
+						{...graph}
+						analysis={analysis}
+						selectedVertex={selectedVertex}
+						onSelectVertex={setSelectedVertex}
+					/>
+					<GraphRepresentationPanel
+						graph={graph}
+						selected={representation}
+						onSelect={setRepresentation}
+					/>
+				</div>
+				<GraphInsights
 					analysis={analysis}
 					selectedVertex={selectedVertex}
 					onSelectVertex={setSelectedVertex}

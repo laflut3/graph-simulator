@@ -7,7 +7,10 @@ export type GraphAnalysis = {
 };
 
 /** Analyze a simple undirected graph, listing each simple cycle once. */
-export function analyzeGraph({ vertices, edges }: Graph): GraphAnalysis {
+export function analyzeGraph({
+	vertices,
+	edges,
+}: Pick<Graph, "vertices" | "edges">): GraphAnalysis {
 	const neighbors = new Map(vertices.map((vertex) => [vertex, [] as Vertex[]]));
 	const degree = new Map(vertices.map((vertex) => [vertex, 0]));
 	for (const { first, second } of edges) {
