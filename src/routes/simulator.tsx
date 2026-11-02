@@ -13,7 +13,7 @@ import {
 	buildGraphFromRepresentation,
 	type GraphConstructionStep,
 	type GraphRepresentation,
-} from "@/lib/graph/representations";
+} from "@/lib/graph/representation";
 import type { GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
 import { type Language, text, useLanguage } from "@/lib/i18n";

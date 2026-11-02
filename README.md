@@ -30,6 +30,8 @@ pnpm install
 pnpm dev
 ```
 
+Graph analysis and editing live in `src/lib/graph`. Representation data, pseudocode, and each step-by-step builder are separated under `src/lib/graph/representation`; UI components display that data and handle interaction.
+
 Regenerate TanStack routes after changing route files, then build the site:
 
 ```bash

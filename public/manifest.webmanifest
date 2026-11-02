@@ -2,7 +2,7 @@
   "id": "/en-us/",
   "name": "Graph Simulator",
   "short_name": "Graph",
-  "description": "Create and explore simple undirected graphs.",
+  "description": "Create and explore directed or undirected graphs.",
   "lang": "en",
   "start_url": "/en-us/",
   "scope": "/",

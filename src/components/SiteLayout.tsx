@@ -272,8 +272,8 @@ export function SiteLayout() {
 							<p>
 								{text(
 									language,
-									"Undirected graphs, built in your browser.",
-									"Graphes non orientés, construits dans votre navigateur.",
+									"Graphs, built in your browser.",
+									"Graphes construits dans votre navigateur.",
 								)}
 							</p>
 							<button

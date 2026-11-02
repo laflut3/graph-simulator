@@ -45,7 +45,7 @@ const pageCopy: Record<
 		home: {
 			title: "Graph Simulator | Create and explore graphs",
 			description:
-				"Create an undirected graph, connect vertices, and explore connected components, cycles, and graph representations.",
+				"Create directed or undirected graphs, add weights, and explore connected components, cycles, and graph representations.",
 		},
 		simulator: {
 			title: "Graph Simulator | Interactive graph editor",
@@ -55,7 +55,7 @@ const pageCopy: Record<
 		docs: {
 			title: "Graph Simulator | Documentation",
 			description:
-				"Learn how to create undirected graphs and read adjacency matrices, neighbor lists, connected components, and cycles.",
+				"Learn how to create directed or undirected graphs and read adjacency matrices, neighbor lists, connected components, and cycles.",
 		},
 		legal: {
 			title: "Graph Simulator | Legal information",
@@ -67,7 +67,7 @@ const pageCopy: Record<
 		home: {
 			title: "Simulateur de graphes | Créer et explorer",
 			description:
-				"Créez un graphe non orienté, reliez ses sommets et explorez ses composantes, ses cycles et ses représentations.",
+				"Créez des graphes orientés ou non orientés, ajoutez des poids et explorez leurs composantes, cycles et représentations.",
 		},
 		simulator: {
 			title: "Simulateur de graphes | Éditeur interactif",
@@ -77,7 +77,7 @@ const pageCopy: Record<
 		docs: {
 			title: "Simulateur de graphes | Documentation",
 			description:
-				"Apprenez à créer un graphe non orienté et à lire sa matrice d’adjacence, ses listes de voisins, ses composantes et ses cycles.",
+				"Apprenez à créer des graphes orientés ou non orientés et à lire leurs matrices, listes de voisins, composantes et cycles.",
 		},
 		legal: {
 			title: "Simulateur de graphes | Informations légales",

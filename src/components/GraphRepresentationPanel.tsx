@@ -4,10 +4,10 @@ import {
 	createAdjacencyMatrix,
 	createNeighborLists,
 	type GraphRepresentation,
+	getRepresentationPseudocode,
 	graphRepresentationName,
 	representationComplexity,
-	representationPseudocode,
-} from "@/lib/graph/representations";
+} from "@/lib/graph/representation";
 import type { Graph } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
 
@@ -65,86 +65,11 @@ export function GraphRepresentationPanel({
 	const currentVertex = execution?.currentVertex;
 	const currentEdge = execution?.currentEdge;
 	const executedRepresentation = execution?.representation ?? selected;
-	const pseudocode = representationPseudocode[language][
-		executedRepresentation
-	].map((line, index) => {
-		if (executedRepresentation === "neighbor-list") {
-			if (graph.directed && index === 4)
-				return {
-					...line,
-					code:
-						language === "en"
-							? "  for each outgoing neighbor v of u:"
-							: "  pour chaque voisin sortant v de u :",
-				};
-			if (graph.directed && index === 5)
-				return {
-					...line,
-					code:
-						language === "en"
-							? "    if (u, v) is not processed:"
-							: "    si (u, v) n’est pas traité :",
-				};
-			if ((graph.directed || graph.weighted) && index === 6)
-				return {
-					...line,
-					code:
-						language === "en"
-							? `      add ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", weight" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} to G'.E`
-							: `      ajouter ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", poids" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} à G'.E`,
-				};
-		}
-		if (executedRepresentation === "edge-list") {
-			if (graph.directed && index === 3)
-				return {
-					...line,
-					code:
-						language === "en"
-							? "for each arc (u, v) in E:"
-							: "pour chaque arc (u, v) de E :",
-				};
-			if ((graph.directed || graph.weighted) && index === 4)
-				return {
-					...line,
-					code:
-						language === "en"
-							? `  add ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", weight" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} to G'.E`
-							: `  ajouter ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", poids" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} à G'.E`,
-				};
-		}
-		if (executedRepresentation !== "adjacency-matrix") return line;
-		if (index === 4)
-			return {
-				...line,
-				code: graph.directed
-					? language === "en"
-						? "  for each column j:"
-						: "  pour chaque colonne j :"
-					: language === "en"
-						? "  for j from i + 1 to |V|:"
-						: "  pour j de i + 1 à |V| :",
-			};
-		if (index === 5)
-			return {
-				...line,
-				code: graph.weighted
-					? language === "en"
-						? "    if A[i, j] contains an edge weight:"
-						: "    si A[i, j] contient un poids d’arête :"
-					: language === "en"
-						? "    if A[i, j] = 1:"
-						: "    si A[i, j] = 1 :",
-			};
-		if ((graph.directed || graph.weighted) && index === 6)
-			return {
-				...line,
-				code:
-					language === "en"
-						? `      add ${graph.directed ? "(vᵢ, vⱼ" : "{vᵢ, vⱼ"}${graph.weighted ? ", weight" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} to G'.E`
-						: `      ajouter ${graph.directed ? "(vᵢ, vⱼ" : "{vᵢ, vⱼ"}${graph.weighted ? ", poids" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} à G'.E`,
-			};
-		return line;
-	});
+	const pseudocode = getRepresentationPseudocode(
+		graph,
+		executedRepresentation,
+		language,
+	);
 	const isCurrentEdge = (first: string, second: string) =>
 		currentEdge !== undefined &&
 		((currentEdge.first === first && currentEdge.second === second) ||

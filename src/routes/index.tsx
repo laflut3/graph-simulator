@@ -56,7 +56,7 @@ export const Route = createFileRoute("/")({
 		createPageHead({
 			title: "Simulateur de graphes en ligne | Graph Simulator",
 			description:
-				"Créez un graphe non orienté, ajoutez des sommets et des arêtes, puis explorez ses composantes, ses cycles et ses représentations.",
+				"Créez un graphe orienté ou non orienté, ajoutez des poids et explorez ses composantes, ses cycles et ses représentations.",
 			path: "/",
 		}),
 	component: HomePage,

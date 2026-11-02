@@ -21,7 +21,7 @@ export function LegalPage() {
 						"The app uses no advertising or analytics cookies. It saves your graph, theme, and language in local storage and remembers dismissal of this notice for the current tab. You can clear these values in your browser settings.",
 					terms: "Terms of use",
 					termsBody:
-						"This educational tool is provided as is. It supports simple undirected graphs. Cycle enumeration can become slow for dense or large graphs. Check JSON files before sharing them.",
+						"This educational tool is provided as is. Cycle enumeration can become slow for dense or large graphs. Check JSON files before sharing them.",
 					address: "Postal address",
 					addressValue: "Not published.",
 					hosted: "Vercel",
@@ -42,7 +42,7 @@ export function LegalPage() {
 						"L’application n’utilise pas de cookie publicitaire ou de mesure d’audience. Elle enregistre le graphe, le thème et la langue dans le stockage local, et la fermeture de ce bandeau pour l’onglet courant. Vous pouvez effacer ces données dans les réglages du navigateur.",
 					terms: "Conditions d’utilisation",
 					termsBody:
-						"Cet outil pédagogique est fourni en l’état. Il prend en charge les graphes simples non orientés. Le calcul des cycles peut ralentir sur les graphes denses ou volumineux. Vérifiez les fichiers JSON avant de les partager.",
+						"Cet outil pédagogique est fourni en l’état. Le calcul des cycles peut ralentir sur les graphes denses ou volumineux. Vérifiez les fichiers JSON avant de les partager.",
 					address: "Adresse postale",
 					addressValue: "Non publiée.",
 					hosted: "Vercel",

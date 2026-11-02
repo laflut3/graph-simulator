@@ -1,6 +1,6 @@
 # Graph Simulator
 
-> A free, browser-based tool for creating and exploring simple undirected graphs.
+> A free, browser-based tool for creating and exploring directed or undirected graphs.
 
 Create word- or letter-labeled vertices, connect them, inspect components and cycles, and compare neighbor lists, adjacency matrices, and edge lists. JSON files are processed in the browser.
 

@@ -43,8 +43,8 @@ export function GraphForm({
 		),
 		"invalid-edge": text(
 			language,
-			"Choose two different vertices.",
-			"Choisissez deux sommets différents.",
+			"Choose valid vertices.",
+			"Choisissez des sommets valides.",
 		),
 		"invalid-weight": text(
 			language,
@@ -342,7 +342,7 @@ export function GraphForm({
 								className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
 								value={firstValue}
 								onChange={(event) => setEdgeFirst(event.target.value)}
-								disabled={vertices.length < 2}
+								disabled={vertices.length < (graph.directed ? 1 : 2)}
 							>
 								{vertices.map((vertex) => (
 									<option key={vertex} value={vertex}>
@@ -358,7 +358,7 @@ export function GraphForm({
 								className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
 								value={secondValue}
 								onChange={(event) => setEdgeSecond(event.target.value)}
-								disabled={vertices.length < 2}
+								disabled={vertices.length < (graph.directed ? 1 : 2)}
 							>
 								{choicesForSecond.map((vertex) => (
 									<option key={vertex} value={vertex}>
@@ -379,7 +379,7 @@ export function GraphForm({
 							<Button
 								type="submit"
 								className="rounded-md"
-								disabled={vertices.length < 2}
+								disabled={vertices.length < (graph.directed ? 1 : 2)}
 							>
 								{text(language, "Add", "Ajouter")}
 							</Button>
