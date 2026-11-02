@@ -9,6 +9,7 @@ import {
 	representationPseudocode,
 } from "@/lib/graph/representations";
 import type { Graph } from "@/lib/graph/types";
+import { text, useLanguage } from "@/lib/i18n";
 
 type Props = {
 	graph: Graph;
@@ -25,6 +26,24 @@ const representations: GraphRepresentation[] = [
 	"edge-list",
 ];
 
+function DebugBugIcon() {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 16 16"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth="1.35"
+			className="size-4"
+		>
+			<path d="M8 2.1v1.4M5.1 3.7 4 2.6m6.9 1.1L12 2.6M2.2 6h2m7.6 0h2M2.2 10h2m7.6 0h2M8 5.3v7.1" />
+			<rect x="5" y="4" width="6" height="9" rx="3" />
+		</svg>
+	);
+}
+
 export function GraphRepresentationPanel({
 	graph,
 	selected,
@@ -33,6 +52,7 @@ export function GraphRepresentationPanel({
 	onDebug,
 	execution,
 }: Props) {
+	const [language] = useLanguage();
 	const vertices = graph.vertices;
 	const edges = graph.edges;
 	const matrix = useMemo(
@@ -47,69 +67,96 @@ export function GraphRepresentationPanel({
 	return (
 		<section
 			aria-labelledby="representation-title"
-			className="min-w-0 rounded-xl border border-border bg-muted/10"
+			className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card/40 shadow-sm"
 		>
-			<header className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
-				<div>
-					<h3 id="representation-title" className="text-sm font-medium">
-						Représentation du graphe
+			<header className="space-y-4 border-b border-border bg-muted/20 p-4 sm:p-5">
+				<div className="flex flex-wrap items-center justify-between gap-3">
+					<h3 id="representation-title" className="text-sm font-semibold">
+						{text(language, "Representation", "Représentation")}
 					</h3>
-					<p className="mt-1 text-xs text-muted-foreground">
-						Choisissez une vue du graphe.
-					</p>
+					<AlgorithmComingSoon />
 				</div>
-				<div className="flex flex-wrap items-center justify-end gap-2">
-					<div className="flex flex-wrap gap-1 rounded-lg bg-muted/60 p-1">
+				<div className="flex flex-wrap items-center gap-2">
+					<nav
+						aria-label={text(
+							language,
+							"Graph representations",
+							"Représentations du graphe",
+						)}
+						className="flex flex-wrap gap-2"
+					>
 						{representations.map((representation) => {
 							const label =
 								representation === "neighbor-list"
-									? "Voisins"
+									? text(language, "Neighbors", "Voisins")
 									: representation === "adjacency-matrix"
-										? "Matrice"
-										: "Arêtes";
+										? text(language, "Matrix", "Matrice")
+										: text(language, "Edges", "Arêtes");
 							const active = selected === representation;
 							return (
 								<div
 									key={representation}
-									className={`inline-flex items-center rounded-md ${active ? "bg-background shadow-sm" : ""}`}
+									className="inline-flex items-center gap-0.5 rounded-xl border border-border bg-background p-1 shadow-sm"
 								>
 									<button
 										type="button"
 										aria-pressed={active}
 										onClick={() => onSelect(representation)}
-										className={`rounded-l-md px-2 py-1.5 text-xs font-medium transition-colors ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+										className={`h-9 rounded-lg px-3 text-xs font-medium transition-colors ${active ? "bg-muted text-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`}
 									>
 										{label}
 									</button>
 									<button
 										type="button"
-										aria-label={`Lire la construction depuis ${graphRepresentationName(representation)}`}
-										title={`Construire depuis ${graphRepresentationName(representation)}`}
+										aria-label={text(
+											language,
+											`Run ${graphRepresentationName(representation, language)}`,
+											`Lancer ${graphRepresentationName(representation, language)}`,
+										)}
+										title={text(
+											language,
+											`Run ${graphRepresentationName(representation, language)}`,
+											`Lancer ${graphRepresentationName(representation, language)}`,
+										)}
 										onClick={() => onPlay(representation)}
-										className={`grid size-7 place-items-center rounded-r-md text-[10px] transition-colors hover:bg-muted ${active ? "text-foreground" : "text-muted-foreground"}`}
+										className="grid size-9 place-items-center rounded-lg border border-transparent text-muted-foreground transition-colors hover:border-border hover:bg-muted/70 hover:text-foreground"
 									>
-										▶
+										<svg
+											aria-hidden="true"
+											viewBox="0 0 16 16"
+											fill="currentColor"
+											className="size-4"
+										>
+											<path d="M4.25 2.75a.75.75 0 0 1 1.12-.65l8 4.75a.75.75 0 0 1 0 1.3l-8 4.75a.75.75 0 0 1-1.12-.65z" />
+										</svg>
 									</button>
 									<button
 										type="button"
-										aria-label={`Démarrer en mode pas à pas depuis ${graphRepresentationName(representation)}`}
-										title="Mode debug pas à pas"
+										aria-label={text(
+											language,
+											`Debug ${graphRepresentationName(representation, language)} step by step`,
+											`Déboguer ${graphRepresentationName(representation, language)} pas à pas`,
+										)}
+										title={text(
+											language,
+											"Debug step by step",
+											"Déboguer pas à pas",
+										)}
 										onClick={() => onDebug(representation)}
-										className={`grid size-7 place-items-center rounded-r-md px-1 text-[9px] font-semibold transition-colors hover:bg-muted ${active ? "text-foreground" : "text-muted-foreground"}`}
+										className="grid size-9 place-items-center rounded-lg border border-blue-500/15 bg-blue-500/5 text-blue-600 transition-colors hover:border-blue-500/30 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-400/10"
 									>
-										pas
+										<DebugBugIcon />
 									</button>
 								</div>
 							);
 						})}
-					</div>
-					<AlgorithmComingSoon />
+					</nav>
 				</div>
 			</header>
 
 			<div className="min-h-52 p-4 sm:p-5">
 				<p className="mb-3 font-mono text-xs text-muted-foreground">
-					{graphRepresentationName(selected)}
+					{graphRepresentationName(selected, language)}
 				</p>
 				{selected === "neighbor-list" && (
 					<ul className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
@@ -133,7 +180,9 @@ export function GraphRepresentationPanel({
 				{selected === "adjacency-matrix" && (
 					<div className="max-h-80 overflow-auto rounded-md border border-border">
 						<table className="w-full border-collapse text-center font-mono text-xs">
-							<caption className="sr-only">Matrice d’adjacence</caption>
+							<caption className="sr-only">
+								{text(language, "Adjacency matrix", "Matrice d’adjacence")}
+							</caption>
 							<thead className="sticky top-0 bg-muted">
 								<tr>
 									<th scope="col" className="sticky left-0 bg-muted px-2 py-2">
@@ -191,7 +240,7 @@ export function GraphRepresentationPanel({
 							))
 						) : (
 							<li className="py-4 text-center text-xs text-muted-foreground">
-								Aucune arête dans le graphe.
+								{text(language, "No edges.", "Aucune arête.")}
 							</li>
 						)}
 					</ol>
@@ -199,17 +248,20 @@ export function GraphRepresentationPanel({
 			</div>
 			{execution && (
 				<section
-					aria-label="Pseudo-code de l’exécution"
+					aria-label={text(
+						language,
+						"Execution pseudocode",
+						"Pseudo-code de l’exécution",
+					)}
 					className="border-t border-border px-4 py-4 sm:px-5"
 				>
 					<div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-						<h4 className="text-xs font-medium">Pseudo-code exécuté</h4>
-						<span className="text-[11px] text-muted-foreground">
-							{graphRepresentationName(execution.representation)}
-						</span>
+						<h4 className="text-xs font-medium">
+							{text(language, "Pseudocode", "Pseudo-code")}
+						</h4>
 					</div>
-					<ol className="max-h-48 space-y-0.5 overflow-y-auto rounded-lg bg-muted/30 p-2 font-mono text-[11px]">
-						{representationPseudocode[execution.representation].map(
+					<ol className="max-h-48 space-y-0.5 overflow-auto rounded-lg bg-muted/30 p-2 font-mono text-[11px]">
+						{representationPseudocode[language][execution.representation].map(
 							({ id, code }, index) => (
 								<li
 									key={`${execution.representation}-${id}`}
@@ -221,7 +273,7 @@ export function GraphRepresentationPanel({
 									<span className="mr-3 inline-block w-4 text-right opacity-60">
 										{index + 1}
 									</span>
-									{code}
+									<code className="whitespace-pre">{code}</code>
 								</li>
 							),
 						)}
@@ -231,7 +283,7 @@ export function GraphRepresentationPanel({
 
 			<footer className="border-t border-border px-4 py-3 sm:px-5">
 				<p className="text-xs text-muted-foreground">
-					Complexité algorithmique
+					{text(language, "Time complexity", "Complexité algorithmique")}
 					<span className="ml-2 font-mono text-foreground">
 						{representationComplexity[selected]}
 					</span>

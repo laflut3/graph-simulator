@@ -4,6 +4,7 @@ import {
 	type GraphAnalysis,
 } from "@/lib/graph/analyze";
 import type { Graph, Vertex } from "@/lib/graph/types";
+import { text, useLanguage } from "@/lib/i18n";
 
 type Props = Graph & {
 	analysis: GraphAnalysis;
@@ -28,10 +29,15 @@ export function GraphVisualization({
 	currentVertex,
 	currentEdge,
 }: Props) {
+	const [language] = useLanguage();
 	if (!vertices.length && !showEmptyCanvas) {
 		return (
 			<p className="rounded-xl border border-dashed border-border py-14 text-center text-sm text-muted-foreground">
-				Ajoutez des sommets pour afficher le graphe.
+				{text(
+					language,
+					"Add vertices to see the graph.",
+					"Ajoutez des sommets pour afficher le graphe.",
+				)}
 			</p>
 		);
 	}
@@ -68,10 +74,16 @@ export function GraphVisualization({
 			<svg
 				viewBox={`0 0 ${size} ${size}`}
 				role="img"
-				aria-label={`Graphe avec ${vertices.length} sommets et ${edges.length} arêtes`}
+				aria-label={text(
+					language,
+					`Graph with ${vertices.length} vertices and ${edges.length} edges`,
+					`Graphe avec ${vertices.length} sommets et ${edges.length} arêtes`,
+				)}
 				className="mx-auto block aspect-square h-auto w-full max-w-2xl"
 			>
-				<title>Visualisation du graphe</title>
+				<title>
+					{text(language, "Graph visualization", "Visualisation du graphe")}
+				</title>
 				<g strokeWidth="1.5">
 					{edges.map(({ first, second }) => {
 						const a = point(first);
@@ -124,7 +136,11 @@ export function GraphVisualization({
 							role="button"
 							tabIndex={interactive ? 0 : -1}
 							aria-disabled={!interactive}
-							aria-label={`Sommet ${vertex}, degré ${analysis.degree.get(vertex) ?? 0}`}
+							aria-label={text(
+								language,
+								`Vertex ${vertex}, degree ${analysis.degree.get(vertex) ?? 0}`,
+								`Sommet ${vertex}, degré ${analysis.degree.get(vertex) ?? 0}`,
+							)}
 							aria-pressed={isSelected}
 							onClick={
 								interactive

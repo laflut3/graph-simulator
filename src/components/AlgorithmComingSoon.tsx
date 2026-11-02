@@ -1,15 +1,25 @@
+import { text, useLanguage } from "@/lib/i18n";
+
 export function AlgorithmComingSoon() {
+	const [language] = useLanguage();
 	return (
-		<aside
-			aria-labelledby="algorithms-title"
-			className="min-w-36 rounded-lg border border-dashed border-border bg-background px-3 py-2"
-		>
-			<h2 id="algorithms-title" className="text-xs font-medium">
-				Algorithmes
-			</h2>
-			<p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-				Coming soon
-			</p>
-		</aside>
+		<label className="flex items-center gap-2">
+			<span className="sr-only">
+				{text(language, "Algorithms", "Algorithmes")}
+			</span>
+			<select
+				disabled
+				aria-label={text(
+					language,
+					"Algorithms, coming soon",
+					"Algorithmes, bientôt disponibles",
+				)}
+				className="h-10 min-w-40 cursor-not-allowed rounded-lg border border-border bg-background px-3 text-xs text-muted-foreground opacity-80"
+			>
+				<option>
+					{text(language, "Algorithms · Coming soon", "Algorithmes · Bientôt")}
+				</option>
+			</select>
+		</label>
 	);
 }

@@ -1,9 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { type Language, localeFromLanguage, useLanguage } from "@/lib/i18n";
 import { createPageHead } from "@/lib/seo";
 
-type Language = "fr" | "en";
 type Section = { title: string; body: string };
 
 const copy: Record<
@@ -28,15 +27,19 @@ const copy: Record<
 			},
 			{
 				title: "Représentations et algorithmes",
-				body: "À droite du dessin (ou dessous sur petit écran), choisissez les listes de voisins, la matrice d’adjacence ou la liste d’arêtes. Le bouton ▶ associé à chaque vue efface temporairement le dessin, puis reconstruit le graphe sommet par sommet et arête par arête selon cette représentation. La ligne du pseudo-code correspondant à l’étape et l’élément en cours sont mis en bleu. Le bouton « pas » lance le mode debug : utilisez Précédent et Suivant pour parcourir les étapes manuellement. La complexité affichée est celle de cette construction : Θ(|V| + |E|) pour les listes de voisins et la liste d’arêtes, Θ(|V|²) pour la matrice. Les autres algorithmes sont à venir.",
+				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes. ▶ reconstruit le graphe ; l’icône debug avance une instruction à la fois. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Le pseudo-code et l’élément en cours sont surlignés. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
 			},
 			{
 				title: "Importer et télécharger",
-				body: "Les boutons du simulateur chargent ou téléchargent un fichier JSON. L’import vérifie les sommets et les arêtes avant de remplacer le graphe.",
+				body: "Le graphe est enregistré automatiquement dans ce navigateur. Les boutons du simulateur importent ou exportent un fichier JSON ; un import valide remplace le graphe enregistré.",
 			},
 			{
 				title: "Installer l’application",
 				body: "Sur un navigateur compatible, utilisez le bouton Installer ou le menu du navigateur. Après le chargement du site et de ses ressources, le simulateur peut aussi s’ouvrir hors ligne.",
+			},
+			{
+				title: "Choisir la langue",
+				body: "L’anglais est la langue par défaut. Choisissez Français dans le menu pour passer sur /fr-fr/ ; English ouvre /en-us/.",
 			},
 		],
 		format: "Format JSON",
@@ -60,15 +63,19 @@ const copy: Record<
 			},
 			{
 				title: "Representations and algorithms",
-				body: "Beside the drawing (or below it on small screens), choose the neighbor lists, adjacency matrix, or edge list. The ▶ button for each view temporarily clears the drawing, then rebuilds the graph vertex by vertex and edge by edge using that representation. The pseudo-code line for the current step and the element being created are highlighted in blue. The “pas” button starts debug mode; use Previous and Next to move through steps manually. The displayed complexity is for this construction: Θ(|V| + |E|) for neighbor lists and edge lists, and Θ(|V|²) for the matrix. Other algorithms are coming soon.",
+				body: "Choose neighbor lists, the matrix, or the edge list. ▶ rebuilds the graph; the bug icon advances one instruction at a time. The trace shows every loop check, condition branch, and return to a loop. The pseudocode and current element are highlighted. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
 			},
 			{
 				title: "Import and download",
-				body: "Use the simulator buttons to load or download a JSON file. The importer checks the vertices and edges before replacing the graph.",
+				body: "Your graph is saved automatically in this browser. Use the simulator buttons to import or export JSON; a valid import replaces the saved graph.",
 			},
 			{
 				title: "Install the app",
 				body: "In a supported browser, use the Install button or the browser menu. Once the site and its resources have loaded, the simulator can also open offline.",
+			},
+			{
+				title: "Choose a language",
+				body: "English is the default. Choose Français in the menu to switch to /fr-fr/; English opens /en-us/.",
 			},
 		],
 		format: "JSON format",
@@ -76,8 +83,9 @@ const copy: Record<
 	},
 };
 
-function DocsPage() {
-	const [language, setLanguage] = useState<Language>("fr");
+export function DocsPage() {
+	const [language] = useLanguage();
+	const locale = localeFromLanguage(language);
 	const [activeSection, setActiveSection] = useState<number | "format">(0);
 	const content = copy[language];
 	const navItems = [
@@ -98,27 +106,6 @@ function DocsPage() {
 						Documentation
 					</h1>
 				</div>
-				<fieldset className="flex gap-2">
-					<legend className="sr-only">Documentation language</legend>
-					<Button
-						type="button"
-						size="sm"
-						variant={language === "fr" ? "default" : "outline"}
-						aria-pressed={language === "fr"}
-						onClick={() => setLanguage("fr")}
-					>
-						Français
-					</Button>
-					<Button
-						type="button"
-						size="sm"
-						variant={language === "en" ? "default" : "outline"}
-						aria-pressed={language === "en"}
-						onClick={() => setLanguage("en")}
-					>
-						English
-					</Button>
-				</fieldset>
 			</header>
 			<p className="max-w-3xl py-6 text-sm leading-6 text-muted-foreground sm:text-base">
 				{content.intro}
@@ -191,7 +178,8 @@ function DocsPage() {
 			</div>
 			<p className="mt-8">
 				<Link
-					to="/simulator"
+					to="/$locale/$page"
+					params={{ locale, page: "simulator" }}
 					className="text-sm font-medium underline underline-offset-4"
 				>
 					{content.back} →
@@ -202,6 +190,16 @@ function DocsPage() {
 }
 
 export const Route = createFileRoute("/docs")({
+	beforeLoad: () => {
+		const language: Language =
+			window.localStorage.getItem("graph-simulator-language") === "fr"
+				? "fr"
+				: "en";
+		throw redirect({
+			to: "/$locale/$page",
+			params: { locale: localeFromLanguage(language), page: "docs" },
+		});
+	},
 	head: () =>
 		createPageHead({
 			title: "Documentation du simulateur de graphes | Graph Simulator",

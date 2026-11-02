@@ -1,5 +1,6 @@
 import type { GraphAnalysis } from "@/lib/graph/analyze";
 import type { Vertex } from "@/lib/graph/types";
+import { text, useLanguage } from "@/lib/i18n";
 
 type Props = {
 	analysis: GraphAnalysis;
@@ -12,6 +13,7 @@ export function GraphInsights({
 	selectedVertex,
 	onSelectVertex,
 }: Props) {
+	const [language] = useLanguage();
 	const componentIndex = analysis.components.findIndex((component) =>
 		component.includes(selectedVertex ?? ""),
 	);
@@ -22,13 +24,19 @@ export function GraphInsights({
 	const listVertices = (vertices: Vertex[]) => vertices.join(", ");
 
 	return (
-		<div className="-mx-4 grid gap-3 px-4 md:grid-cols-2 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10">
+		<div className="-mx-4 mb-16 grid gap-3 px-4 md:grid-cols-2 sm:-mx-8 sm:px-8 sm:mb-20 lg:-mx-10 lg:px-10">
 			<section
-				aria-label="Composantes connexes"
+				aria-label={text(
+					language,
+					"Connected components",
+					"Composantes connexes",
+				)}
 				className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5"
 			>
 				<div className="flex items-baseline justify-between gap-3">
-					<h2 className="text-sm font-medium">Composantes connexes</h2>
+					<h2 className="text-sm font-medium">
+						{text(language, "Connected components", "Composantes connexes")}
+					</h2>
 					<span className="font-mono text-xs text-muted-foreground">
 						{analysis.components.length}
 					</span>
@@ -48,11 +56,13 @@ export function GraphInsights({
 				</ul>
 			</section>
 			<section
-				aria-label="Cycles simples"
+				aria-label={text(language, "Simple cycles", "Cycles simples")}
 				className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5"
 			>
 				<div className="flex items-baseline justify-between gap-3">
-					<h2 className="text-sm font-medium">Cycles simples</h2>
+					<h2 className="text-sm font-medium">
+						{text(language, "Simple cycles", "Cycles simples")}
+					</h2>
 					<span className="font-mono text-xs text-muted-foreground">
 						{analysis.cycles.length}
 					</span>
@@ -74,7 +84,11 @@ export function GraphInsights({
 					</ul>
 				) : (
 					<p className="mt-3 text-sm text-muted-foreground">
-						Aucun cycle dans ce graphe.
+						{text(
+							language,
+							"No cycles in this graph.",
+							"Aucun cycle dans ce graphe.",
+						)}
 					</p>
 				)}
 			</section>
@@ -86,28 +100,35 @@ export function GraphInsights({
 				>
 					<div className="flex items-start justify-between gap-4">
 						<div>
-							<p className="font-mono text-xs text-muted-foreground">
-								SOMMET SÉLECTIONNÉ
-							</p>
-							<h2 className="mt-1 text-lg font-medium">{selectedVertex}</h2>
+							<h2 className="text-lg font-medium">{selectedVertex}</h2>
 						</div>
 						<button
 							type="button"
 							onClick={() => onSelectVertex(null)}
 							className="rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-muted"
-							aria-label="Fermer les détails du sommet"
+							aria-label={text(
+								language,
+								"Close vertex details",
+								"Fermer les détails du sommet",
+							)}
 						>
-							Fermer
+							×
 						</button>
 					</div>
 					<div className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
 						<div>
-							<p className="text-xs text-muted-foreground">Degré</p>
+							<p className="text-xs text-muted-foreground">
+								{text(language, "Degree", "Degré")}
+							</p>
 							<p className="mt-1">{analysis.degree.get(selectedVertex) ?? 0}</p>
 						</div>
 						<div>
 							<p className="text-xs text-muted-foreground">
-								Composante C{componentIndex + 1}
+								{text(
+									language,
+									`Component C${componentIndex + 1}`,
+									`Composante C${componentIndex + 1}`,
+								)}
 							</p>
 							<p className="mt-1">
 								&#123;{listVertices(selectedComponent)}&#125;
@@ -115,14 +136,18 @@ export function GraphInsights({
 						</div>
 						<div>
 							<p className="text-xs text-muted-foreground">
-								Cycles contenant ce sommet
+								{text(
+									language,
+									"Cycles containing this vertex",
+									"Cycles contenant ce sommet",
+								)}
 							</p>
 							<p className="mt-1">
 								{cyclesForVertex.length
 									? cyclesForVertex
 											.map((cycle) => `${cycle.join(" → ")} → ${cycle[0]}`)
 											.join(" ; ")
-									: "Aucun"}
+									: text(language, "None", "Aucun")}
 							</p>
 						</div>
 					</div>

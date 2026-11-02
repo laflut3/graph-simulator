@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://graph.fleothing.com/</loc>
-  </url>
-  <url>
-    <loc>https://graph.fleothing.com/docs</loc>
-  </url>
-  <url>
-    <loc>https://graph.fleothing.com/legal</loc>
-  </url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://graph.fleothing.com/en-us/</loc><xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/"/><xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/"/></url>
+  <url><loc>https://graph.fleothing.com/en-us/docs</loc><xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/docs"/><xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/docs"/></url>
+  <url><loc>https://graph.fleothing.com/en-us/legal</loc><xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/legal"/><xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/legal"/></url>
 </urlset>

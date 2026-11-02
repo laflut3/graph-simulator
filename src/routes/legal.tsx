@@ -1,7 +1,53 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { type Language, localeFromLanguage, useLanguage } from "@/lib/i18n";
 import { createPageHead } from "@/lib/seo";
 
-function LegalPage() {
+export function LegalPage() {
+	const [language] = useLanguage();
+	const copy =
+		language === "en"
+			? {
+					title: "Legal information",
+					intro: "How Graph Simulator handles data and runs.",
+					notice: "Legal notice",
+					publisher: "Publisher",
+					email: "Contact",
+					hosting: "Hosting",
+					privacy: "Privacy",
+					privacyBody:
+						"No account is required. Your graph is saved in this browser’s local storage and is not sent to an application API. Imported JSON is read locally; exports are downloaded to your device. Theme and language preferences are also stored here. The service worker caches app files for offline use, not graph data.",
+					cookies: "Cookies and storage",
+					cookiesBody:
+						"The app uses no advertising or analytics cookies. It saves your graph, theme, and language in local storage and remembers dismissal of this notice for the current tab. You can clear these values in your browser settings.",
+					terms: "Terms of use",
+					termsBody:
+						"This educational tool is provided as is. It supports simple undirected graphs. Cycle enumeration can become slow for dense or large graphs. Check JSON files before sharing them.",
+					address: "Postal address",
+					addressValue: "Not published.",
+					hosted: "Vercel",
+					legalId: "legal-notice",
+				}
+			: {
+					title: "Informations légales",
+					intro: "Fonctionnement et données de Graph Simulator.",
+					notice: "Mentions légales",
+					publisher: "Éditeur",
+					email: "Contact",
+					hosting: "Hébergement",
+					privacy: "Confidentialité",
+					privacyBody:
+						"Aucun compte n’est nécessaire. Votre graphe est enregistré dans le stockage local du navigateur et n’est pas envoyé à une API applicative. Les fichiers JSON sont lus localement ou téléchargés sur votre appareil. Le thème et la langue y sont aussi mémorisés. Le service worker met en cache les fichiers de l’application, pas les graphes.",
+					cookies: "Cookies et stockage",
+					cookiesBody:
+						"L’application n’utilise pas de cookie publicitaire ou de mesure d’audience. Elle enregistre le graphe, le thème et la langue dans le stockage local, et la fermeture de ce bandeau pour l’onglet courant. Vous pouvez effacer ces données dans les réglages du navigateur.",
+					terms: "Conditions d’utilisation",
+					termsBody:
+						"Cet outil pédagogique est fourni en l’état. Il prend en charge les graphes simples non orientés. Le calcul des cycles peut ralentir sur les graphes denses ou volumineux. Vérifiez les fichiers JSON avant de les partager.",
+					address: "Adresse postale",
+					addressValue: "Non publiée.",
+					hosted: "Vercel",
+					legalId: "legal-notice",
+				};
 	return (
 		<main className="w-full px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16">
 			<header className="border-b border-border pb-6">
@@ -9,22 +55,21 @@ function LegalPage() {
 					Graph Simulator
 				</p>
 				<h1 className="mt-2 text-3xl font-medium tracking-tight">
-					Informations légales
+					{copy.title}
 				</h1>
 				<p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-					Les informations ci-dessous décrivent le fonctionnement actuel du
-					simulateur.
+					{copy.intro}
 				</p>
 			</header>
 			<div className="divide-y divide-border">
-				<section id="mentions-legales" className="scroll-mt-8 py-7">
-					<h2 className="text-lg font-medium">Mentions légales</h2>
+				<section id={copy.legalId} className="scroll-mt-8 py-7">
+					<h2 className="text-lg font-medium">{copy.notice}</h2>
 					<dl className="mt-4 grid gap-4 text-sm sm:grid-cols-[10rem_1fr]">
-						<dt className="text-muted-foreground">Éditeur</dt>
+						<dt className="text-muted-foreground">{copy.publisher}</dt>
 						<dd>Léo Torres</dd>
-						<dt className="text-muted-foreground">Adresse postale</dt>
-						<dd>Non publiée sur cette page.</dd>
-						<dt className="text-muted-foreground">Contact</dt>
+						<dt className="text-muted-foreground">{copy.address}</dt>
+						<dd>{copy.addressValue}</dd>
+						<dt className="text-muted-foreground">{copy.email}</dt>
 						<dd>
 							<a
 								className="underline underline-offset-4"
@@ -33,104 +78,27 @@ function LegalPage() {
 								leo0609leo@gmail.com
 							</a>
 						</dd>
-						<dt className="text-muted-foreground">Hébergement</dt>
-						<dd>
-							Infrastructure Kubernetes privée auto-hébergée par Léo Torres.
-						</dd>
-						<dt className="text-muted-foreground">Source du projet</dt>
-						<dd>
-							<a
-								className="underline underline-offset-4"
-								href="https://github.com/laflut3/graph-simulator"
-							>
-								github.com/laflut3/graph-simulator
-							</a>
-						</dd>
+						<dt className="text-muted-foreground">{copy.hosting}</dt>
+						<dd>{copy.hosted}</dd>
 					</dl>
 				</section>
-				<section id="confidentialite" className="scroll-mt-8 py-7">
-					<h2 className="text-lg font-medium">Politique de confidentialité</h2>
-					<div className="mt-4 space-y-4 text-sm leading-6 text-muted-foreground">
-						<p>
-							Le simulateur ne demande pas de compte et ne transmet pas le
-							graphe à une API. Les sommets et les arêtes restent dans la
-							mémoire de la page. Un fichier JSON est lu par le navigateur lors
-							d’un import et téléchargé sur votre appareil lors d’un export.
-						</p>
-						<p>
-							Le choix du thème est enregistré dans le stockage local du
-							navigateur. Le bandeau d’information sur les cookies utilise le
-							stockage de session pour ne pas réapparaître après fermeture dans
-							le même onglet. Le choix du thème y reste jusqu’à son effacement
-							dans les réglages du navigateur.
-						</p>
-						<p>
-							Le service worker met en cache l’application et les ressources
-							chargées pour permettre une ouverture hors ligne. Il ne stocke pas
-							le graphe ni les fichiers JSON importés.
-						</p>
-						<p>
-							Aucun outil de publicité, d’analyse d’audience ou de profilage
-							n’est intégré à l’application. L’infrastructure d’hébergement est
-							administrée par l’éditeur. Les journaux techniques du serveur
-							peuvent contenir des données de connexion nécessaires à son
-							fonctionnement et à sa sécurité. Leur durée de conservation
-							dépendra de la configuration du serveur.
-						</p>
-						<p>
-							Pour toute question relative à la confidentialité, écrivez à{" "}
-							<a
-								className="underline underline-offset-4"
-								href="mailto:leo0609leo@gmail.com"
-							>
-								leo0609leo@gmail.com
-							</a>
-							. Vous pouvez également déposer une réclamation auprès de la{" "}
-							<a
-								className="underline underline-offset-4"
-								href="https://www.cnil.fr/fr/plaintes"
-							>
-								CNIL
-							</a>
-							.
-						</p>
-					</div>
+				<section id="privacy" className="scroll-mt-8 py-7">
+					<h2 className="text-lg font-medium">{copy.privacy}</h2>
+					<p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">
+						{copy.privacyBody}
+					</p>
 				</section>
 				<section id="cookies" className="scroll-mt-8 py-7">
-					<h2 className="text-lg font-medium">Cookies et stockage local</h2>
-					<div className="mt-4 space-y-4 text-sm leading-6 text-muted-foreground">
-						<p>
-							Le simulateur n’utilise actuellement aucun cookie publicitaire ou
-							de mesure d’audience. Le thème est gardé dans le stockage local ;
-							le bandeau est masqué pour l’onglet courant. Le cache hors ligne
-							ne contient que les fichiers de l’application, jamais le graphe.
-						</p>
-						<p>
-							Si des traceurs soumis au consentement sont ajoutés, leur finalité
-							sera expliquée et vous pourrez les refuser ou retirer votre choix
-							à tout moment.
-						</p>
-					</div>
+					<h2 className="text-lg font-medium">{copy.cookies}</h2>
+					<p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">
+						{copy.cookiesBody}
+					</p>
 				</section>
-				<section id="conditions" className="scroll-mt-8 py-7">
-					<h2 className="text-lg font-medium">Conditions d’utilisation</h2>
-					<div className="mt-4 space-y-4 text-sm leading-6 text-muted-foreground">
-						<p>
-							Vous pouvez utiliser le simulateur pour créer et étudier des
-							graphes non orientés simples. Vérifiez les fichiers JSON importés
-							avant de les partager.
-						</p>
-						<p>
-							Le calcul énumère les cycles simples. Leur nombre peut augmenter
-							rapidement lorsque le graphe devient dense ; un grand graphe peut
-							ralentir le navigateur.
-						</p>
-						<p>
-							Le projet est fourni à des fins pédagogiques. Son code source et
-							ses conditions de réutilisation sont disponibles dans le dépôt
-							GitHub.
-						</p>
-					</div>
+				<section id="terms" className="scroll-mt-8 py-7">
+					<h2 className="text-lg font-medium">{copy.terms}</h2>
+					<p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">
+						{copy.termsBody}
+					</p>
 				</section>
 			</div>
 		</main>
@@ -138,11 +106,20 @@ function LegalPage() {
 }
 
 export const Route = createFileRoute("/legal")({
+	beforeLoad: () => {
+		const language: Language =
+			window.localStorage.getItem("graph-simulator-language") === "fr"
+				? "fr"
+				: "en";
+		throw redirect({
+			to: "/$locale/$page",
+			params: { locale: localeFromLanguage(language), page: "legal" },
+		});
+	},
 	head: () =>
 		createPageHead({
-			title: "Informations légales | Graph Simulator",
-			description:
-				"Mentions légales, politique de confidentialité et informations sur les cookies de Graph Simulator.",
+			title: "Legal information | Graph Simulator",
+			description: "Legal and privacy information for Graph Simulator.",
 			path: "/legal",
 		}),
 	component: LegalPage,

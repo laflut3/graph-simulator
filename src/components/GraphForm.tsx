@@ -2,6 +2,7 @@ import { type SubmitEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Graph, GraphEdge, GraphError, Vertex } from "@/lib/graph/types";
+import { text, useLanguage } from "@/lib/i18n";
 
 type GraphFormProps = {
 	graph: Graph;
@@ -12,13 +13,6 @@ type GraphFormProps = {
 	onRemoveEdge: (edge: GraphEdge) => void;
 };
 
-const errorMessages: Record<GraphError, string> = {
-	"invalid-vertex": "Saisissez un nom de sommet.",
-	"duplicate-vertex": "Ce nom est déjà utilisé.",
-	"invalid-edge": "Choisissez deux sommets différents.",
-	"duplicate-edge": "Cette arête existe déjà.",
-};
-
 export function GraphForm({
 	graph,
 	onGraphNameChange,
@@ -27,6 +21,29 @@ export function GraphForm({
 	onRemoveVertex,
 	onRemoveEdge,
 }: GraphFormProps) {
+	const [language] = useLanguage();
+	const errorMessages: Record<GraphError, string> = {
+		"invalid-vertex": text(
+			language,
+			"Enter a vertex name.",
+			"Saisissez un nom de sommet.",
+		),
+		"duplicate-vertex": text(
+			language,
+			"That vertex already exists.",
+			"Ce nom est déjà utilisé.",
+		),
+		"invalid-edge": text(
+			language,
+			"Choose two different vertices.",
+			"Choisissez deux sommets différents.",
+		),
+		"duplicate-edge": text(
+			language,
+			"That edge already exists.",
+			"Cette arête existe déjà.",
+		),
+	};
 	const { vertices, edges } = graph;
 	const [vertexName, setVertexName] = useState("");
 	const [edgeFirst, setEdgeFirst] = useState("");
@@ -59,13 +76,17 @@ export function GraphForm({
 		<div>
 			<div className="mb-5 max-w-xl">
 				<label htmlFor="graph-name" className="mb-2 block text-sm font-medium">
-					Nom du graphe
+					{text(language, "Graph name", "Nom du graphe")}
 				</label>
 				<Input
 					id="graph-name"
 					value={graph.nom}
 					maxLength={64}
-					placeholder="Ex. Réseau de transport"
+					placeholder={text(
+						language,
+						"e.g. Transit network",
+						"Ex. Réseau de transport",
+					)}
 					onChange={(event) => onGraphNameChange(event.target.value)}
 				/>
 			</div>
@@ -76,11 +97,8 @@ export function GraphForm({
 				>
 					<div className="flex items-start justify-between gap-4">
 						<div>
-							<p className="font-mono text-xs text-muted-foreground">
-								ENSEMBLE V
-							</p>
-							<h2 id="vertices-title" className="mt-1 text-lg font-medium">
-								Sommets
+							<h2 id="vertices-title" className="text-lg font-medium">
+								{text(language, "Vertices", "Sommets")}
 							</h2>
 						</div>
 						<span className="rounded-full bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
@@ -89,7 +107,7 @@ export function GraphForm({
 					</div>
 					<div className="mt-5 min-h-24 rounded-lg border border-border/70 bg-background p-4">
 						<p className="mb-3 font-mono text-xs text-muted-foreground">
-							V = &#123; ... &#125;
+							V = &#123;{vertices.join(", ")}&#125;
 						</p>
 						{vertices.length ? (
 							<ul className="flex flex-wrap gap-2">
@@ -104,7 +122,11 @@ export function GraphForm({
 											variant="ghost"
 											size="icon-xs"
 											className="size-6 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-											aria-label={`Supprimer le sommet ${vertex}`}
+											aria-label={text(
+												language,
+												`Remove vertex ${vertex}`,
+												`Supprimer le sommet ${vertex}`,
+											)}
 											onClick={() => onRemoveVertex(vertex)}
 										>
 											×
@@ -114,7 +136,7 @@ export function GraphForm({
 							</ul>
 						) : (
 							<p className="text-sm text-muted-foreground">
-								Aucun sommet pour l’instant.
+								{text(language, "No vertices yet.", "Aucun sommet.")}
 							</p>
 						)}
 					</div>
@@ -123,18 +145,22 @@ export function GraphForm({
 							htmlFor="vertex-name"
 							className="mb-2 block text-sm font-medium"
 						>
-							Ajouter un sommet
+							{text(language, "Add a vertex", "Ajouter un sommet")}
 						</label>
 						<div className="flex gap-2">
 							<Input
 								id="vertex-name"
 								value={vertexName}
 								onChange={(event) => setVertexName(event.target.value)}
-								placeholder="Ex. Départ, A, 5…"
+								placeholder={text(
+									language,
+									"e.g. Start, A, 5",
+									"Ex. Départ, A, 5",
+								)}
 								maxLength={32}
 							/>
 							<Button type="submit" className="rounded-md">
-								Ajouter
+								{text(language, "Add", "Ajouter")}
 							</Button>
 						</div>
 						<p
@@ -152,11 +178,8 @@ export function GraphForm({
 				>
 					<div className="flex items-start justify-between gap-4">
 						<div>
-							<p className="font-mono text-xs text-muted-foreground">
-								ENSEMBLE E
-							</p>
-							<h2 id="edges-title" className="mt-1 text-lg font-medium">
-								Arêtes
+							<h2 id="edges-title" className="text-lg font-medium">
+								{text(language, "Edges", "Arêtes")}
 							</h2>
 						</div>
 						<span className="rounded-full bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
@@ -165,7 +188,11 @@ export function GraphForm({
 					</div>
 					<div className="mt-5 min-h-24 rounded-lg border border-border/70 bg-background p-4">
 						<p className="mb-3 font-mono text-xs text-muted-foreground">
-							E = &#123; ... &#125;
+							E = &#123;
+							{edges
+								.map(({ first, second }) => `{${first}, ${second}}`)
+								.join(", ")}
+							&#125;
 						</p>
 						{edges.length ? (
 							<ul className="flex flex-wrap gap-2">
@@ -180,7 +207,11 @@ export function GraphForm({
 											variant="ghost"
 											size="icon-xs"
 											className="size-6 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-											aria-label={`Supprimer l’arête ${edge.first}–${edge.second}`}
+											aria-label={text(
+												language,
+												`Remove edge ${edge.first}–${edge.second}`,
+												`Supprimer l’arête ${edge.first}–${edge.second}`,
+											)}
 											onClick={() => onRemoveEdge(edge)}
 										>
 											×
@@ -190,15 +221,17 @@ export function GraphForm({
 							</ul>
 						) : (
 							<p className="text-sm text-muted-foreground">
-								Aucune arête pour l’instant.
+								{text(language, "No edges yet.", "Aucune arête.")}
 							</p>
 						)}
 					</div>
 					<form className="mt-5" onSubmit={addEdge}>
-						<p className="mb-2 text-sm font-medium">Relier deux sommets</p>
+						<p className="mb-2 text-sm font-medium">
+							{text(language, "Connect two vertices", "Relier deux sommets")}
+						</p>
 						<div className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
 							<select
-								aria-label="Premier sommet"
+								aria-label={text(language, "First vertex", "Premier sommet")}
 								className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
 								value={firstValue}
 								onChange={(event) => setEdgeFirst(event.target.value)}
@@ -212,7 +245,7 @@ export function GraphForm({
 							</select>
 							<span className="font-mono text-muted-foreground">—</span>
 							<select
-								aria-label="Second sommet"
+								aria-label={text(language, "Second vertex", "Second sommet")}
 								className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
 								value={secondValue}
 								onChange={(event) => setEdgeSecond(event.target.value)}
@@ -229,7 +262,7 @@ export function GraphForm({
 								className="rounded-md"
 								disabled={vertices.length < 2}
 							>
-								Ajouter
+								{text(language, "Add", "Ajouter")}
 							</Button>
 						</div>
 						<p

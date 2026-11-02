@@ -1,23 +1,22 @@
 # Graph Simulator
 
-> A free, browser-based educational tool for creating and exploring simple undirected graphs.
+> A free, browser-based tool for creating and exploring simple undirected graphs.
 
-Graph Simulator lets learners name a graph, add word- or letter-labeled vertices, connect them with edges, and inspect connected components, simple cycles, neighbor lists, adjacency matrices, and edge lists. Representation views can be animated as the graph is reconstructed. Graph data stays in the browser unless the user exports it as JSON.
+Create word- or letter-labeled vertices, connect them, inspect components and cycles, and compare neighbor lists, adjacency matrices, and edge lists. JSON files are processed in the browser.
 
-## Main pages
+## Pages
 
-- [Home](https://graph.fleothing.com/): Project overview and entry points.
-- [Graph simulator](https://graph.fleothing.com/simulator): Interactive graph editor. The page is intentionally excluded from search results because it is an interactive workspace.
-- [Documentation](https://graph.fleothing.com/docs): User guide in French and English.
-- [Legal information](https://graph.fleothing.com/legal): Publisher, privacy, cookies, and terms.
+- English home: https://graph.fleothing.com/en-us/
+- English simulator: https://graph.fleothing.com/en-us/simulator
+- English documentation: https://graph.fleothing.com/en-us/docs
+- French home: https://graph.fleothing.com/fr-fr/
+- French simulator: https://graph.fleothing.com/fr-fr/simulator
+- French documentation: https://graph.fleothing.com/fr-fr/docs
+- Legal information: https://graph.fleothing.com/en-us/legal and https://graph.fleothing.com/fr-fr/legal
 
-## Project and author
+## Project
 
-- [Source repository](https://github.com/laflut3/graph-simulator)
-- [Author portfolio](https://leo-torres.fleothing.com/)
-- [Author GitHub](https://github.com/laflut3)
-- [Author LinkedIn](https://www.linkedin.com/in/leo-torres-804687264)
-
-## Graph model
-
-The application models finite, simple, undirected graphs: loops and duplicate edges are not allowed. Vertex labels can be words or letters. JSON imports use the fields `nom`, `sommets`, and `aretes`.
+- Source: https://github.com/laflut3/graph-simulator
+- Author: Léo Torres (https://leo-torres.fleothing.com/)
+- GitHub: https://github.com/laflut3
+- LinkedIn: https://www.linkedin.com/in/leo-torres-804687264

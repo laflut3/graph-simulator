@@ -1,4 +1,4 @@
-const CACHE_NAME = "graph-simulator-v1";
+const CACHE_NAME = "graph-simulator-v2";
 const APP_SHELL = [
 	"/",
 	"/favicon.svg",

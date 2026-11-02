@@ -1,7 +1,7 @@
 # Project instructions
 
 - Keep the simulator, home page, and documentation direct and easy to use. Prefer small, consistent UI changes that work on mobile and in light, dark, and system themes.
-- For every feature, review the user-facing documentation and update it in both French and English. Keep `README.md` and the in-app documentation consistent with the actual routes and behavior.
+- Keep the interface and in-app documentation available in English and French. Keep repository Markdown files in English only, and keep them consistent with actual routes and behavior.
 - After each feature, review the affected pages for clear navigation, accessible controls, responsive layout, and visual consistency. Check all three theme choices when UI behavior or colors change.
 - Keep cookie, privacy, and legal statements tied to behavior that exists in the code. Update those pages whenever storage, analytics, hosting, or data flows change. Do not claim legal compliance from a code review alone.
 - Keep PWA manifest icons, service worker cache rules, offline documentation, and HTTPS deployment notes in sync. Verify the production build and offline app shell when these change.

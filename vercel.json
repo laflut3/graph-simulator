@@ -1,38 +1,21 @@
 {
-	"$schema": "https://openapi.vercel.sh/vercel.json",
-	"redirects": [
-		{
-			"source": "/docs/",
-			"destination": "/docs",
-			"permanent": true
-		},
-		{
-			"source": "/legal/",
-			"destination": "/legal",
-			"permanent": true
-		},
-		{
-			"source": "/simulator/",
-			"destination": "/simulator",
-			"permanent": true
-		}
-	],
-	"rewrites": [
-		{
-			"source": "/docs",
-			"destination": "/docs/index.html"
-		},
-		{
-			"source": "/legal",
-			"destination": "/legal/index.html"
-		},
-		{
-			"source": "/simulator",
-			"destination": "/simulator/index.html"
-		},
-		{
-			"source": "/(.*)",
-			"destination": "/index.html"
-		}
-	]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    { "source": "/", "destination": "/en-us/", "permanent": true },
+    { "source": "/en-us", "destination": "/en-us/", "permanent": true },
+    { "source": "/fr-fr", "destination": "/fr-fr/", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/en-us", "destination": "/en-us/index.html" },
+    { "source": "/en-us/", "destination": "/en-us/index.html" },
+    { "source": "/en-us/docs", "destination": "/en-us/docs/index.html" },
+    { "source": "/en-us/legal", "destination": "/en-us/legal/index.html" },
+    { "source": "/en-us/simulator", "destination": "/en-us/simulator/index.html" },
+    { "source": "/fr-fr", "destination": "/fr-fr/index.html" },
+    { "source": "/fr-fr/", "destination": "/fr-fr/index.html" },
+    { "source": "/fr-fr/docs", "destination": "/fr-fr/docs/index.html" },
+    { "source": "/fr-fr/legal", "destination": "/fr-fr/legal/index.html" },
+    { "source": "/fr-fr/simulator", "destination": "/fr-fr/simulator/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { GraphForm } from "@/components/GraphForm";
 import { GraphInsights } from "@/components/GraphInsights";
@@ -16,10 +16,24 @@ import {
 } from "@/lib/graph/representations";
 import type { GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
+import { type Language, text, useLanguage } from "@/lib/i18n";
 import { createPageHead } from "@/lib/seo";
 
-function SimulatorPage() {
-	const [graph, setGraph] = useState(createGraph);
+const savedGraphKey = "graph-simulator-graph-v1";
+
+function loadSavedGraph() {
+	try {
+		const stored = window.localStorage.getItem(savedGraphKey);
+		if (stored) return parseGraphConfig(JSON.parse(stored)) ?? createGraph();
+	} catch {
+		// Storage may be unavailable or contain an invalid graph.
+	}
+	return createGraph();
+}
+
+export function SimulatorPage() {
+	const [language] = useLanguage();
+	const [graph, setGraph] = useState(loadSavedGraph);
 	const [selectedVertex, setSelectedVertex] = useState<Vertex | null>(null);
 	const [representation, setRepresentation] =
 		useState<GraphRepresentation>("neighbor-list");
@@ -35,6 +49,13 @@ function SimulatorPage() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const vertices = graph.vertices;
 	const edges = graph.edges;
+	useEffect(() => {
+		try {
+			window.localStorage.setItem(savedGraphKey, serializeGraphConfig(graph));
+		} catch {
+			// Keep the graph usable when browser storage is full or disabled.
+		}
+	}, [graph]);
 	const analysis = useMemo(
 		() => analyzeGraph({ vertices, edges }),
 		[vertices, edges],
@@ -46,7 +67,7 @@ function SimulatorPage() {
 		setRepresentation(selected);
 		setSelectedVertex(null);
 		setConstruction({
-			steps: buildGraphFromRepresentation(graph, selected),
+			steps: buildGraphFromRepresentation(graph, selected, language),
 			index: 0,
 			playing: !debugMode,
 			debugMode,
@@ -100,7 +121,13 @@ function SimulatorPage() {
 		link.download = `${fileName}.json`;
 		link.click();
 		URL.revokeObjectURL(url);
-		setConfigMessage(`Configuration « ${graph.nom} » téléchargée.`);
+		setConfigMessage(
+			text(
+				language,
+				`“${graph.nom}” downloaded.`,
+				`« ${graph.nom} » téléchargé.`,
+			),
+		);
 		setConfigError("");
 	};
 
@@ -116,10 +143,16 @@ function SimulatorPage() {
 			setConstruction(null);
 			setGraph(parsed);
 			setSelectedVertex(null);
-			setConfigMessage(`Configuration « ${parsed.nom} » chargée.`);
+			setConfigMessage(
+				text(language, `“${parsed.nom}” loaded.`, `« ${parsed.nom} » chargé.`),
+			);
 		} catch {
 			setConfigError(
-				"Fichier JSON invalide : vérifiez le nom, les sommets et les arêtes.",
+				text(
+					language,
+					"Invalid JSON. Check the graph name, vertices, and edges.",
+					"JSON invalide. Vérifiez le nom, les sommets et les arêtes.",
+				),
 			);
 		} finally {
 			input.value = "";
@@ -155,50 +188,48 @@ function SimulatorPage() {
 	};
 
 	return (
-		<main className="w-full px-4 py-10 text-foreground sm:px-8 sm:py-12 lg:px-10 lg:py-16">
-			<header className="mb-14 border-b border-border pb-8 sm:mb-16">
-				<div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-					<p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-						Théorie des graphes
+		<main className="w-full px-4 py-8 text-foreground sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+			<header className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6 sm:mb-12">
+				<h1 className="text-2xl font-medium tracking-tight">
+					{text(language, "Simulator", "Simulateur")}
+				</h1>
+				<div className="flex flex-wrap gap-2">
+					<input
+						ref={fileInputRef}
+						type="file"
+						accept=".json,application/json"
+						className="hidden"
+						aria-label={text(
+							language,
+							"Choose a JSON graph file",
+							"Choisir un fichier JSON de graphe",
+						)}
+						onChange={handleImport}
+					/>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={() => fileInputRef.current?.click()}
+					>
+						{text(language, "Import JSON", "Importer JSON")}
+					</Button>
+					<Button type="button" variant="outline" onClick={handleExport}>
+						{text(language, "Export JSON", "Exporter JSON")}
+					</Button>
+				</div>
+				{configError && (
+					<p className="w-full text-sm text-destructive" role="alert">
+						{configError}
 					</p>
-					<div className="flex flex-wrap gap-2">
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept=".json,application/json"
-							className="hidden"
-							aria-label="Choisir un fichier de configuration JSON"
-							onChange={handleImport}
-						/>
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => fileInputRef.current?.click()}
-						>
-							Importer JSON
-						</Button>
-						<Button type="button" variant="outline" onClick={handleExport}>
-							Télécharger JSON
-						</Button>
-					</div>
-				</div>
-				<div className="flex flex-wrap items-baseline justify-between gap-4">
-					<h1 className="font-mono text-3xl font-medium tracking-tight sm:text-4xl">
-						G = [V, E]
-					</h1>
-					<div className="text-right">
-						<p className="text-sm font-medium">Graphe non orienté simple</p>
-					</div>
-				</div>
-				<p className="mt-3 min-h-5 text-sm text-destructive" role="alert">
-					{configError}
-				</p>
-				<p
-					className="mt-1 min-h-5 text-sm text-muted-foreground"
-					aria-live="polite"
-				>
-					{configMessage}
-				</p>
+				)}
+				{configMessage && (
+					<p
+						className="w-full text-sm text-muted-foreground"
+						aria-live="polite"
+					>
+						{configMessage}
+					</p>
+				)}
 			</header>
 
 			<GraphForm
@@ -215,16 +246,16 @@ function SimulatorPage() {
 
 			<section
 				aria-labelledby="graph-title"
-				className="mt-16 border-t border-border pt-8"
+				className="mt-12 border-t border-border pt-8"
 			>
 				<div className="mb-4 flex items-baseline justify-between">
 					<h2 id="graph-title" className="text-sm font-medium">
-						Graphe
+						{text(language, "Graph", "Graphe")}
 					</h2>
 					<span className="text-xs text-muted-foreground">
 						{construction
-							? `${displayedGraph.vertices.length}/${graph.vertices.length} sommets · ${displayedGraph.edges.length}/${graph.edges.length} arêtes`
-							: `${graph.vertices.length} sommets · ${graph.edges.length} arêtes`}
+							? `${displayedGraph.vertices.length}/${graph.vertices.length} ${text(language, "vertices", "sommets")} · ${displayedGraph.edges.length}/${graph.edges.length} ${text(language, "edges", "arêtes")}`
+							: `${graph.vertices.length} ${text(language, "vertices", "sommets")} · ${graph.edges.length} ${text(language, "edges", "arêtes")}`}
 					</span>
 				</div>
 				{construction && currentStep && (
@@ -234,11 +265,12 @@ function SimulatorPage() {
 					>
 						<div className="min-w-0">
 							<p className="text-sm font-medium">{currentStep.title}</p>
-							<p className="mt-1 text-xs text-muted-foreground">
-								{currentStep.description}
-							</p>
 							<p className="mt-1 font-mono text-[11px] text-muted-foreground">
-								Étape {construction.index + 1} / {construction.steps.length}
+								{text(
+									language,
+									`Step ${construction.index + 1} / ${construction.steps.length}`,
+									`Étape ${construction.index + 1} / ${construction.steps.length}`,
+								)}
 							</p>
 						</div>
 						<div className="flex flex-wrap gap-2">
@@ -251,7 +283,7 @@ function SimulatorPage() {
 										disabled={construction.index === 0}
 										onClick={() => stepConstruction(-1)}
 									>
-										Précédent
+										{text(language, "Previous", "Précédent")}
 									</Button>
 									<Button
 										type="button"
@@ -262,7 +294,7 @@ function SimulatorPage() {
 										}
 										onClick={() => stepConstruction(1)}
 									>
-										Suivant
+										{text(language, "Next", "Suivant")}
 									</Button>
 								</>
 							) : (
@@ -276,7 +308,9 @@ function SimulatorPage() {
 										)
 									}
 								>
-									{construction.playing ? "Pause" : "Reprendre"}
+									{construction.playing
+										? text(language, "Pause", "Pause")
+										: text(language, "Resume", "Reprendre")}
 								</Button>
 							)}
 							<Button
@@ -296,7 +330,9 @@ function SimulatorPage() {
 									)
 								}
 							>
-								{construction.debugMode ? "Debug activé" : "Mode debug"}
+								{construction.debugMode
+									? text(language, "Debug on", "Debug activé")
+									: "Debug"}
 							</Button>
 							<Button
 								type="button"
@@ -304,7 +340,7 @@ function SimulatorPage() {
 								size="sm"
 								onClick={() => setConstruction(null)}
 							>
-								Terminer
+								{text(language, "Stop", "Terminer")}
 							</Button>
 						</div>
 					</div>
@@ -350,6 +386,19 @@ function SimulatorPage() {
 }
 
 export const Route = createFileRoute("/simulator")({
+	beforeLoad: () => {
+		const language: Language =
+			window.localStorage.getItem("graph-simulator-language") === "fr"
+				? "fr"
+				: "en";
+		throw redirect({
+			to: "/$locale/$page",
+			params: {
+				locale: language === "fr" ? "fr-fr" : "en-us",
+				page: "simulator",
+			},
+		});
+	},
 	head: () =>
 		createPageHead({
 			title: "Simulateur de graphes interactif | Graph Simulator",
