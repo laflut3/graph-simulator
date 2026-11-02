@@ -1,20 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist/client",
   "redirects": [
     { "source": "/en-us", "destination": "/en-us/", "permanent": true },
-    { "source": "/fr-fr", "destination": "/fr-fr/", "permanent": true }
-  ],
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/en-us", "destination": "/index.html" },
-    { "source": "/en-us/", "destination": "/index.html" },
-    { "source": "/en-us/docs", "destination": "/index.html" },
-    { "source": "/en-us/legal", "destination": "/index.html" },
-    { "source": "/en-us/simulator", "destination": "/index.html" },
-    { "source": "/fr-fr", "destination": "/index.html" },
-    { "source": "/fr-fr/", "destination": "/index.html" },
-    { "source": "/fr-fr/docs", "destination": "/index.html" },
-    { "source": "/fr-fr/legal", "destination": "/index.html" },
-    { "source": "/fr-fr/simulator", "destination": "/index.html" }
+    { "source": "/fr-fr", "destination": "/fr-fr/", "permanent": true },
+    { "source": "/simulator", "destination": "/en-us/simulator", "permanent": true },
+    { "source": "/docs", "destination": "/en-us/docs", "permanent": true },
+    { "source": "/legal", "destination": "/en-us/legal", "permanent": true }
   ]
 }

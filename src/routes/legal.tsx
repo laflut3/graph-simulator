@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { type Language, localeFromLanguage, useLanguage } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 
 export function LegalPage() {
 	const [language] = useLanguage();
@@ -106,14 +106,7 @@ export function LegalPage() {
 
 export const Route = createFileRoute("/legal")({
 	beforeLoad: () => {
-		const language: Language =
-			window.localStorage.getItem("graph-simulator-language") === "fr"
-				? "fr"
-				: "en";
-		throw redirect({
-			to: "/$locale/$page",
-			params: { locale: localeFromLanguage(language), page: "legal" },
-		});
+		throw redirect({ href: "/en-us/legal" });
 	},
 	component: LegalPage,
 });

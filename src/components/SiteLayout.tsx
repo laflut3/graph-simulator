@@ -1,10 +1,4 @@
-import {
-	HeadContent,
-	Link,
-	Outlet,
-	useNavigate,
-	useRouterState,
-} from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useState } from "react";
 import {
 	type Language,
@@ -30,8 +24,8 @@ function loadTheme(): Theme {
 	return "system";
 }
 
-export function SiteLayout() {
-	const [theme, setTheme] = useState<Theme>(loadTheme);
+export function SiteLayout({ children }: { children: ReactNode }) {
+	const [theme, setTheme] = useState<Theme>("system");
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
@@ -66,6 +60,7 @@ export function SiteLayout() {
 	const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(
 		null,
 	);
+	useEffect(() => setTheme(loadTheme()), []);
 
 	useEffect(() => {
 		const handleInstallPrompt = (event: Event) => {
@@ -82,13 +77,14 @@ export function SiteLayout() {
 	}, []);
 
 	useEffect(() => {
+		if (pathname === "/") return;
 		try {
 			window.localStorage.setItem("graph-simulator-language", language);
 		} catch {
 			// The URL still determines the language when storage is unavailable.
 		}
 		document.documentElement.lang = language === "en" ? "en-US" : "fr-FR";
-	}, [language]);
+	}, [language, pathname]);
 
 	useEffect(() => {
 		if (!window.sessionStorage.getItem("graph-simulator-cookie-notice")) {
@@ -124,7 +120,6 @@ export function SiteLayout() {
 
 	return (
 		<LanguageProvider language={language} setLanguage={setLanguage}>
-			<HeadContent />
 			<div className="flex min-h-dvh flex-col">
 				<header className="pwa-header border-b border-border">
 					<div className="safe-header flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 sm:gap-x-8 sm:gap-y-3 sm:py-4">
@@ -292,9 +287,7 @@ export function SiteLayout() {
 					</div>
 				</header>
 
-				<div className="flex flex-1 flex-col">
-					<Outlet />
-				</div>
+				<div className="flex flex-1 flex-col">{children}</div>
 
 				<footer className="border-t border-border bg-muted/40 text-foreground">
 					<div className="safe-footer mx-auto w-full max-w-[1680px] px-4 py-10 sm:px-8 sm:py-12 lg:px-10">
@@ -432,10 +425,8 @@ function FooterColumn({
 	title: string;
 	children: ReactNode;
 }) {
-	const [compact, setCompact] = useState(
-		() => window.matchMedia("(max-width: 639px)").matches,
-	);
-	const [open, setOpen] = useState(!compact);
+	const [compact, setCompact] = useState(false);
+	const [open, setOpen] = useState(true);
 	useEffect(() => {
 		const media = window.matchMedia("(max-width: 639px)");
 		const update = () => {

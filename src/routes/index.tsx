@@ -1,11 +1,7 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-	type Language,
-	localeFromLanguage,
-	text,
-	useLanguage,
-} from "@/lib/i18n";
+import { localeFromLanguage, text, useLanguage } from "@/lib/i18n";
 import { createLocalizedPageHead } from "@/lib/seo";
 
 export function HomePage() {
@@ -44,17 +40,21 @@ export function HomePage() {
 	);
 }
 
-export const Route = createFileRoute("/")({
-	beforeLoad: () => {
-		let language: Language = "en";
+function RootHomePage() {
+	const navigate = useNavigate();
+	useEffect(() => {
 		try {
-			if (window.localStorage.getItem("graph-simulator-language") === "fr")
-				language = "fr";
+			if (window.localStorage.getItem("graph-simulator-language") === "fr") {
+				void navigate({ href: `/${localeFromLanguage("fr")}/` });
+			}
 		} catch {
-			// Default to English when browser storage is unavailable.
+			// Keep the English default when browser storage is unavailable.
 		}
-		throw redirect({ href: `/${localeFromLanguage(language)}/` });
-	},
+	}, [navigate]);
+	return <HomePage />;
+}
+
+export const Route = createFileRoute("/")({
 	head: () => createLocalizedPageHead("home", "en", "/en-us/"),
-	component: HomePage,
+	component: RootHomePage,
 });

@@ -56,11 +56,13 @@ If `oriente` or `pondere` is omitted, it defaults to `false`. For directed graph
 
 ## SEO and deployment
 
-The production domain is `graph.fleothing.com`, hosted on Vercel. `src/lib/seo-content.json` is the shared source for localized page titles and descriptions; TanStack Router adds the matching canonical, reciprocal `hreflang`, social metadata, and JSON-LD to each route. `public/sitemap.xml` lists every English and French page with its language alternates. `public/robots.txt` points crawlers to the sitemap, and `public/llms.txt` provides a plain-text site summary for compatible assistants. The simulator is indexable because it is the main public feature.
+The production domain is `graph.fleothing.com`, hosted on Vercel. TanStack Start statically prerenders all nine public URLs during `pnpm build`, so page text and route metadata are present in the delivered HTML before JavaScript runs. `src/lib/seo-content.json` is the shared source for localized page titles and descriptions; route metadata adds canonical URLs, reciprocal `hreflang`, social tags, and JSON-LD. `public/sitemap.xml` lists all eight localized pages and their language alternates. `public/robots.txt` points crawlers to the sitemap, and `public/llms.txt` gives compatible assistants a concise site summary. The simulator is indexable as the main public feature.
 
-The root URL uses the browser's saved language when available and defaults to English. Localized URLs remain directly accessible and are listed separately for crawlers. Vercel rewrites only the declared localized routes to the Vite app shell.
+The root URL uses the browser's saved language when available and defaults to English. Each localized URL is a static HTML page. Vercel serves `dist/client` as a static site and redirects old unlocalized page URLs to English; there is no application API or database.
 
-To submit the site to Google, verify `graph.fleothing.com` as a Domain property in [Google Search Console](https://search.google.com/search-console) using the DNS TXT record Google provides. Then submit `https://graph.fleothing.com/sitemap.xml` under **Sitemaps**. Submission helps Google discover pages but does not guarantee indexing.
+To submit the site to Google, verify `graph.fleothing.com` as a Domain property in [Google Search Console](https://search.google.com/search-console) using Google's DNS TXT record. Submit `https://graph.fleothing.com/sitemap.xml` under **Sitemaps**, then use **URL inspection** to request indexing for the home, simulator, and documentation pages in both languages. Keep the DNS verification record in place. Google decides independently whether and when to index or rank each page.
+
+For every production change, confirm that the Vercel project uses the repository root, `pnpm build`, and `dist/client` as its output directory. The settings are also recorded in `vercel.json`.
 
 ## Project checks
 

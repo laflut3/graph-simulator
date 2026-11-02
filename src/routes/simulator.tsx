@@ -16,7 +16,7 @@ import {
 } from "@/lib/graph/representation";
 import type { GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
-import { type Language, text, useLanguage } from "@/lib/i18n";
+import { text, useLanguage } from "@/lib/i18n";
 
 const savedGraphKey = "graph-simulator-graph-v1";
 
@@ -32,13 +32,10 @@ function loadSavedGraph() {
 
 export function SimulatorPage() {
 	const [language] = useLanguage();
-	const [compactLayout, setCompactLayout] = useState(
-		() => window.matchMedia("(max-width: 1023px)").matches,
-	);
-	const [editorOpen, setEditorOpen] = useState(
-		() => !window.matchMedia("(max-width: 1023px)").matches,
-	);
-	const [graph, setGraph] = useState(loadSavedGraph);
+	const [compactLayout, setCompactLayout] = useState(false);
+	const [editorOpen, setEditorOpen] = useState(true);
+	const [graph, setGraph] = useState(createGraph);
+	const [graphLoaded, setGraphLoaded] = useState(false);
 	const [selectedVertex, setSelectedVertex] = useState<Vertex | null>(null);
 	const [representation, setRepresentation] =
 		useState<GraphRepresentation>("neighbor-list");
@@ -59,15 +56,21 @@ export function SimulatorPage() {
 			setEditorOpen(!media.matches);
 		};
 		media.addEventListener("change", updateLayout);
+		updateLayout();
 		return () => media.removeEventListener("change", updateLayout);
 	}, []);
 	useEffect(() => {
+		setGraph(loadSavedGraph());
+		setGraphLoaded(true);
+	}, []);
+	useEffect(() => {
+		if (!graphLoaded) return;
 		try {
 			window.localStorage.setItem(savedGraphKey, serializeGraphConfig(graph));
 		} catch {
 			// Keep the graph usable when browser storage is full or disabled.
 		}
-	}, [graph]);
+	}, [graph, graphLoaded]);
 	const analysis = useMemo(() => analyzeGraph(graph), [graph]);
 	const runRepresentation = (
 		selected: GraphRepresentation,
@@ -460,17 +463,7 @@ function EditIcon() {
 
 export const Route = createFileRoute("/simulator")({
 	beforeLoad: () => {
-		const language: Language =
-			window.localStorage.getItem("graph-simulator-language") === "fr"
-				? "fr"
-				: "en";
-		throw redirect({
-			to: "/$locale/$page",
-			params: {
-				locale: language === "fr" ? "fr-fr" : "en-us",
-				page: "simulator",
-			},
-		});
+		throw redirect({ href: "/en-us/simulator" });
 	},
 	component: SimulatorPage,
 });

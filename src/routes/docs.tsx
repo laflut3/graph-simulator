@@ -172,17 +172,21 @@ const copy: Record<
 export function DocsPage() {
 	const [language] = useLanguage();
 	const locale = localeFromLanguage(language);
-	const [activeSection, setActiveSection] = useState<number | "format">(
-		loadDocsSection,
-	);
+	const [activeSection, setActiveSection] = useState<number | "format">(0);
+	const [sectionLoaded, setSectionLoaded] = useState(false);
 	const content = copy[language];
 	useEffect(() => {
+		setActiveSection(loadDocsSection());
+		setSectionLoaded(true);
+	}, []);
+	useEffect(() => {
+		if (!sectionLoaded) return;
 		try {
 			window.localStorage.setItem(docsSectionKey, String(activeSection));
 		} catch {
 			// Keep navigation usable when browser storage is unavailable.
 		}
-	}, [activeSection]);
+	}, [activeSection, sectionLoaded]);
 	const navItems = [
 		...content.sections.map(({ title }) => title),
 		content.format,
@@ -301,14 +305,7 @@ export function DocsPage() {
 
 export const Route = createFileRoute("/docs")({
 	beforeLoad: () => {
-		const language: Language =
-			window.localStorage.getItem("graph-simulator-language") === "fr"
-				? "fr"
-				: "en";
-		throw redirect({
-			to: "/$locale/$page",
-			params: { locale: localeFromLanguage(language), page: "docs" },
-		});
+		throw redirect({ href: "/en-us/docs" });
 	},
 	component: DocsPage,
 });
