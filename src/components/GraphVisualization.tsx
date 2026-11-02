@@ -1,4 +1,5 @@
 import {
+	directedEdgeKey,
 	edgeKey,
 	edgesInCycles,
 	type GraphAnalysis,
@@ -20,6 +21,8 @@ type Props = Graph & {
 export function GraphVisualization({
 	vertices,
 	edges,
+	directed,
+	weighted,
 	analysis,
 	selectedVertex,
 	onSelectVertex,
@@ -47,9 +50,13 @@ export function GraphVisualization({
 		positions.length <= 1
 			? 0
 			: Math.max(150, Math.min(260, positions.length * 22));
-	const size = radius * 2 + 100;
+	const size =
+		radius * 2 +
+		100 +
+		(edges.some((edge) => edge.first === edge.second) ? 90 : 0);
 	const center = size / 2;
 	const point = (vertex: Vertex) => {
+		if (positions.length <= 1) return { x: center, y: center };
 		const angle =
 			(2 * Math.PI * positions.indexOf(vertex)) / positions.length -
 			Math.PI / 2;
@@ -65,7 +72,7 @@ export function GraphVisualization({
 	const cyclesForVertex = analysis.cycles.filter((cycle) =>
 		cycle.includes(selectedVertex ?? ""),
 	);
-	const cycleEdges = edgesInCycles(cyclesForVertex);
+	const cycleEdges = edgesInCycles(cyclesForVertex, directed);
 	const selectedComponentSet = new Set(selectedComponent);
 	const selectedCycleVertices = new Set(cyclesForVertex.flat());
 
@@ -84,38 +91,163 @@ export function GraphVisualization({
 				<title>
 					{text(language, "Graph visualization", "Visualisation du graphe")}
 				</title>
+				<defs>
+					<marker
+						id="graph-arrow"
+						viewBox="0 0 10 10"
+						refX="8"
+						refY="5"
+						markerWidth="6"
+						markerHeight="6"
+						orient="auto-start-reverse"
+					>
+						<path d="M 0 0 L 10 5 L 0 10 z" fill="var(--muted-foreground)" />
+					</marker>
+					<marker
+						id="graph-arrow-active"
+						viewBox="0 0 10 10"
+						refX="8"
+						refY="5"
+						markerWidth="6"
+						markerHeight="6"
+						orient="auto-start-reverse"
+					>
+						<path d="M 0 0 L 10 5 L 0 10 z" fill="var(--construction-active)" />
+					</marker>
+					<marker
+						id="graph-arrow-cycle"
+						viewBox="0 0 10 10"
+						refX="8"
+						refY="5"
+						markerWidth="6"
+						markerHeight="6"
+						orient="auto-start-reverse"
+					>
+						<path d="M 0 0 L 10 5 L 0 10 z" fill="var(--primary)" />
+					</marker>
+				</defs>
 				<g strokeWidth="1.5">
-					{edges.map(({ first, second }) => {
+					{edges.map(({ first, second, weight }) => {
 						const a = point(first);
 						const b = point(second);
-						const key = edgeKey(first, second);
+						const isLoop = first === second;
+						const dx = b.x - a.x;
+						const dy = b.y - a.y;
+						const firstWidth = Math.max(
+							48,
+							Math.min(112, first.length * 9 + 24),
+						);
+						const secondWidth = Math.max(
+							48,
+							Math.min(112, second.length * 9 + 24),
+						);
+						const sourceScale =
+							1 / Math.max(Math.abs(dx) / (firstWidth / 2), Math.abs(dy) / 22);
+						const targetScale =
+							1 /
+							Math.max(
+								Math.abs(dx) / (secondWidth / 2 + (directed ? 9 : 0)),
+								Math.abs(dy) / (22 + (directed ? 9 : 0)),
+							);
+						const key = directed
+							? directedEdgeKey(first, second)
+							: edgeKey(first, second);
 						const isCurrent = currentEdge
-							? key === edgeKey(currentEdge.first, currentEdge.second)
+							? key ===
+								(directed
+									? directedEdgeKey(currentEdge.first, currentEdge.second)
+									: edgeKey(currentEdge.first, currentEdge.second))
 							: false;
 						const highlighted = isCurrent || cycleEdges.has(key);
+						const hasReverseArc =
+							directed &&
+							edges.some(
+								(edge) => edge.first === second && edge.second === first,
+							);
+						const length = Math.hypot(dx, dy) || 1;
+						const normalX = -dy / length;
+						const normalY = dx / length;
+						const curveOffset = hasReverseArc ? 15 : 0;
+						const startX = isLoop
+							? a.x - 16
+							: a.x + dx * sourceScale + normalX * curveOffset * 0.5;
+						const startY = isLoop
+							? a.y - 24
+							: a.y + dy * sourceScale + normalY * curveOffset * 0.5;
+						const endX = isLoop
+							? b.x + 16
+							: b.x - dx * targetScale + normalX * curveOffset * 0.5;
+						const endY = isLoop
+							? b.y - 24
+							: b.y - dy * targetScale + normalY * curveOffset * 0.5;
+						const controlX = (startX + endX) / 2 + normalX * curveOffset * 2;
+						const controlY = (startY + endY) / 2 + normalY * curveOffset * 2;
+						const labelX = isLoop
+							? a.x
+							: (startX + endX) / 2 + normalX * curveOffset;
+						const labelY = isLoop
+							? a.y - 58
+							: (startY + endY) / 2 + normalY * curveOffset;
+						const stroke = isCurrent
+							? "var(--construction-active)"
+							: cycleEdges.has(key)
+								? "var(--primary)"
+								: "var(--muted-foreground)";
 						return (
-							<line
-								key={edgeKey(first, second)}
-								x1={a.x}
-								y1={a.y}
-								x2={b.x}
-								y2={b.y}
-								stroke={
-									isCurrent
-										? "var(--construction-active)"
-										: cycleEdges.has(key)
-											? "var(--primary)"
-											: "var(--muted-foreground)"
-								}
-								strokeWidth={isCurrent ? 4 : highlighted ? 3 : 1.5}
-								opacity={
-									isCurrent
-										? 1
-										: selectedVertex !== null && !highlighted
-											? 0.22
-											: 0.8
-								}
-							/>
+							<g key={key}>
+								<path
+									fill="none"
+									d={
+										isLoop
+											? `M ${startX} ${startY} C ${a.x - 44} ${a.y - 70} ${a.x + 44} ${a.y - 70} ${endX} ${endY}`
+											: hasReverseArc
+												? `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`
+												: `M ${startX} ${startY} L ${endX} ${endY}`
+									}
+									stroke={stroke}
+									strokeWidth={isCurrent ? 4 : highlighted ? 3 : 1.5}
+									opacity={
+										isCurrent
+											? 1
+											: selectedVertex !== null && !highlighted
+												? 0.22
+												: 0.8
+									}
+									{...(directed
+										? {
+												markerEnd: `url(#${isCurrent ? "graph-arrow-active" : cycleEdges.has(key) ? "graph-arrow-cycle" : "graph-arrow"})`,
+											}
+										: {})}
+								/>
+								{weighted && (
+									<g>
+										<rect
+											x={labelX - 15}
+											y={labelY - 10}
+											width="30"
+											height="20"
+											rx="6"
+											fill="var(--background)"
+											stroke="var(--border)"
+										/>
+										<text
+											x={labelX}
+											y={labelY}
+											textAnchor="middle"
+											dominantBaseline="central"
+											fill={
+												isCurrent
+													? "var(--construction-active)"
+													: "var(--foreground)"
+											}
+											fontSize="11"
+											fontFamily="var(--font-mono)"
+										>
+											{weight ?? 1}
+										</text>
+									</g>
+								)}
+							</g>
 						);
 					})}
 				</g>
@@ -138,8 +270,12 @@ export function GraphVisualization({
 							aria-disabled={!interactive}
 							aria-label={text(
 								language,
-								`Vertex ${vertex}, degree ${analysis.degree.get(vertex) ?? 0}`,
-								`Sommet ${vertex}, degré ${analysis.degree.get(vertex) ?? 0}`,
+								directed
+									? `Vertex ${vertex}, in-degree ${analysis.inDegree.get(vertex) ?? 0}, out-degree ${analysis.outDegree.get(vertex) ?? 0}`
+									: `Vertex ${vertex}, degree ${analysis.degree.get(vertex) ?? 0}`,
+								directed
+									? `Sommet ${vertex}, degré entrant ${analysis.inDegree.get(vertex) ?? 0}, degré sortant ${analysis.outDegree.get(vertex) ?? 0}`
+									: `Sommet ${vertex}, degré ${analysis.degree.get(vertex) ?? 0}`,
 							)}
 							aria-pressed={isSelected}
 							onClick={

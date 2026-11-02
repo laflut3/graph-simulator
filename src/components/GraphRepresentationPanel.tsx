@@ -60,20 +60,97 @@ export function GraphRepresentationPanel({
 	const [language] = useLanguage();
 	const vertices = graph.vertices;
 	const edges = graph.edges;
-	const matrix = useMemo(
-		() => createAdjacencyMatrix({ vertices, edges }),
-		[vertices, edges],
-	);
-	const neighbors = useMemo(
-		() => createNeighborLists({ vertices, edges }),
-		[vertices, edges],
-	);
+	const matrix = useMemo(() => createAdjacencyMatrix(graph), [graph]);
+	const neighbors = useMemo(() => createNeighborLists(graph), [graph]);
 	const currentVertex = execution?.currentVertex;
 	const currentEdge = execution?.currentEdge;
+	const executedRepresentation = execution?.representation ?? selected;
+	const pseudocode = representationPseudocode[language][
+		executedRepresentation
+	].map((line, index) => {
+		if (executedRepresentation === "neighbor-list") {
+			if (graph.directed && index === 4)
+				return {
+					...line,
+					code:
+						language === "en"
+							? "  for each outgoing neighbor v of u:"
+							: "  pour chaque voisin sortant v de u :",
+				};
+			if (graph.directed && index === 5)
+				return {
+					...line,
+					code:
+						language === "en"
+							? "    if (u, v) is not processed:"
+							: "    si (u, v) n’est pas traité :",
+				};
+			if ((graph.directed || graph.weighted) && index === 6)
+				return {
+					...line,
+					code:
+						language === "en"
+							? `      add ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", weight" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} to G'.E`
+							: `      ajouter ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", poids" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} à G'.E`,
+				};
+		}
+		if (executedRepresentation === "edge-list") {
+			if (graph.directed && index === 3)
+				return {
+					...line,
+					code:
+						language === "en"
+							? "for each arc (u, v) in E:"
+							: "pour chaque arc (u, v) de E :",
+				};
+			if ((graph.directed || graph.weighted) && index === 4)
+				return {
+					...line,
+					code:
+						language === "en"
+							? `  add ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", weight" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} to G'.E`
+							: `  ajouter ${graph.directed ? "(u, v" : "{u, v"}${graph.weighted ? ", poids" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} à G'.E`,
+				};
+		}
+		if (executedRepresentation !== "adjacency-matrix") return line;
+		if (index === 4)
+			return {
+				...line,
+				code: graph.directed
+					? language === "en"
+						? "  for each column j:"
+						: "  pour chaque colonne j :"
+					: language === "en"
+						? "  for j from i + 1 to |V|:"
+						: "  pour j de i + 1 à |V| :",
+			};
+		if (index === 5)
+			return {
+				...line,
+				code: graph.weighted
+					? language === "en"
+						? "    if A[i, j] contains an edge weight:"
+						: "    si A[i, j] contient un poids d’arête :"
+					: language === "en"
+						? "    if A[i, j] = 1:"
+						: "    si A[i, j] = 1 :",
+			};
+		if ((graph.directed || graph.weighted) && index === 6)
+			return {
+				...line,
+				code:
+					language === "en"
+						? `      add ${graph.directed ? "(vᵢ, vⱼ" : "{vᵢ, vⱼ"}${graph.weighted ? ", weight" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} to G'.E`
+						: `      ajouter ${graph.directed ? "(vᵢ, vⱼ" : "{vᵢ, vⱼ"}${graph.weighted ? ", poids" : graph.directed ? ")" : "}"}${graph.weighted ? (graph.directed ? ")" : "}") : ""} à G'.E`,
+			};
+		return line;
+	});
 	const isCurrentEdge = (first: string, second: string) =>
 		currentEdge !== undefined &&
 		((currentEdge.first === first && currentEdge.second === second) ||
-			(currentEdge.first === second && currentEdge.second === first));
+			(!graph.directed &&
+				currentEdge.first === second &&
+				currentEdge.second === first));
 
 	return (
 		<section
@@ -202,6 +279,9 @@ export function GraphRepresentationPanel({
 														}
 													>
 														{neighbor}
+														{graph.weighted
+															? ` (${graph.edges.find((edge) => (graph.directed ? edge.first === vertex && edge.second === neighbor : (edge.first === vertex && edge.second === neighbor) || (edge.first === neighbor && edge.second === vertex)))?.weight ?? 1})`
+															: ""}
 													</span>
 												</span>
 											))}
@@ -270,9 +350,9 @@ export function GraphRepresentationPanel({
 															? "step"
 															: undefined
 													}
-													className={`px-2 py-2 ${currentCell || currentVertexCell ? "construction-item-active" : value ? "font-semibold text-foreground" : "text-muted-foreground/60"}`}
+													className={`px-2 py-2 ${currentCell || currentVertexCell ? "construction-item-active" : value !== null ? "font-semibold text-foreground" : "text-muted-foreground/60"}`}
 												>
-													{value}
+													{value ?? (graph.weighted ? "∞" : 0)}
 												</td>
 											);
 										})}
@@ -285,7 +365,7 @@ export function GraphRepresentationPanel({
 				{selected === "edge-list" && (
 					<ol className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
 						{edges.length ? (
-							edges.map(({ first, second }, index) => (
+							edges.map(({ first, second, weight }, index) => (
 								<li
 									key={`${first}-${second}`}
 									aria-current={
@@ -297,7 +377,10 @@ export function GraphRepresentationPanel({
 										{index + 1}.
 									</span>
 									<span className="font-mono">
-										&#123;{first}, {second}&#125;
+										{graph.directed
+											? `${first} → ${second}`
+											: `{${first}, ${second}}`}
+										{graph.weighted ? ` : ${weight ?? 1}` : ""}
 									</span>
 								</li>
 							))
@@ -324,22 +407,18 @@ export function GraphRepresentationPanel({
 						</h4>
 					</div>
 					<ol className="max-h-48 space-y-0.5 overflow-auto rounded-lg bg-muted/30 p-2 font-mono text-[11px]">
-						{representationPseudocode[language][execution.representation].map(
-							({ id, code }, index) => (
-								<li
-									key={`${execution.representation}-${id}`}
-									aria-current={
-										index === execution.codeLine ? "step" : undefined
-									}
-									className={`rounded px-2 py-1 ${index === execution.codeLine ? "construction-code-active" : "text-muted-foreground"}`}
-								>
-									<span className="mr-3 inline-block w-4 text-right opacity-60">
-										{index + 1}
-									</span>
-									<code className="whitespace-pre">{code}</code>
-								</li>
-							),
-						)}
+						{pseudocode.map(({ id, code }, index) => (
+							<li
+								key={`${execution.representation}-${id}`}
+								aria-current={index === execution.codeLine ? "step" : undefined}
+								className={`rounded px-2 py-1 ${index === execution.codeLine ? "construction-code-active" : "text-muted-foreground"}`}
+							>
+								<span className="mr-3 inline-block w-4 text-right opacity-60">
+									{index + 1}
+								</span>
+								<code className="whitespace-pre">{code}</code>
+							</li>
+						))}
 					</ol>
 				</section>
 			)}

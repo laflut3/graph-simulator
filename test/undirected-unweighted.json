@@ -1,0 +1,7 @@
+{
+  "nom": "Undirected unweighted traversal",
+  "oriente": false,
+  "pondere": false,
+  "sommets": ["A", "B", "C", "D", "E", "F"],
+  "aretes": [["A", "B"], ["A", "C"], ["B", "D"], ["C", "D"], ["D", "E"]]
+}

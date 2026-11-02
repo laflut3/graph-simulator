@@ -1,10 +1,11 @@
 # Graph Simulator
 
-A browser-based tool for creating and exploring simple undirected graphs. Add named vertices and edges, inspect connected components and simple cycles, compare graph representations, and import or export JSON. Graphs are saved in browser storage; no account, database, or application backend is used.
+A browser-based tool for creating and exploring directed or undirected graphs, with or without weights. Add named vertices and edges, inspect connected components and simple cycles, compare graph representations, and import or export JSON. Graphs are saved in browser storage; no account, database, or application backend is used.
 
 ## Features
 
 - Vertices can use letters, words, or short labels.
+- Choose directed or undirected edges and optionally attach numeric weights. Changing either graph type restores the sample graph after confirmation.
 - View vertex degree, connected components, simple cycles, and selected-vertex details.
 - Compare neighbor lists, adjacency matrices, and edge lists.
 - Animate each representation's construction or debug it instruction by instruction. The trace shows loop checks, condition branches, and returns to loops; the active graph element and representation entry are highlighted in blue.
@@ -41,12 +42,14 @@ pnpm build
 ```json
 {
   "nom": "test",
+  "oriente": false,
+  "pondere": false,
   "sommets": ["A", "B", "C"],
   "aretes": [["A", "B"], ["A", "C"]]
 }
 ```
 
-Edges must connect existing vertices. Self-loops and duplicate edges are rejected.
+If `oriente` or `pondere` is omitted, it defaults to `false`. For directed graphs, set `oriente` to `true`; reverse arcs are separate edges and self-loops such as `["A", "A"]` are allowed. For weighted graphs, set `pondere` to `true` and use three-item edge arrays such as `["A", "B", 2.5]`. Two-item edge arrays remain valid and receive a default weight of `1` when imported as weighted. Edges must connect existing vertices. Self-loops are rejected for undirected graphs, as are duplicate edges. Connected components in directed graphs are weak components, which ignore arc direction.
 
 ## SEO and deployment
 

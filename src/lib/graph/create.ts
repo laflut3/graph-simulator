@@ -8,5 +8,7 @@ export function createGraph(): Graph {
 			{ first: "A", second: "B" },
 			{ first: "A", second: "C" },
 		],
+		directed: false,
+		weighted: false,
 	};
 }

@@ -1,0 +1,7 @@
+{
+  "nom": "Undirected weighted paths",
+  "oriente": false,
+  "pondere": true,
+  "sommets": ["A", "B", "C", "D", "E", "F"],
+  "aretes": [["A", "B", 4], ["A", "C", 2], ["B", "C", 1], ["B", "D", 5], ["C", "D", 8], ["C", "E", 10], ["D", "E", 2]]
+}

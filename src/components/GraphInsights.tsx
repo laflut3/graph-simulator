@@ -3,12 +3,14 @@ import type { Vertex } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
 
 type Props = {
+	directed: boolean;
 	analysis: GraphAnalysis;
 	selectedVertex: Vertex | null;
 	onSelectVertex: (vertex: Vertex | null) => void;
 };
 
 export function GraphInsights({
+	directed,
 	analysis,
 	selectedVertex,
 	onSelectVertex,
@@ -24,18 +26,24 @@ export function GraphInsights({
 	const listVertices = (vertices: Vertex[]) => vertices.join(", ");
 
 	return (
-		<div className="-mx-4 mb-16 grid gap-3 px-4 md:grid-cols-2 sm:-mx-8 sm:px-8 sm:mb-20 lg:-mx-10 lg:px-10">
+		<div className="-mx-4 mt-16 mb-16 grid gap-3 px-4 md:grid-cols-2 sm:-mx-8 sm:px-8 sm:mt-20 sm:mb-20 lg:-mx-10 lg:px-10">
 			<section
 				aria-label={text(
 					language,
-					"Connected components",
-					"Composantes connexes",
+					directed ? "Weakly connected components" : "Connected components",
+					directed ? "Composantes connexes faibles" : "Composantes connexes",
 				)}
 				className="rounded-xl border border-border bg-muted/20 p-4 sm:p-5"
 			>
 				<div className="flex items-baseline justify-between gap-3">
 					<h2 className="text-sm font-medium">
-						{text(language, "Connected components", "Composantes connexes")}
+						{text(
+							language,
+							directed ? "Weakly connected components" : "Connected components",
+							directed
+								? "Composantes connexes faibles"
+								: "Composantes connexes",
+						)}
 					</h2>
 					<span className="font-mono text-xs text-muted-foreground">
 						{analysis.components.length}
@@ -118,9 +126,17 @@ export function GraphInsights({
 					<div className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
 						<div>
 							<p className="text-xs text-muted-foreground">
-								{text(language, "Degree", "Degré")}
+								{text(
+									language,
+									directed ? "In-degree / out-degree" : "Degree",
+									directed ? "Degré entrant / sortant" : "Degré",
+								)}
 							</p>
-							<p className="mt-1">{analysis.degree.get(selectedVertex) ?? 0}</p>
+							<p className="mt-1">
+								{directed
+									? `${analysis.inDegree.get(selectedVertex) ?? 0} / ${analysis.outDegree.get(selectedVertex) ?? 0}`
+									: (analysis.degree.get(selectedVertex) ?? 0)}
+							</p>
 						</div>
 						<div>
 							<p className="text-xs text-muted-foreground">

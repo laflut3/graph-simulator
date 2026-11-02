@@ -7,7 +7,7 @@ import { GraphVisualization } from "@/components/GraphVisualization";
 import { Button } from "@/components/ui/button";
 import { analyzeGraph } from "@/lib/graph/analyze";
 import { createGraph } from "@/lib/graph/create";
-import { addEdge, removeEdge } from "@/lib/graph/edges";
+import { addEdge, removeEdge, updateGraphType } from "@/lib/graph/edges";
 import { parseGraphConfig, serializeGraphConfig } from "@/lib/graph/io";
 import {
 	buildGraphFromRepresentation,
@@ -47,8 +47,6 @@ export function SimulatorPage() {
 	const [configMessage, setConfigMessage] = useState("");
 	const [configError, setConfigError] = useState("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	const vertices = graph.vertices;
-	const edges = graph.edges;
 	useEffect(() => {
 		try {
 			window.localStorage.setItem(savedGraphKey, serializeGraphConfig(graph));
@@ -56,10 +54,7 @@ export function SimulatorPage() {
 			// Keep the graph usable when browser storage is full or disabled.
 		}
 	}, [graph]);
-	const analysis = useMemo(
-		() => analyzeGraph({ vertices, edges }),
-		[vertices, edges],
-	);
+	const analysis = useMemo(() => analyzeGraph(graph), [graph]);
 	const runRepresentation = (
 		selected: GraphRepresentation,
 		debugMode = false,
@@ -168,8 +163,8 @@ export function SimulatorPage() {
 		return result.error;
 	};
 
-	const handleAddEdge = (first: Vertex, second: Vertex) => {
-		const result = addEdge(graph, first, second);
+	const handleAddEdge = (first: Vertex, second: Vertex, weight?: number) => {
+		const result = addEdge(graph, first, second, weight);
 		if (!result.error) {
 			setConstruction(null);
 			setGraph(result.graph);
@@ -234,6 +229,11 @@ export function SimulatorPage() {
 
 			<GraphForm
 				graph={graph}
+				onGraphTypeChange={(patch) => {
+					setConstruction(null);
+					setSelectedVertex(null);
+					setGraph((current) => updateGraphType(current, patch));
+				}}
 				onGraphNameChange={(name) => {
 					setConstruction(null);
 					setGraph((current) => ({ ...current, nom: name }));
@@ -377,6 +377,7 @@ export function SimulatorPage() {
 				</div>
 				{!construction && (
 					<GraphInsights
+						directed={graph.directed}
 						analysis={analysis}
 						selectedVertex={selectedVertex}
 						onSelectVertex={setSelectedVertex}

@@ -1,9 +1,96 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useState } from "react";
-import { type Language, localeFromLanguage, useLanguage } from "@/lib/i18n";
+import { useEffect, useState } from "react";
+import {
+	type Language,
+	localeFromLanguage,
+	text,
+	useLanguage,
+} from "@/lib/i18n";
 import { createPageHead } from "@/lib/seo";
 
 type Section = { title: string; body: string };
+const graphExamples = [
+	{
+		title: { en: "Undirected · unweighted", fr: "Non orienté · non pondéré" },
+		config: {
+			nom: "test",
+			oriente: false,
+			pondere: false,
+			sommets: ["A", "B", "C"],
+			aretes: [
+				["A", "B"],
+				["A", "C"],
+			],
+		},
+	},
+	{
+		title: { en: "Directed · unweighted", fr: "Orienté · non pondéré" },
+		config: {
+			nom: "test",
+			oriente: true,
+			pondere: false,
+			sommets: ["A", "B", "C"],
+			aretes: [
+				["A", "B"],
+				["B", "C"],
+			],
+		},
+	},
+	{
+		title: { en: "Undirected · weighted", fr: "Non orienté · pondéré" },
+		config: {
+			nom: "test",
+			oriente: false,
+			pondere: true,
+			sommets: ["A", "B", "C"],
+			aretes: [
+				["A", "B", 2],
+				["A", "C", 3],
+			],
+		},
+	},
+	{
+		title: { en: "Directed · weighted", fr: "Orienté · pondéré" },
+		config: {
+			nom: "test",
+			oriente: true,
+			pondere: true,
+			sommets: ["A", "B", "C"],
+			aretes: [
+				["A", "B", 2],
+				["B", "A", 5],
+				["C", "C", 1],
+			],
+		},
+	},
+] as const;
+const docsSectionKey = "graph-simulator-docs-section-v1";
+
+function loadDocsSection(): number | "format" {
+	try {
+		const saved = window.localStorage.getItem(docsSectionKey);
+		if (saved === "format") return saved;
+		const index = Number(saved);
+		if (Number.isInteger(index) && index >= 0 && index < 7) return index;
+	} catch {
+		// Keep the documentation usable when browser storage is unavailable.
+	}
+	return 0;
+}
+
+function formatGraphJson(config: (typeof graphExamples)[number]["config"]) {
+	const inlineArray = (items: readonly (string | number)[]) =>
+		`[${items.map((item) => JSON.stringify(item)).join(", ")}]`;
+	return [
+		"{",
+		`  "nom": ${JSON.stringify(config.nom)},`,
+		`  "oriente": ${config.oriente},`,
+		`  "pondere": ${config.pondere},`,
+		`  "sommets": ${inlineArray(config.sommets)},`,
+		`  "aretes": [${config.aretes.map(inlineArray).join(", ")}]`,
+		"}",
+	].join("\n");
+}
 
 const copy: Record<
 	Language,
@@ -11,11 +98,11 @@ const copy: Record<
 > = {
 	fr: {
 		intro:
-			"Le simulateur représente un graphe non orienté simple : ses arêtes relient des paires de sommets, sans direction ni boucle.",
+			"Choisissez un graphe orienté ou non orienté, avec ou sans poids, puis explorez ses représentations et ses propriétés.",
 		sections: [
 			{
 				title: "Créer un graphe",
-				body: "Donnez un nom au graphe, puis ajoutez des sommets avec un nom ou un mot. Choisissez deux sommets pour ajouter une arête. Les listes montrent les éléments présents ; le bouton × les supprime.",
+				body: "Choisissez l’orientation et la pondération, puis donnez un nom au graphe. Un changement de type confirmé restaure l’exemple A–D en conservant son nom. Ajoutez ensuite des sommets et reliez-les ; les graphes pondérés demandent un poids numérique. Les graphes orientés acceptent aussi les boucles réflexives, comme A → A.",
 			},
 			{
 				title: "Lire la visualisation",
@@ -23,15 +110,15 @@ const copy: Record<
 			},
 			{
 				title: "Composantes et cycles",
-				body: "Une composante connexe regroupe les sommets que l’on peut atteindre les uns depuis les autres. Le degré d’un sommet compte ses arêtes. Un cycle simple revient à son départ sans repasser par un sommet intermédiaire.",
+				body: "Une composante regroupe les sommets reliés ; pour un graphe orienté, les composantes affichées sont faibles et ignorent le sens des arcs. Le degré entrant et le degré sortant comptent respectivement les arcs qui arrivent au sommet et ceux qui en partent. Un cycle simple revient à son départ en respectant le sens des arcs.",
 			},
 			{
 				title: "Représentations et algorithmes",
-				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes. ▶ reconstruit le graphe ; l’icône debug avance une instruction à la fois. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Le pseudo-code, l’élément du dessin et son entrée dans la représentation sont surlignés en bleu. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
+				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes. En orienté, les listes montrent les voisins sortants et la matrice n’est pas symétrique ; en pondéré, la matrice contient les poids et ∞ indique l’absence d’arête. ▶ reconstruit le graphe ; l’icône debug avance une instruction à la fois. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Les étapes actives sont surlignées en bleu. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
 			},
 			{
 				title: "Importer et télécharger",
-				body: "Le graphe est enregistré automatiquement dans ce navigateur. Les boutons du simulateur importent ou exportent un fichier JSON ; un import valide remplace le graphe enregistré.",
+				body: "Le graphe est enregistré automatiquement dans ce navigateur. Les boutons du simulateur importent ou exportent un fichier JSON. Les arêtes pondérées utilisent le format [sommet de départ, sommet d’arrivée, poids] ; les anciennes arêtes à deux sommets restent compatibles.",
 			},
 			{
 				title: "Installer l’application",
@@ -47,11 +134,11 @@ const copy: Record<
 	},
 	en: {
 		intro:
-			"The simulator represents a simple undirected graph. Its edges connect pairs of vertices, with no direction or loops.",
+			"Choose a directed or undirected graph, with or without weights, then explore its representations and properties.",
 		sections: [
 			{
 				title: "Create a graph",
-				body: "Name the graph, then add vertices using names or words. Choose two vertices to add an edge. The lists show the current elements; use × to remove one.",
+				body: "Choose the orientation and weighting, then name the graph. Confirming a type change restores the A–D sample graph and keeps its name. Add vertices and connect them; weighted graphs ask for a numeric weight. Directed graphs also allow reflexive loops such as A → A.",
 			},
 			{
 				title: "Read the visualization",
@@ -59,15 +146,15 @@ const copy: Record<
 			},
 			{
 				title: "Components and cycles",
-				body: "A connected component groups vertices that can reach one another. A vertex’s degree counts its edges. A simple cycle returns to its starting vertex without revisiting an intermediate vertex.",
+				body: "A component groups connected vertices; for directed graphs, the displayed weak components ignore arc direction. In-degree and out-degree count arcs entering and leaving a vertex. A simple cycle returns to its start while following arc directions.",
 			},
 			{
 				title: "Representations and algorithms",
-				body: "Choose neighbor lists, the matrix, or the edge list. ▶ rebuilds the graph; the bug icon advances one instruction at a time. The trace shows every loop check, condition branch, and return to a loop. The pseudocode, current graph element, and its representation entry are highlighted in blue. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
+				body: "Choose neighbor lists, the matrix, or the edge list. Directed neighbor lists show outgoing neighbors and their matrix is not symmetric; weighted matrices contain edge weights and use ∞ for a missing edge. ▶ rebuilds the graph; the bug icon advances one instruction at a time. The trace shows every loop check, condition branch, and return to a loop, with active steps highlighted in blue. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
 			},
 			{
 				title: "Import and download",
-				body: "Your graph is saved automatically in this browser. Use the simulator buttons to import or export JSON; a valid import replaces the saved graph.",
+				body: "Your graph is saved automatically in this browser. Use the simulator buttons to import or export JSON. Weighted edges use [source vertex, destination vertex, weight]; existing two-vertex edge entries remain supported.",
 			},
 			{
 				title: "Install the app",
@@ -86,8 +173,17 @@ const copy: Record<
 export function DocsPage() {
 	const [language] = useLanguage();
 	const locale = localeFromLanguage(language);
-	const [activeSection, setActiveSection] = useState<number | "format">(0);
+	const [activeSection, setActiveSection] = useState<number | "format">(
+		loadDocsSection,
+	);
 	const content = copy[language];
+	useEffect(() => {
+		try {
+			window.localStorage.setItem(docsSectionKey, String(activeSection));
+		} catch {
+			// Keep navigation usable when browser storage is unavailable.
+		}
+	}, [activeSection]);
 	const navItems = [
 		...content.sections.map(({ title }) => title),
 		content.format,
@@ -165,13 +261,28 @@ export function DocsPage() {
 					) : (
 						<>
 							<h2 className="text-xl font-medium">{content.format}</h2>
-							<pre className="mt-5 overflow-x-auto rounded-lg bg-foreground p-4 text-sm leading-6 text-background">
-								<code>{`{
-  "nom": "test",
-  "sommets": ["A", "B", "C"],
-  "aretes": [["A", "B"], ["A", "C"]]
-}`}</code>
-							</pre>
+							<p className="mt-3 text-sm leading-6 text-muted-foreground">
+								{text(
+									language,
+									"If oriente or pondere is omitted, it defaults to false.",
+									"Si oriente ou pondere est absent, sa valeur par défaut est false.",
+								)}
+							</p>
+							<div className="mt-5 grid gap-4 xl:grid-cols-2">
+								{graphExamples.map(({ title, config }) => (
+									<article
+										key={title.en}
+										className="min-w-0 overflow-hidden rounded-lg border border-border"
+									>
+										<h3 className="border-b border-border px-4 py-3 text-sm font-medium">
+											{title[language]}
+										</h3>
+										<pre className="overflow-x-auto bg-foreground p-4 text-xs leading-5 text-background">
+											<code>{formatGraphJson(config)}</code>
+										</pre>
+									</article>
+								))}
+							</div>
 						</>
 					)}
 				</section>
@@ -204,7 +315,7 @@ export const Route = createFileRoute("/docs")({
 		createPageHead({
 			title: "Documentation du simulateur de graphes | Graph Simulator",
 			description:
-				"Apprenez à créer un graphe non orienté, lire sa matrice d’adjacence et ses listes de voisins, et comprendre ses composantes et cycles.",
+				"Apprenez à créer des graphes orientés ou non orientés, pondérés ou non, et à lire leurs représentations, composantes et cycles.",
 			path: "/docs",
 		}),
 	component: DocsPage,

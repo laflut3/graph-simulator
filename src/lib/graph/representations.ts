@@ -1,4 +1,4 @@
-import { edgeKey } from "@/lib/graph/analyze";
+import { directedEdgeKey, edgeKey } from "@/lib/graph/analyze";
 import type { Graph, Vertex } from "@/lib/graph/types";
 import type { Language } from "@/lib/i18n";
 
@@ -6,26 +6,42 @@ export type GraphRepresentation =
 	| "neighbor-list"
 	| "adjacency-matrix"
 	| "edge-list";
-type GraphStructure = Pick<Graph, "vertices" | "edges">;
+type GraphStructure = Pick<
+	Graph,
+	"vertices" | "edges" | "directed" | "weighted"
+>;
 
-export function createAdjacencyMatrix({ vertices, edges }: GraphStructure) {
+export function createAdjacencyMatrix({
+	vertices,
+	edges,
+	directed,
+	weighted,
+}: GraphStructure) {
 	const indexes = new Map(vertices.map((vertex, index) => [vertex, index]));
-	const matrix = vertices.map(() => vertices.map(() => 0));
-	for (const { first, second } of edges) {
+	const matrix: (number | null)[][] = vertices.map(() =>
+		vertices.map(() => null),
+	);
+	for (const edge of edges) {
+		const { first, second } = edge;
 		const firstIndex = indexes.get(first);
 		const secondIndex = indexes.get(second);
 		if (firstIndex === undefined || secondIndex === undefined) continue;
-		matrix[firstIndex][secondIndex] = 1;
-		matrix[secondIndex][firstIndex] = 1;
+		matrix[firstIndex][secondIndex] = weighted ? (edge.weight ?? 1) : 1;
+		if (!directed)
+			matrix[secondIndex][firstIndex] = weighted ? (edge.weight ?? 1) : 1;
 	}
 	return matrix;
 }
 
-export function createNeighborLists({ vertices, edges }: GraphStructure) {
+export function createNeighborLists({
+	vertices,
+	edges,
+	directed,
+}: GraphStructure) {
 	const neighbors = new Map(vertices.map((vertex) => [vertex, [] as Vertex[]]));
 	for (const { first, second } of edges) {
 		neighbors.get(first)?.push(second);
-		neighbors.get(second)?.push(first);
+		if (!directed) neighbors.get(second)?.push(first);
 	}
 	return neighbors;
 }
@@ -109,12 +125,20 @@ export function buildGraphFromRepresentation(
 	representation: GraphRepresentation,
 	language: Language = "en",
 ): GraphConstructionStep[] {
-	const built: Graph = { nom: graph.nom, vertices: [], edges: [] };
+	const built: Graph = {
+		nom: graph.nom,
+		vertices: [],
+		edges: [],
+		directed: graph.directed,
+		weighted: graph.weighted,
+	};
 	const steps: GraphConstructionStep[] = [];
 	const snapshot = (): Graph => ({
 		nom: built.nom,
 		vertices: [...built.vertices],
 		edges: [...built.edges],
+		directed: built.directed,
+		weighted: built.weighted,
 	});
 	const addStep = (
 		title: string,
@@ -132,6 +156,12 @@ export function buildGraphFromRepresentation(
 	};
 
 	const en = language === "en";
+	const edgeDescription = (edge: Graph["edges"][number]) => {
+		const endpoints = graph.directed
+			? `${edge.first} → ${edge.second}`
+			: `{${edge.first}, ${edge.second}}`;
+		return graph.weighted ? `${endpoints} : ${edge.weight ?? 1}` : endpoints;
+	};
 	addStep(en ? "Initialize empty graph" : "Initialiser le graphe vide", 0);
 	for (const vertex of graph.vertices) {
 		addStep(
@@ -164,8 +194,8 @@ export function buildGraphFromRepresentation(
 		for (const edge of graph.edges) {
 			addStep(
 				en
-					? `Check edge loop: {${edge.first}, ${edge.second}} is next`
-					: `Tester la boucle des arêtes : {${edge.first}, ${edge.second}} est suivante`,
+					? `Check edge loop: ${edgeDescription(edge)} is next`
+					: `Tester la boucle des arêtes : ${edgeDescription(edge)} est suivante`,
 				3,
 				edge.first,
 				edge,
@@ -173,8 +203,8 @@ export function buildGraphFromRepresentation(
 			built.edges.push(edge);
 			addStep(
 				en
-					? `Add edge {${edge.first}, ${edge.second}}`
-					: `Ajouter l’arête {${edge.first}, ${edge.second}}`,
+					? `Add edge ${edgeDescription(edge)}`
+					: `Ajouter l’arête ${edgeDescription(edge)}`,
 				4,
 				edge.second,
 				edge,
@@ -212,7 +242,9 @@ export function buildGraphFromRepresentation(
 					vertex,
 					{ first: vertex, second: neighbor },
 				);
-				const key = edgeKey(vertex, neighbor);
+				const key = graph.directed
+					? directedEdgeKey(vertex, neighbor)
+					: edgeKey(vertex, neighbor);
 				if (seen.has(key)) {
 					addStep(
 						en
@@ -232,12 +264,21 @@ export function buildGraphFromRepresentation(
 						vertex,
 						{ first: vertex, second: neighbor },
 					);
-					const edge = { first: vertex, second: neighbor };
+					const original = graph.edges.find((item) =>
+						graph.directed
+							? item.first === vertex && item.second === neighbor
+							: edgeKey(item.first, item.second) === edgeKey(vertex, neighbor),
+					);
+					const edge = {
+						first: vertex,
+						second: neighbor,
+						...(graph.weighted ? { weight: original?.weight ?? 1 } : {}),
+					};
 					built.edges.push(edge);
 					addStep(
 						en
-							? `Add edge {${vertex}, ${neighbor}}`
-							: `Ajouter l’arête {${vertex}, ${neighbor}}`,
+							? `Add edge ${edgeDescription(edge)}`
+							: `Ajouter l’arête ${edgeDescription(edge)}`,
 						6,
 						vertex,
 						edge,
@@ -283,7 +324,12 @@ export function buildGraphFromRepresentation(
 				3,
 				first,
 			);
-			for (let column = row + 1; column < graph.vertices.length; column++) {
+			for (
+				let column = graph.directed ? 0 : row + 1;
+				column < graph.vertices.length;
+				column++
+			) {
+				if (column === row && !graph.directed) continue;
 				const second = graph.vertices[column];
 				if (second === undefined) continue;
 				addStep(
@@ -294,30 +340,35 @@ export function buildGraphFromRepresentation(
 					first,
 					{ first, second },
 				);
-				if (matrix[row][column] === 1) {
+				if (matrix[row][column] !== null) {
 					addStep(
 						en
-							? `Condition true: A[${first}, ${second}] = 1`
-							: `Condition vraie : A[${first}, ${second}] = 1`,
+							? `Condition true: A[${first}, ${second}] = ${matrix[row][column]}`
+							: `Condition vraie : A[${first}, ${second}] = ${matrix[row][column]}`,
 						5,
 						first,
 						{ first, second },
 					);
-					const edge = { first, second };
+					const edge = {
+						first,
+						second,
+						...(graph.weighted ? { weight: matrix[row][column] ?? 1 } : {}),
+					};
 					built.edges.push(edge);
 					addStep(
 						en
-							? `Add edge {${first}, ${second}}`
-							: `Ajouter l’arête {${first}, ${second}}`,
+							? `Add edge ${edgeDescription(edge)}`
+							: `Ajouter l’arête ${edgeDescription(edge)}`,
 						6,
 						second,
 						edge,
 					);
 				} else {
+					const emptyCell = graph.weighted ? "∞" : "0";
 					addStep(
 						en
-							? `Condition false: A[${first}, ${second}] = 0; skip`
-							: `Condition fausse : A[${first}, ${second}] = 0 ; ignorer`,
+							? `Condition false: A[${first}, ${second}] = ${emptyCell}; skip`
+							: `Condition fausse : A[${first}, ${second}] = ${emptyCell} ; ignorer`,
 						5,
 						first,
 						{ first, second },

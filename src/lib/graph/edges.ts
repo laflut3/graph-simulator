@@ -1,37 +1,47 @@
+import { createGraph } from "@/lib/graph/create";
 import type { Graph, GraphEdge, GraphUpdate } from "@/lib/graph/types";
+
+function sameEdge(a: GraphEdge, b: GraphEdge, directed: boolean) {
+	return (
+		(a.first === b.first && a.second === b.second) ||
+		(!directed && a.first === b.second && a.second === b.first)
+	);
+}
 
 export function addEdge(
 	graph: Graph,
 	first: string,
 	second: string,
+	weight?: number,
 ): GraphUpdate {
 	if (
 		!graph.vertices.includes(first) ||
 		!graph.vertices.includes(second) ||
-		first === second
-	) {
+		(first === second && !graph.directed)
+	)
 		return { graph, error: "invalid-edge" };
-	}
+	if (graph.weighted && (weight === undefined || !Number.isFinite(weight)))
+		return { graph, error: "invalid-weight" };
 	if (
-		graph.edges.some(
-			(edge) =>
-				(edge.first === first && edge.second === second) ||
-				(edge.first === second && edge.second === first),
+		graph.edges.some((edge) =>
+			sameEdge(edge, { first, second }, graph.directed),
 		)
-	) {
+	)
 		return { graph, error: "duplicate-edge" };
-	}
 
-	const edge = {
-		first:
-			first.localeCompare(second, "fr", { numeric: true }) <= 0
-				? first
-				: second,
-		second:
-			first.localeCompare(second, "fr", { numeric: true }) <= 0
-				? second
-				: first,
-	};
+	const edge = graph.directed
+		? { first, second, ...(graph.weighted ? { weight } : {}) }
+		: {
+				first:
+					first.localeCompare(second, "fr", { numeric: true }) <= 0
+						? first
+						: second,
+				second:
+					first.localeCompare(second, "fr", { numeric: true }) <= 0
+						? second
+						: first,
+				...(graph.weighted ? { weight } : {}),
+			};
 	return {
 		graph: {
 			...graph,
@@ -49,13 +59,26 @@ export function removeEdge(graph: Graph, edgeToRemove: GraphEdge): Graph {
 	return {
 		...graph,
 		edges: graph.edges.filter(
-			(edge) =>
-				!(
-					(edge.first === edgeToRemove.first &&
-						edge.second === edgeToRemove.second) ||
-					(edge.first === edgeToRemove.second &&
-						edge.second === edgeToRemove.first)
-				),
+			(edge) => !sameEdge(edge, edgeToRemove, graph.directed),
 		),
+	};
+}
+
+export function updateGraphType(
+	graph: Graph,
+	patch: Partial<Pick<Graph, "directed" | "weighted">>,
+): Graph {
+	const directed = patch.directed ?? graph.directed;
+	const weighted = patch.weighted ?? graph.weighted;
+	const sample = createGraph();
+	return {
+		...graph,
+		directed,
+		weighted,
+		vertices: sample.vertices,
+		edges: sample.edges.map((edge) => ({
+			...edge,
+			...(weighted ? { weight: 1 } : {}),
+		})),
 	};
 }
