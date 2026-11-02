@@ -27,7 +27,7 @@ const copy: Record<
 			},
 			{
 				title: "Représentations et algorithmes",
-				body: "À côté du dessin (ou dessous sur petit écran), choisissez les listes de voisins, la matrice d’adjacence ou la liste d’arêtes ; les listes de voisins sont affichées par défaut. La matrice est symétrique, sa diagonale est nulle et la somme d’une ligne donne le degré du sommet. Pour tester une arête, les coûts sont O(deg(u)) en listes de voisins, O(|E|) en liste d’arêtes et O(1) en matrice. Le stockage demande Θ(|V| + |E|), Θ(|E|) et Θ(|V|²) respectivement. Les visualisations d’algorithmes pas à pas sont à venir.",
+				body: "À droite du dessin (ou dessous sur petit écran), choisissez les listes de voisins, la matrice d’adjacence ou la liste d’arêtes. Le bouton ▶ associé à chaque vue efface temporairement le dessin, puis reconstruit le graphe sommet par sommet et arête par arête selon cette représentation. La complexité affichée est celle de cette construction : Θ(|V| + |E|) pour les listes de voisins et la liste d’arêtes, Θ(|V|²) pour la matrice. Les autres algorithmes sont à venir.",
 			},
 			{
 				title: "Importer et télécharger",
@@ -59,7 +59,7 @@ const copy: Record<
 			},
 			{
 				title: "Representations and algorithms",
-				body: "Beside the drawing (or below it on small screens), choose the neighbor lists, adjacency matrix, or edge list; neighbor lists are shown by default. The matrix is symmetric, has a zero diagonal, and each row sum gives the vertex degree. Testing an edge takes O(deg(u)) with neighbor lists, O(|E|) with an edge list, and O(1) with a matrix. Storage takes Θ(|V| + |E|), Θ(|E|), and Θ(|V|²), respectively. Step-by-step algorithm visualizations are coming soon.",
+				body: "Beside the drawing (or below it on small screens), choose the neighbor lists, adjacency matrix, or edge list. The ▶ button for each view temporarily clears the drawing, then rebuilds the graph vertex by vertex and edge by edge using that representation. The displayed complexity is for this construction: Θ(|V| + |E|) for neighbor lists and edge lists, and Θ(|V|²) for the matrix. Other algorithms are coming soon.",
 			},
 			{
 				title: "Import and download",

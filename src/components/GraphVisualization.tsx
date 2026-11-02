@@ -9,6 +9,11 @@ type Props = Graph & {
 	analysis: GraphAnalysis;
 	selectedVertex: Vertex | null;
 	onSelectVertex: (vertex: Vertex | null) => void;
+	layoutVertices?: Vertex[];
+	showEmptyCanvas?: boolean;
+	interactive?: boolean;
+	currentVertex?: Vertex;
+	currentEdge?: Graph["edges"][number];
 };
 
 export function GraphVisualization({
@@ -17,8 +22,13 @@ export function GraphVisualization({
 	analysis,
 	selectedVertex,
 	onSelectVertex,
+	layoutVertices,
+	showEmptyCanvas = false,
+	interactive = true,
+	currentVertex,
+	currentEdge,
 }: Props) {
-	if (!vertices.length) {
+	if (!vertices.length && !showEmptyCanvas) {
 		return (
 			<p className="rounded-xl border border-dashed border-border py-14 text-center text-sm text-muted-foreground">
 				Ajoutez des sommets pour afficher le graphe.
@@ -26,15 +36,17 @@ export function GraphVisualization({
 		);
 	}
 
+	const positions = layoutVertices ?? vertices;
 	const radius =
-		vertices.length === 1
+		positions.length <= 1
 			? 0
-			: Math.max(150, Math.min(260, vertices.length * 22));
+			: Math.max(150, Math.min(260, positions.length * 22));
 	const size = radius * 2 + 100;
 	const center = size / 2;
 	const point = (vertex: Vertex) => {
 		const angle =
-			(2 * Math.PI * vertices.indexOf(vertex)) / vertices.length - Math.PI / 2;
+			(2 * Math.PI * positions.indexOf(vertex)) / positions.length -
+			Math.PI / 2;
 		return {
 			x: center + radius * Math.cos(angle),
 			y: center + radius * Math.sin(angle),
@@ -64,7 +76,11 @@ export function GraphVisualization({
 					{edges.map(({ first, second }) => {
 						const a = point(first);
 						const b = point(second);
-						const highlighted = cycleEdges.has(edgeKey(first, second));
+						const key = edgeKey(first, second);
+						const isCurrent = currentEdge
+							? key === edgeKey(currentEdge.first, currentEdge.second)
+							: false;
+						const highlighted = isCurrent || cycleEdges.has(key);
 						return (
 							<line
 								key={edgeKey(first, second)}
@@ -75,7 +91,7 @@ export function GraphVisualization({
 								stroke={
 									highlighted ? "var(--primary)" : "var(--muted-foreground)"
 								}
-								strokeWidth={highlighted ? 3 : 1.5}
+								strokeWidth={isCurrent ? 3.5 : highlighted ? 3 : 1.5}
 								opacity={selectedVertex !== null && !highlighted ? 0.22 : 0.8}
 							/>
 						);
@@ -95,17 +111,27 @@ export function GraphVisualization({
 						<g
 							key={vertex}
 							role="button"
-							tabIndex={0}
+							tabIndex={interactive ? 0 : -1}
+							aria-disabled={!interactive}
 							aria-label={`Sommet ${vertex}, degré ${analysis.degree.get(vertex) ?? 0}`}
 							aria-pressed={isSelected}
-							onClick={() => onSelectVertex(isSelected ? null : vertex)}
+							onClick={
+								interactive
+									? () => onSelectVertex(isSelected ? null : vertex)
+									: undefined
+							}
 							onKeyDown={(event) => {
-								if (event.key === "Enter" || event.key === " ") {
+								if (
+									interactive &&
+									(event.key === "Enter" || event.key === " ")
+								) {
 									event.preventDefault();
 									onSelectVertex(isSelected ? null : vertex);
 								}
 							}}
-							className="cursor-pointer outline-none"
+							className={
+								interactive ? "cursor-pointer outline-none" : "outline-none"
+							}
 						>
 							<rect
 								x={x - labelWidth / 2}
@@ -118,8 +144,12 @@ export function GraphVisualization({
 										? "var(--accent)"
 										: "var(--background)"
 								}
-								stroke={isSelected ? "var(--primary)" : "var(--foreground)"}
-								strokeWidth={isSelected ? 3 : 1.5}
+								stroke={
+									isSelected || currentVertex === vertex
+										? "var(--primary)"
+										: "var(--foreground)"
+								}
+								strokeWidth={isSelected || currentVertex === vertex ? 3 : 1.5}
 								opacity={isRelated ? 1 : 0.35}
 							/>
 							<text

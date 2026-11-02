@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { type ChangeEvent, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { GraphForm } from "@/components/GraphForm";
 import { GraphInsights } from "@/components/GraphInsights";
 import { GraphRepresentationPanel } from "@/components/GraphRepresentationPanel";
@@ -9,7 +9,11 @@ import { analyzeGraph } from "@/lib/graph/analyze";
 import { createGraph } from "@/lib/graph/create";
 import { addEdge, removeEdge } from "@/lib/graph/edges";
 import { parseGraphConfig, serializeGraphConfig } from "@/lib/graph/io";
-import type { GraphRepresentation } from "@/lib/graph/representations";
+import {
+	buildGraphFromRepresentation,
+	type GraphConstructionStep,
+	type GraphRepresentation,
+} from "@/lib/graph/representations";
 import type { GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
 
@@ -18,6 +22,11 @@ function SimulatorPage() {
 	const [selectedVertex, setSelectedVertex] = useState<Vertex | null>(null);
 	const [representation, setRepresentation] =
 		useState<GraphRepresentation>("neighbor-list");
+	const [construction, setConstruction] = useState<{
+		steps: GraphConstructionStep[];
+		index: number;
+		playing: boolean;
+	} | null>(null);
 	const [configMessage, setConfigMessage] = useState("");
 	const [configError, setConfigError] = useState("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,6 +36,30 @@ function SimulatorPage() {
 		() => analyzeGraph({ vertices, edges }),
 		[vertices, edges],
 	);
+	const runRepresentation = (selected: GraphRepresentation) => {
+		setRepresentation(selected);
+		setSelectedVertex(null);
+		setConstruction({
+			steps: buildGraphFromRepresentation(graph, selected),
+			index: 0,
+			playing: true,
+		});
+	};
+
+	useEffect(() => {
+		if (!construction?.playing) return;
+		const timer = window.setInterval(() => {
+			setConstruction((current) => {
+				if (!current) return null;
+				if (current.index >= current.steps.length - 1) return null;
+				return { ...current, index: current.index + 1 };
+			});
+		}, 550);
+		return () => window.clearInterval(timer);
+	}, [construction?.playing]);
+
+	const currentStep = construction?.steps[construction.index];
+	const displayedGraph = currentStep?.graph ?? graph;
 
 	const handleExport = () => {
 		const fileName =
@@ -57,6 +90,7 @@ function SimulatorPage() {
 		try {
 			const parsed = parseGraphConfig(JSON.parse(await file.text()));
 			if (!parsed) throw new Error("invalid-config");
+			setConstruction(null);
 			setGraph(parsed);
 			setSelectedVertex(null);
 			setConfigMessage(`Configuration « ${parsed.nom} » chargée.`);
@@ -71,22 +105,31 @@ function SimulatorPage() {
 
 	const handleAddVertex = (vertex: string) => {
 		const result = addVertex(graph, vertex);
-		if (!result.error) setGraph(result.graph);
+		if (!result.error) {
+			setConstruction(null);
+			setGraph(result.graph);
+		}
 		return result.error;
 	};
 
 	const handleAddEdge = (first: Vertex, second: Vertex) => {
 		const result = addEdge(graph, first, second);
-		if (!result.error) setGraph(result.graph);
+		if (!result.error) {
+			setConstruction(null);
+			setGraph(result.graph);
+		}
 		return result.error;
 	};
 
 	const handleRemoveVertex = (vertex: string) => {
+		setConstruction(null);
 		setGraph((current) => removeVertex(current, vertex));
 		setSelectedVertex((current) => (current === vertex ? null : current));
 	};
-	const handleRemoveEdge = (edge: GraphEdge) =>
+	const handleRemoveEdge = (edge: GraphEdge) => {
+		setConstruction(null);
 		setGraph((current) => removeEdge(current, edge));
+	};
 
 	return (
 		<main className="w-full px-4 py-10 text-foreground sm:px-8 sm:py-12 lg:px-10 lg:py-16">
@@ -137,9 +180,10 @@ function SimulatorPage() {
 
 			<GraphForm
 				graph={graph}
-				onGraphNameChange={(name) =>
-					setGraph((current) => ({ ...current, nom: name }))
-				}
+				onGraphNameChange={(name) => {
+					setConstruction(null);
+					setGraph((current) => ({ ...current, nom: name }));
+				}}
 				onAddVertex={handleAddVertex}
 				onAddEdge={handleAddEdge}
 				onRemoveVertex={handleRemoveVertex}
@@ -155,27 +199,75 @@ function SimulatorPage() {
 						Graphe
 					</h2>
 					<span className="text-xs text-muted-foreground">
-						{graph.vertices.length} sommets · {graph.edges.length} arêtes
+						{construction
+							? `${displayedGraph.vertices.length}/${graph.vertices.length} sommets · ${displayedGraph.edges.length}/${graph.edges.length} arêtes`
+							: `${graph.vertices.length} sommets · ${graph.edges.length} arêtes`}
 					</span>
 				</div>
+				{construction && currentStep && (
+					<div
+						className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/20 px-4 py-3"
+						aria-live="polite"
+					>
+						<div className="min-w-0">
+							<p className="text-sm font-medium">{currentStep.title}</p>
+							<p className="mt-1 text-xs text-muted-foreground">
+								{currentStep.description}
+							</p>
+							<p className="mt-1 font-mono text-[11px] text-muted-foreground">
+								Étape {construction.index + 1} / {construction.steps.length}
+							</p>
+						</div>
+						<div className="flex gap-2">
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() =>
+									setConstruction((run) =>
+										run ? { ...run, playing: !run.playing } : null,
+									)
+								}
+							>
+								{construction.playing ? "Pause" : "Reprendre"}
+							</Button>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => setConstruction(null)}
+							>
+								Terminer
+							</Button>
+						</div>
+					</div>
+				)}
 				<div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
 					<GraphVisualization
-						{...graph}
+						{...displayedGraph}
 						analysis={analysis}
-						selectedVertex={selectedVertex}
+						selectedVertex={construction ? null : selectedVertex}
 						onSelectVertex={setSelectedVertex}
+						layoutVertices={graph.vertices}
+						showEmptyCanvas={Boolean(construction)}
+						interactive={!construction}
+						currentVertex={currentStep?.currentVertex}
+						currentEdge={currentStep?.currentEdge}
 					/>
 					<GraphRepresentationPanel
 						graph={graph}
 						selected={representation}
 						onSelect={setRepresentation}
+						onPlay={runRepresentation}
 					/>
 				</div>
-				<GraphInsights
-					analysis={analysis}
-					selectedVertex={selectedVertex}
-					onSelectVertex={setSelectedVertex}
-				/>
+				{!construction && (
+					<GraphInsights
+						analysis={analysis}
+						selectedVertex={selectedVertex}
+						onSelectVertex={setSelectedVertex}
+					/>
+				)}
 			</section>
 		</main>
 	);

@@ -13,6 +13,7 @@ type Props = {
 	graph: Graph;
 	selected: GraphRepresentation;
 	onSelect: (representation: GraphRepresentation) => void;
+	onPlay: (representation: GraphRepresentation) => void;
 };
 
 const representations: GraphRepresentation[] = [
@@ -21,7 +22,12 @@ const representations: GraphRepresentation[] = [
 	"edge-list",
 ];
 
-export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
+export function GraphRepresentationPanel({
+	graph,
+	selected,
+	onSelect,
+	onPlay,
+}: Props) {
 	const vertices = graph.vertices;
 	const edges = graph.edges;
 	const matrix = useMemo(
@@ -32,7 +38,6 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 		() => createNeighborLists({ vertices, edges }),
 		[vertices, edges],
 	);
-	const complexity = representationComplexity[selected];
 
 	return (
 		<section
@@ -50,21 +55,39 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 				</div>
 				<div className="flex flex-wrap items-center justify-end gap-2">
 					<div className="flex flex-wrap gap-1 rounded-lg bg-muted/60 p-1">
-						{representations.map((representation) => (
-							<button
-								key={representation}
-								type="button"
-								aria-pressed={selected === representation}
-								onClick={() => onSelect(representation)}
-								className={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${selected === representation ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-							>
-								{representation === "neighbor-list"
+						{representations.map((representation) => {
+							const label =
+								representation === "neighbor-list"
 									? "Voisins"
 									: representation === "adjacency-matrix"
 										? "Matrice"
-										: "Arêtes"}
-							</button>
-						))}
+										: "Arêtes";
+							const active = selected === representation;
+							return (
+								<div
+									key={representation}
+									className={`inline-flex items-center rounded-md ${active ? "bg-background shadow-sm" : ""}`}
+								>
+									<button
+										type="button"
+										aria-pressed={active}
+										onClick={() => onSelect(representation)}
+										className={`rounded-l-md px-2 py-1.5 text-xs font-medium transition-colors ${active ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+									>
+										{label}
+									</button>
+									<button
+										type="button"
+										aria-label={`Lire la construction depuis ${graphRepresentationName(representation)}`}
+										title={`Construire depuis ${graphRepresentationName(representation)}`}
+										onClick={() => onPlay(representation)}
+										className={`grid size-7 place-items-center rounded-r-md text-[10px] transition-colors hover:bg-muted ${active ? "text-foreground" : "text-muted-foreground"}`}
+									>
+										▶
+									</button>
+								</div>
+							);
+						})}
 					</div>
 					<AlgorithmComingSoon />
 				</div>
@@ -76,7 +99,7 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 				</p>
 				{selected === "neighbor-list" && (
 					<ul className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
-						{graph.vertices.map((vertex) => (
+						{vertices.map((vertex) => (
 							<li
 								key={vertex}
 								className="flex min-w-0 gap-2 rounded-md px-2 py-1.5 even:bg-muted/40"
@@ -102,7 +125,7 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 									<th scope="col" className="sticky left-0 bg-muted px-2 py-2">
 										·
 									</th>
-									{graph.vertices.map((vertex) => (
+									{vertices.map((vertex) => (
 										<th
 											scope="col"
 											key={vertex}
@@ -114,7 +137,7 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 								</tr>
 							</thead>
 							<tbody>
-								{graph.vertices.map((vertex, row) => (
+								{vertices.map((vertex, row) => (
 									<tr key={vertex} className="border-t border-border">
 										<th
 											scope="row"
@@ -124,7 +147,7 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 										</th>
 										{matrix[row].map((value, column) => (
 											<td
-												key={`${vertex}-${graph.vertices[column]}`}
+												key={`${vertex}-${vertices[column]}`}
 												className={`px-2 py-2 ${value ? "font-semibold text-foreground" : "text-muted-foreground/60"}`}
 											>
 												{value}
@@ -138,8 +161,8 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 				)}
 				{selected === "edge-list" && (
 					<ol className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
-						{graph.edges.length ? (
-							graph.edges.map(({ first, second }, index) => (
+						{edges.length ? (
+							edges.map(({ first, second }, index) => (
 								<li
 									key={`${first}-${second}`}
 									className="flex gap-3 rounded-md px-2 py-1.5 even:bg-muted/40"
@@ -162,42 +185,13 @@ export function GraphRepresentationPanel({ graph, selected, onSelect }: Props) {
 			</div>
 
 			<footer className="border-t border-border px-4 py-3 sm:px-5">
-				<div className="grid grid-cols-2 gap-4 text-xs sm:grid-cols-4">
-					<ComplexityItem label="Mémoire" value={complexity.space} />
-					<ComplexityItem
-						label="Tester l’adjacence"
-						value={complexity.testAdjacency}
-					/>
-					<ComplexityItem
-						label="Lister les voisins"
-						value={complexity.listNeighbors}
-					/>
-					<ComplexityItem
-						label="Lister les arêtes"
-						value={complexity.listEdges}
-					/>
-				</div>
-				{selected === "adjacency-matrix" && (
-					<p className="mt-3 border-t border-border pt-3 text-xs leading-5 text-muted-foreground">
-						La matrice est symétrique, sa diagonale est nulle et chaque ligne
-						somme au degré du sommet.
-					</p>
-				)}
-				{selected === "neighbor-list" && (
-					<p className="mt-3 border-t border-border pt-3 text-xs leading-5 text-muted-foreground">
-						Chaque arête apparaît dans les listes de ses deux extrémités.
-					</p>
-				)}
+				<p className="text-xs text-muted-foreground">
+					Complexité algorithmique
+					<span className="ml-2 font-mono text-foreground">
+						{representationComplexity[selected]}
+					</span>
+				</p>
 			</footer>
 		</section>
-	);
-}
-
-function ComplexityItem({ label, value }: { label: string; value: string }) {
-	return (
-		<p className="text-muted-foreground">
-			{label}
-			<span className="mt-1 block font-mono text-foreground">{value}</span>
-		</p>
 	);
 }

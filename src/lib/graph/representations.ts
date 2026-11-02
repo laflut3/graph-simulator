@@ -1,3 +1,4 @@
+import { edgeKey } from "@/lib/graph/analyze";
 import type { Graph, Vertex } from "@/lib/graph/types";
 
 export type GraphRepresentation =
@@ -25,39 +26,120 @@ export function createNeighborLists({ vertices, edges }: GraphStructure) {
 		neighbors.get(first)?.push(second);
 		neighbors.get(second)?.push(first);
 	}
-	for (const adjacent of neighbors.values())
-		adjacent.sort((a, b) => a.localeCompare(b, "fr", { numeric: true }));
 	return neighbors;
 }
 
-export const representationComplexity: Record<
-	GraphRepresentation,
-	{
-		space: string;
-		testAdjacency: string;
-		listNeighbors: string;
-		listEdges: string;
-	}
-> = {
-	"neighbor-list": {
-		space: "Θ(|V| + |E|)",
-		testAdjacency: "O(deg(u))",
-		listNeighbors: "Θ(deg(u))",
-		listEdges: "Θ(|V| + |E|)",
-	},
-	"adjacency-matrix": {
-		space: "Θ(|V|²)",
-		testAdjacency: "O(1)",
-		listNeighbors: "Θ(|V|)",
-		listEdges: "Θ(|V|²)",
-	},
-	"edge-list": {
-		space: "Θ(|E|)",
-		testAdjacency: "O(|E|)",
-		listNeighbors: "O(|E|)",
-		listEdges: "Θ(|E|)",
-	},
+export const representationComplexity: Record<GraphRepresentation, string> = {
+	"neighbor-list": "Θ(|V| + |E|)",
+	"adjacency-matrix": "Θ(|V|²)",
+	"edge-list": "Θ(|V| + |E|)",
 };
+
+export type GraphConstructionStep = {
+	graph: Graph;
+	title: string;
+	description: string;
+	currentVertex?: Vertex;
+	currentEdge?: Graph["edges"][number];
+};
+
+export function buildGraphFromRepresentation(
+	graph: Graph,
+	representation: GraphRepresentation,
+): GraphConstructionStep[] {
+	const built: Graph = { nom: graph.nom, vertices: [], edges: [] };
+	const steps: GraphConstructionStep[] = [];
+	const snapshot = (): Graph => ({
+		nom: built.nom,
+		vertices: [...built.vertices],
+		edges: [...built.edges],
+	});
+	const addStep = (
+		title: string,
+		description: string,
+		currentVertex?: Vertex,
+		currentEdge?: Graph["edges"][number],
+	) => {
+		steps.push({
+			graph: snapshot(),
+			title,
+			description,
+			currentVertex,
+			currentEdge,
+		});
+	};
+
+	addStep(
+		"Effacer le dessin",
+		"On vide le dessin avant de reconstruire le graphe.",
+	);
+	for (const vertex of graph.vertices) {
+		built.vertices.push(vertex);
+		addStep(
+			`Ajouter ${vertex}`,
+			`Le sommet ${vertex} est ajouté au dessin.`,
+			vertex,
+		);
+	}
+
+	if (representation === "edge-list") {
+		for (const edge of graph.edges) {
+			built.edges.push(edge);
+			addStep(
+				`Ajouter {${edge.first}, ${edge.second}}`,
+				`La paire {${edge.first}, ${edge.second}} de la liste devient une arête.`,
+				edge.second,
+				edge,
+			);
+		}
+	} else if (representation === "neighbor-list") {
+		const neighbors = createNeighborLists(graph);
+		const seen = new Set<string>();
+		for (const vertex of graph.vertices) {
+			for (const neighbor of neighbors.get(vertex) ?? []) {
+				const key = edgeKey(vertex, neighbor);
+				if (seen.has(key)) continue;
+				seen.add(key);
+				const edge = { first: vertex, second: neighbor };
+				built.edges.push(edge);
+				addStep(
+					`Relier ${vertex} à ${neighbor}`,
+					`${neighbor} apparaît dans la liste de voisins de ${vertex} ; l’arête est ajoutée une seule fois.`,
+					vertex,
+					edge,
+				);
+			}
+		}
+	} else {
+		const matrix = createAdjacencyMatrix(graph);
+		for (let row = 0; row < graph.vertices.length; row++) {
+			for (let column = row + 1; column < graph.vertices.length; column++) {
+				const first = graph.vertices[row];
+				const second = graph.vertices[column];
+				if (first === undefined || second === undefined) continue;
+				if (matrix[row][column] === 1) {
+					const edge = { first, second };
+					built.edges.push(edge);
+					addStep(
+						`Créer {${first}, ${second}}`,
+						`A[${first}, ${second}] = 1 : on crée cette arête.`,
+						second,
+						edge,
+					);
+				} else {
+					addStep(
+						`Lire A[${first}, ${second}]`,
+						`A[${first}, ${second}] = 0 : aucune arête à dessiner.`,
+						first,
+					);
+				}
+			}
+		}
+	}
+	if (steps.length === 1)
+		addStep("Graphe vide", "La représentation ne contient aucun sommet.");
+	return steps;
+}
 
 export function graphRepresentationName(representation: GraphRepresentation) {
 	return {
