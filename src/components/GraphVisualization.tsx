@@ -89,10 +89,20 @@ export function GraphVisualization({
 								x2={b.x}
 								y2={b.y}
 								stroke={
-									highlighted ? "var(--primary)" : "var(--muted-foreground)"
+									isCurrent
+										? "var(--construction-active)"
+										: cycleEdges.has(key)
+											? "var(--primary)"
+											: "var(--muted-foreground)"
 								}
-								strokeWidth={isCurrent ? 3.5 : highlighted ? 3 : 1.5}
-								opacity={selectedVertex !== null && !highlighted ? 0.22 : 0.8}
+								strokeWidth={isCurrent ? 4 : highlighted ? 3 : 1.5}
+								opacity={
+									isCurrent
+										? 1
+										: selectedVertex !== null && !highlighted
+											? 0.22
+											: 0.8
+								}
 							/>
 						);
 					})}
@@ -100,6 +110,7 @@ export function GraphVisualization({
 				{vertices.map((vertex) => {
 					const { x, y } = point(vertex);
 					const isSelected = vertex === selectedVertex;
+					const isCurrent = vertex === currentVertex;
 					const isRelated =
 						selectedVertex === null || selectedComponentSet.has(vertex);
 					const labelWidth = Math.max(
@@ -140,16 +151,20 @@ export function GraphVisualization({
 								height="44"
 								rx="18"
 								fill={
-									selectedCycleVertices.has(vertex)
-										? "var(--accent)"
-										: "var(--background)"
+									isCurrent
+										? "var(--construction-active)"
+										: selectedCycleVertices.has(vertex)
+											? "var(--accent)"
+											: "var(--background)"
 								}
 								stroke={
-									isSelected || currentVertex === vertex
-										? "var(--primary)"
-										: "var(--foreground)"
+									isCurrent
+										? "var(--construction-active)"
+										: isSelected
+											? "var(--primary)"
+											: "var(--foreground)"
 								}
-								strokeWidth={isSelected || currentVertex === vertex ? 3 : 1.5}
+								strokeWidth={isSelected || isCurrent ? 3 : 1.5}
 								opacity={isRelated ? 1 : 0.35}
 							/>
 							<text
@@ -157,7 +172,11 @@ export function GraphVisualization({
 								y={y}
 								dominantBaseline="central"
 								textAnchor="middle"
-								fill="var(--foreground)"
+								fill={
+									isCurrent
+										? "var(--construction-active-foreground)"
+										: "var(--foreground)"
+								}
 								fontFamily="var(--font-mono)"
 								fontSize="13"
 								textLength={Math.min(vertex.length * 8, labelWidth - 14)}
