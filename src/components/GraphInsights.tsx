@@ -53,9 +53,9 @@ export function GraphInsights({
 					{analysis.components.map((component, index) => (
 						<li
 							key={JSON.stringify(component)}
-							className={
+							className={`break-words ${
 								index === componentIndex ? "font-medium text-foreground" : ""
-							}
+							}`}
 						>
 							<span className="mr-2 font-mono text-xs">C{index + 1}</span>
 							&#123;{listVertices(component)}&#125;
@@ -80,11 +80,11 @@ export function GraphInsights({
 						{analysis.cycles.map((cycle) => (
 							<li
 								key={JSON.stringify(cycle)}
-								className={
+								className={`break-words ${
 									cyclesForVertex.includes(cycle)
 										? "font-medium text-foreground"
 										: ""
-								}
+								}`}
 							>
 								{cycle.join(" → ")} → {cycle[0]}
 							</li>
@@ -123,7 +123,7 @@ export function GraphInsights({
 							×
 						</button>
 					</div>
-					<div className="mt-4 grid gap-4 text-sm sm:grid-cols-3">
+					<div className="mt-4 grid gap-4 text-sm md:grid-cols-3">
 						<div>
 							<p className="text-xs text-muted-foreground">
 								{text(
@@ -132,7 +132,7 @@ export function GraphInsights({
 									directed ? "Degré entrant / sortant" : "Degré",
 								)}
 							</p>
-							<p className="mt-1">
+							<p className="mt-1 break-words">
 								{directed
 									? `${analysis.inDegree.get(selectedVertex) ?? 0} / ${analysis.outDegree.get(selectedVertex) ?? 0}`
 									: (analysis.degree.get(selectedVertex) ?? 0)}
@@ -146,7 +146,7 @@ export function GraphInsights({
 									`Composante C${componentIndex + 1}`,
 								)}
 							</p>
-							<p className="mt-1">
+							<p className="mt-1 break-words">
 								&#123;{listVertices(selectedComponent)}&#125;
 							</p>
 						</div>

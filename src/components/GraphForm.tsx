@@ -189,7 +189,7 @@ export function GraphForm({
 					onChange={(event) => onGraphNameChange(event.target.value)}
 				/>
 			</div>
-			<div className="grid gap-5 lg:grid-cols-2">
+			<div className="grid gap-5 xl:grid-cols-2">
 				<section
 					aria-labelledby="vertices-title"
 					className="rounded-xl border border-border bg-muted/20 p-5 sm:p-6"
@@ -205,7 +205,7 @@ export function GraphForm({
 						</span>
 					</div>
 					<div className="mt-5 min-h-24 rounded-lg border border-border/70 bg-background p-4">
-						<p className="mb-3 font-mono text-xs text-muted-foreground">
+						<p className="mb-3 break-words font-mono text-xs text-muted-foreground">
 							V = &#123;{vertices.join(", ")}&#125;
 						</p>
 						{vertices.length ? (
@@ -213,7 +213,7 @@ export function GraphForm({
 								{vertices.map((vertex) => (
 									<li
 										key={vertex}
-										className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-1 pl-3 pr-1 font-mono text-sm"
+										className="inline-flex max-w-full items-center gap-1 break-words rounded-md border border-border bg-muted/30 py-1 pl-3 pr-1 font-mono text-sm"
 									>
 										{vertex}
 										<Button
@@ -286,7 +286,7 @@ export function GraphForm({
 						</span>
 					</div>
 					<div className="mt-5 min-h-24 rounded-lg border border-border/70 bg-background p-4">
-						<p className="mb-3 font-mono text-xs text-muted-foreground">
+						<p className="mb-3 break-words font-mono text-xs text-muted-foreground">
 							E = &#123;
 							{edges
 								.map(
@@ -301,7 +301,7 @@ export function GraphForm({
 								{edges.map((edge) => (
 									<li
 										key={`${edge.first}:${edge.second}`}
-										className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-1 pl-3 pr-1 font-mono text-sm"
+										className="inline-flex max-w-full items-center gap-1 break-words rounded-md border border-border bg-muted/30 py-1 pl-3 pr-1 font-mono text-sm"
 									>
 										{graph.directed
 											? `${edge.first} → ${edge.second}`
@@ -335,7 +335,7 @@ export function GraphForm({
 							{text(language, "Connect two vertices", "Relier deux sommets")}
 						</p>
 						<div
-							className={`grid items-center gap-2 ${graph.weighted ? "grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_5rem_auto]" : "grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto]"}`}
+							className={`grid items-center gap-2 ${graph.weighted ? "grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_5rem_auto]" : "grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto]"}`}
 						>
 							<select
 								aria-label={text(language, "First vertex", "Premier sommet")}
@@ -350,7 +350,7 @@ export function GraphForm({
 									</option>
 								))}
 							</select>
-							<span className="font-mono text-muted-foreground">
+							<span className="hidden font-mono text-muted-foreground sm:inline">
 								{graph.directed ? "→" : "—"}
 							</span>
 							<select

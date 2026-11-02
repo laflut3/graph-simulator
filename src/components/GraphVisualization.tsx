@@ -77,7 +77,7 @@ export function GraphVisualization({
 	const selectedCycleVertices = new Set(cyclesForVertex.flat());
 
 	return (
-		<div className="rounded-xl border border-border bg-background p-3 sm:p-6">
+		<div className="overflow-x-auto rounded-xl border border-border bg-background p-3 sm:p-6">
 			<svg
 				viewBox={`0 0 ${size} ${size}`}
 				role="img"
@@ -86,7 +86,7 @@ export function GraphVisualization({
 					`Graph with ${vertices.length} vertices and ${edges.length} edges`,
 					`Graphe avec ${vertices.length} sommets et ${edges.length} arêtes`,
 				)}
-				className="mx-auto block aspect-square h-auto w-full max-w-2xl"
+				className={`mx-auto block aspect-square h-auto w-full max-w-2xl ${vertices.length > 8 ? "max-sm:min-w-[28rem]" : ""}`}
 			>
 				<title>
 					{text(language, "Graph visualization", "Visualisation du graphe")}

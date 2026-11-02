@@ -248,7 +248,7 @@ export function SimulatorPage() {
 				aria-labelledby="graph-title"
 				className="mt-12 border-t border-border pt-8"
 			>
-				<div className="mb-4 flex items-baseline justify-between">
+				<div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
 					<h2 id="graph-title" className="text-sm font-medium">
 						{text(language, "Graph", "Graphe")}
 					</h2>
