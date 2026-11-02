@@ -159,20 +159,88 @@ export function SiteLayout() {
 							</nav>
 							<div className="order-2 ml-auto flex items-center gap-2 md:order-none md:ml-0 md:gap-3">
 								{installPrompt && (
-									<button
-										type="button"
-										className="inline-flex min-h-10 items-center gap-2 rounded-md border border-border px-3 text-xs font-medium text-foreground hover:bg-muted"
-										onClick={async () => {
-											await installPrompt.prompt();
-											await installPrompt.userChoice;
-											setInstallPrompt(null);
-										}}
-									>
-										<InstallIcon />
-										{text(language, "Install", "Installer")}
-									</button>
+									<>
+										<button
+											type="button"
+											aria-label={text(
+												language,
+												"Install app",
+												"Installer l’application",
+											)}
+											title={text(
+												language,
+												"Install app",
+												"Installer l’application",
+											)}
+											className="grid size-10 place-items-center rounded-md border border-border hover:bg-muted sm:hidden"
+											onClick={async () => {
+												await installPrompt.prompt();
+												await installPrompt.userChoice;
+												setInstallPrompt(null);
+											}}
+										>
+											<InstallIcon />
+										</button>
+										<button
+											type="button"
+											className="hidden min-h-10 items-center gap-2 rounded-md border border-border px-3 text-xs font-medium text-foreground hover:bg-muted sm:inline-flex"
+											onClick={async () => {
+												await installPrompt.prompt();
+												await installPrompt.userChoice;
+												setInstallPrompt(null);
+											}}
+										>
+											<InstallIcon />
+											{text(language, "Install", "Installer")}
+										</button>
+									</>
 								)}
-								<label className="flex items-center gap-2 text-xs text-muted-foreground">
+								<label className="relative grid h-10 w-10 place-items-center rounded-md border border-border text-foreground focus-within:ring-2 focus-within:ring-ring/50 sm:hidden">
+									<ThemeIcon theme={theme} />
+									<span className="sr-only">
+										{text(language, "Theme", "Thème")}
+									</span>
+									<select
+										aria-label={text(language, "Theme", "Thème")}
+										value={theme}
+										onChange={(event) => setTheme(event.target.value as Theme)}
+										className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+									>
+										<option value="system">
+											{text(language, "System", "Système")}
+										</option>
+										<option value="light">
+											{text(language, "Light", "Clair")}
+										</option>
+										<option value="dark">
+											{text(language, "Dark", "Sombre")}
+										</option>
+									</select>
+								</label>
+								<label className="relative grid h-10 min-w-14 place-items-center rounded-md border border-border text-xs font-medium text-foreground focus-within:ring-2 focus-within:ring-ring/50 sm:hidden">
+									<span
+										className="inline-flex items-center gap-1.5"
+										aria-hidden="true"
+									>
+										<LanguageIcon />
+										{language.toUpperCase()}
+									</span>
+									<span className="sr-only">
+										{text(language, "Language", "Langue")}
+									</span>
+									<select
+										aria-label={text(language, "Language", "Langue")}
+										value={language}
+										onChange={(event) =>
+											setLanguage(event.target.value as Language)
+										}
+										className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+									>
+										<option value="en">English</option>
+										<option value="fr">Français</option>
+									</select>
+								</label>
+								<label className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
 									<span className="sr-only">
 										{text(language, "Theme", "Thème")}
 									</span>
@@ -203,7 +271,7 @@ export function SiteLayout() {
 									onChange={(event) =>
 										setLanguage(event.target.value as Language)
 									}
-									className="h-10 rounded-md border border-border bg-background px-2 text-xs text-foreground"
+									className="hidden h-10 rounded-md border border-border bg-background px-2 text-xs text-foreground sm:block"
 								>
 									<option value="en">English</option>
 									<option value="fr">Français</option>
@@ -480,6 +548,49 @@ function InstallIcon() {
 			className="size-4"
 		>
 			<path d="M8 2.5v7m0 0 2.5-2.5M8 9.5 5.5 7M3.5 10.5v3h9v-3" />
+		</svg>
+	);
+}
+
+function ThemeIcon({ theme }: { theme: Theme }) {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			strokeWidth="1.4"
+			className="size-4"
+		>
+			{theme === "dark" ? (
+				<path d="M16 12.4A6.7 6.7 0 0 1 7.6 4a6.8 6.8 0 1 0 8.4 8.4Z" />
+			) : theme === "light" ? (
+				<>
+					<circle cx="10" cy="10" r="3.2" />
+					<path d="M10 2v1.5m0 13V18m8-8h-1.5m-13 0H2m13.66-5.66-1.06 1.06m-9.2 9.2-1.06 1.06m11.32 0-1.06-1.06m-9.2-9.2L4.34 4.34" />
+				</>
+			) : (
+				<path d="M4 3.5h12a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 16 14.5H4A1.5 1.5 0 0 1 2.5 13V5A1.5 1.5 0 0 1 4 3.5Zm4 14h4m-2-3v3" />
+			)}
+		</svg>
+	);
+}
+
+function LanguageIcon() {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 20 20"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+			strokeWidth="1.4"
+			className="size-4"
+		>
+			<circle cx="10" cy="10" r="7.5" />
+			<path d="M2.8 7h14.4M2.8 13h14.4M10 2.5c2 2 3 4.5 3 7.5s-1 5.5-3 7.5c-2-2-3-4.5-3-7.5s1-5.5 3-7.5Z" />
 		</svg>
 	);
 }

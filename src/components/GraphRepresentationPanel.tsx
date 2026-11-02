@@ -96,7 +96,7 @@ export function GraphRepresentationPanel({
 							"Graph representations",
 							"Représentations du graphe",
 						)}
-						className="flex flex-wrap gap-2"
+						className="hidden flex-wrap gap-2 sm:flex"
 					>
 						{representations.map((representation) => {
 							const label =
@@ -164,6 +164,59 @@ export function GraphRepresentationPanel({
 							);
 						})}
 					</nav>
+					<div className="flex min-w-0 flex-1 items-center gap-2 sm:hidden">
+						<label className="sr-only" htmlFor="mobile-representation">
+							{text(
+								language,
+								"Graph representation",
+								"Représentation du graphe",
+							)}
+						</label>
+						<select
+							id="mobile-representation"
+							value={selected}
+							onChange={(event) =>
+								onSelect(event.target.value as GraphRepresentation)
+							}
+							className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-background px-3 text-xs font-medium text-foreground"
+						>
+							{representations.map((representation) => (
+								<option key={representation} value={representation}>
+									{graphRepresentationName(representation, language)}
+								</option>
+							))}
+						</select>
+						<button
+							type="button"
+							aria-label={text(
+								language,
+								`Run ${graphRepresentationName(selected, language)}`,
+								`Lancer ${graphRepresentationName(selected, language)}`,
+							)}
+							title={text(
+								language,
+								"Run representation",
+								"Lancer la représentation",
+							)}
+							onClick={() => onPlay(selected)}
+							className="grid size-10 shrink-0 place-items-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:bg-muted"
+						>
+							<PlayIcon />
+						</button>
+						<button
+							type="button"
+							aria-label={text(
+								language,
+								`Debug ${graphRepresentationName(selected, language)} step by step`,
+								`Déboguer ${graphRepresentationName(selected, language)} pas à pas`,
+							)}
+							title={text(language, "Debug step by step", "Déboguer pas à pas")}
+							onClick={() => onDebug(selected)}
+							className="grid size-10 shrink-0 place-items-center rounded-lg border border-blue-500/15 bg-blue-500/5 text-blue-600 transition-colors hover:border-blue-500/30 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-400/10"
+						>
+							<DebugBugIcon />
+						</button>
+					</div>
 				</div>
 			</header>
 
@@ -357,5 +410,18 @@ export function GraphRepresentationPanel({
 				</p>
 			</footer>
 		</section>
+	);
+}
+
+function PlayIcon() {
+	return (
+		<svg
+			aria-hidden="true"
+			viewBox="0 0 16 16"
+			fill="currentColor"
+			className="size-4"
+		>
+			<path d="M4.25 2.75a.75.75 0 0 1 1.12-.65l8 4.75a.75.75 0 0 1 0 1.3l-8 4.75a.75.75 0 0 1-1.12-.65z" />
+		</svg>
 	);
 }

@@ -114,7 +114,7 @@ const copy: Record<
 			},
 			{
 				title: "Représentations et algorithmes",
-				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes. En orienté, les listes montrent les voisins sortants et la matrice n’est pas symétrique ; en pondéré, la matrice contient les poids et ∞ indique l’absence d’arête. ▶ reconstruit le graphe ; l’icône debug avance une instruction à la fois. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Les étapes actives sont surlignées en bleu. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
+				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes. En orienté, les listes montrent les voisins sortants et la matrice n’est pas symétrique ; en pondéré, la matrice contient les poids et ∞ indique l’absence d’arête. ▶ reconstruit le graphe ; l’icône debug avance une instruction à la fois. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Les étapes actives sont surlignées en bleu. Sur téléphone, choisissez la représentation dans le menu, puis lancez-la ou déboguez-la. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
 			},
 			{
 				title: "Importer et télécharger",
@@ -150,7 +150,7 @@ const copy: Record<
 			},
 			{
 				title: "Representations and algorithms",
-				body: "Choose neighbor lists, the matrix, or the edge list. Directed neighbor lists show outgoing neighbors and their matrix is not symmetric; weighted matrices contain edge weights and use ∞ for a missing edge. ▶ rebuilds the graph; the bug icon advances one instruction at a time. The trace shows every loop check, condition branch, and return to a loop, with active steps highlighted in blue. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
+				body: "Choose neighbor lists, the matrix, or the edge list. Directed neighbor lists show outgoing neighbors and their matrix is not symmetric; weighted matrices contain edge weights and use ∞ for a missing edge. ▶ rebuilds the graph; the bug icon advances one instruction at a time. The trace shows every loop check, condition branch, and return to a loop, with active steps highlighted in blue. On phones, choose a representation from the menu, then run or debug it. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
 			},
 			{
 				title: "Import and download",
