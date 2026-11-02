@@ -1,79 +1,51 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { GraphForm } from "@/components/GraphForm";
-import { GraphVisualization } from "@/components/GraphVisualization";
-import { analyzeGraph } from "@/lib/graph/analyze";
-import { createGraph } from "@/lib/graph/create";
-import { addEdge, removeEdge } from "@/lib/graph/edges";
-import type { GraphEdge, Vertex } from "@/lib/graph/types";
-import { addVertex, removeVertex } from "@/lib/graph/vertices";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 
 function HomePage() {
-	const [graph, setGraph] = useState(createGraph);
-	const [selectedVertex, setSelectedVertex] = useState<Vertex | null>(null);
-	const analysis = useMemo(() => analyzeGraph(graph), [graph]);
-
-	const handleAddVertex = (vertex: string) => {
-		const result = addVertex(graph, vertex);
-		if (!result.error) setGraph(result.graph);
-		return result.error;
-	};
-
-	const handleAddEdge = (first: Vertex, second: Vertex) => {
-		const result = addEdge(graph, first, second);
-		if (!result.error) setGraph(result.graph);
-		return result.error;
-	};
-
-	const handleRemoveVertex = (vertex: string) => {
-		setGraph((current) => removeVertex(current, vertex));
-		setSelectedVertex((current) => (current === vertex ? null : current));
-	};
-	const handleRemoveEdge = (edge: GraphEdge) =>
-		setGraph((current) => removeEdge(current, edge));
-
 	return (
-		<main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12 text-foreground sm:px-10 sm:py-16">
-			<header className="mb-14 border-b border-border pb-8 sm:mb-16">
-				<p className="mb-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
+		<main className="mx-auto w-full max-w-6xl px-6 py-16 sm:px-10 sm:py-24">
+			<section className="max-w-3xl">
+				<p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
 					Théorie des graphes
 				</p>
-				<div className="flex flex-wrap items-baseline justify-between gap-4">
-					<h1 className="font-mono text-3xl font-medium tracking-tight sm:text-4xl">
-						G = [V, E]
-					</h1>
-					<p className="text-sm text-muted-foreground">
-						Graphe non orienté simple
+				<h1 className="mt-5 text-4xl font-medium tracking-tight sm:text-6xl">
+					Créez et explorez des graphes.
+				</h1>
+				<p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+					Ajoutez des sommets, reliez-les et observez les composantes connexes,
+					les degrés et les cycles.
+				</p>
+				<div className="mt-8 flex flex-wrap gap-3">
+					<Button asChild size="lg">
+						<Link to="/simulator">Ouvrir le simulateur</Link>
+					</Button>
+					<Button asChild variant="outline" size="lg">
+						<Link to="/docs">Lire la documentation</Link>
+					</Button>
+				</div>
+			</section>
+			<section className="mt-20 grid gap-4 border-t border-border pt-6 sm:grid-cols-3">
+				<div>
+					<p className="font-mono text-sm">01</p>
+					<h2 className="mt-3 text-sm font-medium">Construisez</h2>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Nommez les sommets et créez les arêtes.
 					</p>
 				</div>
-			</header>
-
-			<GraphForm
-				graph={graph}
-				onAddVertex={handleAddVertex}
-				onAddEdge={handleAddEdge}
-				onRemoveVertex={handleRemoveVertex}
-				onRemoveEdge={handleRemoveEdge}
-			/>
-
-			<section
-				aria-labelledby="graph-title"
-				className="mt-16 border-t border-border pt-8"
-			>
-				<div className="mb-4 flex items-baseline justify-between">
-					<h2 id="graph-title" className="text-sm font-medium">
-						Graphe
-					</h2>
-					<span className="text-xs text-muted-foreground">
-						{graph.vertices.length} sommets · {graph.edges.length} arêtes
-					</span>
+				<div>
+					<p className="font-mono text-sm">02</p>
+					<h2 className="mt-3 text-sm font-medium">Explorez</h2>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Sélectionnez un sommet pour voir ses propriétés.
+					</p>
 				</div>
-				<GraphVisualization
-					{...graph}
-					analysis={analysis}
-					selectedVertex={selectedVertex}
-					onSelectVertex={setSelectedVertex}
-				/>
+				<div>
+					<p className="font-mono text-sm">03</p>
+					<h2 className="mt-3 text-sm font-medium">Enregistrez</h2>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Importez ou téléchargez le graphe en JSON.
+					</p>
+				</div>
 			</section>
 		</main>
 	);

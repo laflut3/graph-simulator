@@ -25,6 +25,7 @@ export function addVertex(graph: Graph, vertex: string): GraphUpdate {
 
 export function removeVertex(graph: Graph, vertex: string): Graph {
 	return {
+		...graph,
 		vertices: graph.vertices.filter((item) => item !== vertex),
 		edges: graph.edges.filter(
 			(edge) => edge.first !== vertex && edge.second !== vertex,

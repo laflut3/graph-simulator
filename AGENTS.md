@@ -1,0 +1,9 @@
+# Project instructions
+
+- Keep the simulator, home page, and documentation direct and easy to use. Prefer small, consistent UI changes that work on mobile and in light, dark, and system themes.
+- For every feature, review the user-facing documentation and update it in both French and English. Keep `README.md` and the in-app documentation consistent with the actual routes and behavior.
+- After each feature, review the affected pages for clear navigation, accessible controls, responsive layout, and visual consistency. Check all three theme choices when UI behavior or colors change.
+- Keep cookie, privacy, and legal statements tied to behavior that exists in the code. Update those pages whenever storage, analytics, hosting, or data flows change. Do not claim legal compliance from a code review alone.
+- The graph is a simple, undirected graph. Keep imported JSON validation aligned with the graph model and document its exported format in both languages.
+- Run `pnpm exec biome check`, `pnpm exec tsc --noEmit`, and `pnpm build` after implementation changes. Review `git diff --check` and the final diff before finishing.
+- Do not add dependencies, commit, push, or deploy unless the user asks.
