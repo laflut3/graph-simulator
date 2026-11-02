@@ -1,34 +1,39 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { GraphForm } from "@/components/GraphForm";
 import { GraphVisualization } from "@/components/GraphVisualization";
-import { addEdge, removeEdge } from "@/lib/graph/edges";
+import { analyzeGraph } from "@/lib/graph/analyze";
 import { createGraph } from "@/lib/graph/create";
-import type { GraphEdge } from "@/lib/graph/types";
+import { addEdge, removeEdge } from "@/lib/graph/edges";
+import type { GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
 
 function HomePage() {
 	const [graph, setGraph] = useState(createGraph);
+	const [selectedVertex, setSelectedVertex] = useState<Vertex | null>(null);
+	const analysis = useMemo(() => analyzeGraph(graph), [graph]);
 
-	const handleAddVertex = (vertex: number) => {
+	const handleAddVertex = (vertex: string) => {
 		const result = addVertex(graph, vertex);
 		if (!result.error) setGraph(result.graph);
 		return result.error;
 	};
 
-	const handleAddEdge = (first: number, second: number) => {
+	const handleAddEdge = (first: Vertex, second: Vertex) => {
 		const result = addEdge(graph, first, second);
 		if (!result.error) setGraph(result.graph);
 		return result.error;
 	};
 
-	const handleRemoveVertex = (vertex: number) =>
+	const handleRemoveVertex = (vertex: string) => {
 		setGraph((current) => removeVertex(current, vertex));
+		setSelectedVertex((current) => (current === vertex ? null : current));
+	};
 	const handleRemoveEdge = (edge: GraphEdge) =>
 		setGraph((current) => removeEdge(current, edge));
 
 	return (
-		<main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-12 text-foreground sm:px-10 sm:py-16">
+		<main className="mx-auto min-h-screen w-full max-w-6xl px-6 py-12 text-foreground sm:px-10 sm:py-16">
 			<header className="mb-14 border-b border-border pb-8 sm:mb-16">
 				<p className="mb-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
 					Théorie des graphes
@@ -63,7 +68,12 @@ function HomePage() {
 						{graph.vertices.length} sommets · {graph.edges.length} arêtes
 					</span>
 				</div>
-				<GraphVisualization {...graph} />
+				<GraphVisualization
+					{...graph}
+					analysis={analysis}
+					selectedVertex={selectedVertex}
+					onSelectVertex={setSelectedVertex}
+				/>
 			</section>
 		</main>
 	);

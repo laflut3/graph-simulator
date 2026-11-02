@@ -1,5 +1,6 @@
-export type GraphEdge = { first: number; second: number };
-export type Graph = { vertices: number[]; edges: GraphEdge[] };
+export type Vertex = string;
+export type GraphEdge = { first: Vertex; second: Vertex };
+export type Graph = { vertices: Vertex[]; edges: GraphEdge[] };
 export type GraphError =
 	| "invalid-vertex"
 	| "duplicate-vertex"

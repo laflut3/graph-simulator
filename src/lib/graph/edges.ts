@@ -2,8 +2,8 @@ import type { Graph, GraphEdge, GraphUpdate } from "@/lib/graph/types";
 
 export function addEdge(
 	graph: Graph,
-	first: number,
-	second: number,
+	first: string,
+	second: string,
 ): GraphUpdate {
 	if (
 		!graph.vertices.includes(first) ||
@@ -23,14 +23,22 @@ export function addEdge(
 	}
 
 	const edge = {
-		first: Math.min(first, second),
-		second: Math.max(first, second),
+		first:
+			first.localeCompare(second, "fr", { numeric: true }) <= 0
+				? first
+				: second,
+		second:
+			first.localeCompare(second, "fr", { numeric: true }) <= 0
+				? second
+				: first,
 	};
 	return {
 		graph: {
 			...graph,
 			edges: [...graph.edges, edge].sort(
-				(a, b) => a.first - b.first || a.second - b.second,
+				(a, b) =>
+					a.first.localeCompare(b.first, "fr", { numeric: true }) ||
+					a.second.localeCompare(b.second, "fr", { numeric: true }),
 			),
 		},
 		error: null,

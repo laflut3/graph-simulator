@@ -1,19 +1,19 @@
-import { useState, type SubmitEvent } from "react";
+import { type SubmitEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Graph, GraphEdge, GraphError } from "@/lib/graph/types";
+import type { Graph, GraphEdge, GraphError, Vertex } from "@/lib/graph/types";
 
 type GraphFormProps = {
 	graph: Graph;
-	onAddVertex: (vertex: number) => GraphError | null;
-	onAddEdge: (first: number, second: number) => GraphError | null;
-	onRemoveVertex: (vertex: number) => void;
+	onAddVertex: (vertex: Vertex) => GraphError | null;
+	onAddEdge: (first: Vertex, second: Vertex) => GraphError | null;
+	onRemoveVertex: (vertex: Vertex) => void;
 	onRemoveEdge: (edge: GraphEdge) => void;
 };
 
 const errorMessages: Record<GraphError, string> = {
-	"invalid-vertex": "Saisissez un entier positif ou nul.",
-	"duplicate-vertex": "Ce sommet existe déjà.",
+	"invalid-vertex": "Saisissez un nom de sommet.",
+	"duplicate-vertex": "Ce nom est déjà utilisé.",
 	"invalid-edge": "Choisissez deux sommets différents.",
 	"duplicate-edge": "Cette arête existe déjà.",
 };
@@ -26,172 +26,189 @@ export function GraphForm({
 	onRemoveEdge,
 }: GraphFormProps) {
 	const { vertices, edges } = graph;
-	const [vertexName, setVertexName] = useState("5");
-	const [edgeFirst, setEdgeFirst] = useState("1");
-	const [edgeSecond, setEdgeSecond] = useState("2");
+	const [vertexName, setVertexName] = useState("");
+	const [edgeFirst, setEdgeFirst] = useState("");
+	const [edgeSecond, setEdgeSecond] = useState("");
 	const [vertexError, setVertexError] = useState("");
 	const [edgeError, setEdgeError] = useState("");
 
-	const firstValue = vertices.some((vertex) => String(vertex) === edgeFirst)
+	const firstValue = vertices.includes(edgeFirst)
 		? edgeFirst
-		: String(vertices[0] ?? "");
-	const otherVertices = vertices.filter(
-		(vertex) => String(vertex) !== firstValue,
-	);
-	const secondValue = otherVertices.some(
-		(vertex) => String(vertex) === edgeSecond,
-	)
+		: (vertices[0] ?? "");
+	const choicesForSecond = vertices.filter((vertex) => vertex !== firstValue);
+	const secondValue = choicesForSecond.includes(edgeSecond)
 		? edgeSecond
-		: String(otherVertices[0] ?? "");
+		: (choicesForSecond[0] ?? "");
 
 	function addVertex(event: SubmitEvent<HTMLFormElement>) {
 		event.preventDefault();
-		const vertex = Number(vertexName);
-		if (!/^\d+$/.test(vertexName)) {
-			setVertexError(errorMessages["invalid-vertex"]);
-			return;
-		}
-		const error = onAddVertex(vertex);
+		const error = onAddVertex(vertexName);
 		setVertexError(error ? errorMessages[error] : "");
-		if (!error) setVertexName(String(Math.max(0, ...vertices, vertex) + 1));
+		if (!error) setVertexName("");
 	}
 
 	function addEdge(event: SubmitEvent<HTMLFormElement>) {
 		event.preventDefault();
-		const error = onAddEdge(Number(firstValue), Number(secondValue));
+		const error = onAddEdge(firstValue, secondValue);
 		setEdgeError(error ? errorMessages[error] : "");
 	}
 
 	return (
-		<div className="grid gap-12 md:grid-cols-2 md:gap-16">
-			<section aria-labelledby="vertices-title">
-				<div className="mb-6 flex items-baseline justify-between">
-					<h2 id="vertices-title" className="text-sm font-medium">
-						Sommets <span className="font-mono text-muted-foreground">V</span>
-					</h2>
-					<span className="font-mono text-xs text-muted-foreground">
-						{vertices.length} éléments
+		<div className="grid gap-5 lg:grid-cols-2">
+			<section
+				aria-labelledby="vertices-title"
+				className="rounded-xl border border-border bg-muted/20 p-5 sm:p-6"
+			>
+				<div className="flex items-start justify-between gap-4">
+					<div>
+						<p className="font-mono text-xs text-muted-foreground">
+							ENSEMBLE V
+						</p>
+						<h2 id="vertices-title" className="mt-1 text-lg font-medium">
+							Sommets
+						</h2>
+					</div>
+					<span className="rounded-full bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
+						{vertices.length}
 					</span>
 				</div>
-				<div className="flex min-h-20 flex-wrap items-center gap-x-1 gap-y-2 border-b border-border pb-6 font-mono text-lg sm:text-xl">
-					<span className="text-muted-foreground">V = &#123;</span>
+				<div className="mt-5 min-h-24 rounded-lg border border-border/70 bg-background p-4">
+					<p className="mb-3 font-mono text-xs text-muted-foreground">
+						V = &#123; ... &#125;
+					</p>
 					{vertices.length ? (
-						vertices.map((vertex, index) => (
-							<span
-								key={vertex}
-								className="inline-flex items-center whitespace-nowrap"
-							>
-								<span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-0.5 pl-2 pr-1">
+						<ul className="flex flex-wrap gap-2">
+							{vertices.map((vertex) => (
+								<li
+									key={vertex}
+									className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-1 pl-3 pr-1 font-mono text-sm"
+								>
 									{vertex}
 									<Button
 										type="button"
 										variant="ghost"
 										size="icon-xs"
-										className="size-5 rounded-sm text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+										className="size-6 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
 										aria-label={`Supprimer le sommet ${vertex}`}
 										onClick={() => onRemoveVertex(vertex)}
 									>
 										×
 									</Button>
-								</span>
-								{index < vertices.length - 1 ? "," : ""}
-							</span>
-						))
+								</li>
+							))}
+						</ul>
 					) : (
-						<span className="text-muted-foreground">∅</span>
+						<p className="text-sm text-muted-foreground">
+							Aucun sommet pour l’instant.
+						</p>
 					)}
-					<span className="text-muted-foreground">&#125;</span>
 				</div>
-				<form className="mt-6 space-y-3" onSubmit={addVertex}>
+				<form className="mt-5" onSubmit={addVertex}>
 					<label
 						htmlFor="vertex-name"
-						className="block text-xs text-muted-foreground"
+						className="mb-2 block text-sm font-medium"
 					>
 						Ajouter un sommet
 					</label>
 					<div className="flex gap-2">
 						<Input
 							id="vertex-name"
-							inputMode="numeric"
 							value={vertexName}
 							onChange={(event) => setVertexName(event.target.value)}
-							placeholder="Ex. 5"
+							placeholder="Ex. Départ, A, 5…"
+							maxLength={32}
 						/>
 						<Button type="submit" className="rounded-md">
 							Ajouter
 						</Button>
 					</div>
-					<p className="min-h-5 text-xs text-destructive" aria-live="polite">
+					<p
+						className="mt-2 min-h-5 text-xs text-destructive"
+						aria-live="polite"
+					>
 						{vertexError}
 					</p>
 				</form>
 			</section>
 
-			<section aria-labelledby="edges-title">
-				<div className="mb-6 flex items-baseline justify-between">
-					<h2 id="edges-title" className="text-sm font-medium">
-						Arêtes <span className="font-mono text-muted-foreground">E</span>
-					</h2>
-					<span className="font-mono text-xs text-muted-foreground">
-						{edges.length} éléments
+			<section
+				aria-labelledby="edges-title"
+				className="rounded-xl border border-border bg-muted/20 p-5 sm:p-6"
+			>
+				<div className="flex items-start justify-between gap-4">
+					<div>
+						<p className="font-mono text-xs text-muted-foreground">
+							ENSEMBLE E
+						</p>
+						<h2 id="edges-title" className="mt-1 text-lg font-medium">
+							Arêtes
+						</h2>
+					</div>
+					<span className="rounded-full bg-background px-3 py-1 font-mono text-xs text-muted-foreground">
+						{edges.length}
 					</span>
 				</div>
-				<div className="flex min-h-20 flex-wrap items-center gap-x-1 gap-y-2 border-b border-border pb-6 font-mono text-lg sm:text-xl">
-					<span className="text-muted-foreground">E = &#123;</span>
+				<div className="mt-5 min-h-24 rounded-lg border border-border/70 bg-background p-4">
+					<p className="mb-3 font-mono text-xs text-muted-foreground">
+						E = &#123; ... &#125;
+					</p>
 					{edges.length ? (
-						edges.map((edge, index) => (
-							<span
-								key={`${edge.first}:${edge.second}`}
-								className="inline-flex items-center whitespace-nowrap"
-							>
-								<span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-0.5 pl-2 pr-1">
+						<ul className="flex flex-wrap gap-2">
+							{edges.map((edge) => (
+								<li
+									key={`${edge.first}:${edge.second}`}
+									className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/30 py-1 pl-3 pr-1 font-mono text-sm"
+								>
 									&#123;{edge.first}, {edge.second}&#125;
 									<Button
 										type="button"
 										variant="ghost"
 										size="icon-xs"
-										className="size-5 rounded-sm text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+										className="size-6 rounded text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
 										aria-label={`Supprimer l’arête ${edge.first}–${edge.second}`}
 										onClick={() => onRemoveEdge(edge)}
 									>
 										×
 									</Button>
-								</span>
-								{index < edges.length - 1 ? "," : ""}
-							</span>
-						))
+								</li>
+							))}
+						</ul>
 					) : (
-						<span className="text-muted-foreground">∅</span>
+						<p className="text-sm text-muted-foreground">
+							Aucune arête pour l’instant.
+						</p>
 					)}
-					<span className="text-muted-foreground">&#125;</span>
 				</div>
-				<form className="mt-6 space-y-3" onSubmit={addEdge}>
-					<p className="text-xs text-muted-foreground">Ajouter une arête</p>
-					<datalist id="vertices">
-						{vertices.map((vertex) => (
-							<option key={vertex} value={vertex} />
-						))}
-					</datalist>
+				<form className="mt-5" onSubmit={addEdge}>
+					<p className="mb-2 text-sm font-medium">Relier deux sommets</p>
 					<div className="grid grid-cols-[1fr_auto_1fr_auto] items-center gap-2">
-						<Input
+						<select
 							aria-label="Premier sommet"
-							type="number"
-							min="0"
-							list="vertices"
+							className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
 							value={firstValue}
 							onChange={(event) => setEdgeFirst(event.target.value)}
 							disabled={vertices.length < 2}
-						/>
+						>
+							{vertices.map((vertex) => (
+								<option key={vertex} value={vertex}>
+									{vertex}
+								</option>
+							))}
+						</select>
 						<span className="font-mono text-muted-foreground">—</span>
-						<Input
+						<select
 							aria-label="Second sommet"
-							type="number"
-							min="0"
-							list="vertices"
+							className="h-9 min-w-0 rounded-md border border-input bg-background px-3 text-sm"
 							value={secondValue}
 							onChange={(event) => setEdgeSecond(event.target.value)}
 							disabled={vertices.length < 2}
-						/>
+						>
+							{choicesForSecond.map((vertex) => (
+								<option key={vertex} value={vertex}>
+									{vertex}
+								</option>
+							))}
+						</select>
 						<Button
 							type="submit"
 							className="rounded-md"
@@ -200,7 +217,10 @@ export function GraphForm({
 							Ajouter
 						</Button>
 					</div>
-					<p className="min-h-5 text-xs text-destructive" aria-live="polite">
+					<p
+						className="mt-2 min-h-5 text-xs text-destructive"
+						aria-live="polite"
+					>
 						{edgeError}
 					</p>
 				</form>

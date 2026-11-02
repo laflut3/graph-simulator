@@ -2,10 +2,10 @@ import type { Graph } from "@/lib/graph/types";
 
 export function createGraph(): Graph {
 	return {
-		vertices: [1, 2, 3, 4],
+		vertices: ["A", "B", "C", "D"],
 		edges: [
-			{ first: 1, second: 2 },
-			{ first: 1, second: 3 },
+			{ first: "A", second: "B" },
+			{ first: "A", second: "C" },
 		],
 	};
 }
