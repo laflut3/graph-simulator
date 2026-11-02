@@ -2,10 +2,31 @@ import { Link, Outlet } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useState } from "react";
 
 type Theme = "system" | "light" | "dark";
+type InstallPromptEvent = Event & {
+	prompt: () => Promise<void>;
+	userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
 
 export function SiteLayout() {
 	const [theme, setTheme] = useState<Theme>("system");
 	const [cookieNoticeOpen, setCookieNoticeOpen] = useState(false);
+	const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(
+		null,
+	);
+
+	useEffect(() => {
+		const handleInstallPrompt = (event: Event) => {
+			event.preventDefault();
+			setInstallPrompt(event as InstallPromptEvent);
+		};
+		const handleInstalled = () => setInstallPrompt(null);
+		window.addEventListener("beforeinstallprompt", handleInstallPrompt);
+		window.addEventListener("appinstalled", handleInstalled);
+		return () => {
+			window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
+			window.removeEventListener("appinstalled", handleInstalled);
+		};
+	}, []);
 
 	useEffect(() => {
 		const savedTheme = window.localStorage.getItem("graph-simulator-theme");
@@ -46,7 +67,7 @@ export function SiteLayout() {
 	return (
 		<div className="flex min-h-screen flex-col">
 			<header className="border-b border-border">
-				<div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-4 px-6 py-4 sm:px-10">
+				<div className="flex w-full flex-wrap items-center justify-between gap-x-8 gap-y-4 px-4 py-4 sm:px-8 lg:px-10">
 					<Link
 						to="/"
 						className="flex items-center gap-3 font-medium tracking-tight"
@@ -82,29 +103,44 @@ export function SiteLayout() {
 								Documentation
 							</Link>
 						</nav>
-						<label className="flex items-center gap-2 text-xs text-muted-foreground">
-							<span className="sr-only">Thème</span>
-							<select
-								aria-label="Thème"
-								value={theme}
-								onChange={(event) => setTheme(event.target.value as Theme)}
-								className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground"
-							>
-								<option value="system">Système</option>
-								<option value="light">Clair</option>
-								<option value="dark">Sombre</option>
-							</select>
-						</label>
+						<div className="flex items-center gap-3">
+							{installPrompt && (
+								<button
+									type="button"
+									className="rounded-md border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted"
+									onClick={async () => {
+										await installPrompt.prompt();
+										await installPrompt.userChoice;
+										setInstallPrompt(null);
+									}}
+								>
+									Installer
+								</button>
+							)}
+							<label className="flex items-center gap-2 text-xs text-muted-foreground">
+								<span className="sr-only">Thème</span>
+								<select
+									aria-label="Thème"
+									value={theme}
+									onChange={(event) => setTheme(event.target.value as Theme)}
+									className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground"
+								>
+									<option value="system">Système</option>
+									<option value="light">Clair</option>
+									<option value="dark">Sombre</option>
+								</select>
+							</label>
+						</div>
 					</div>
 				</div>
 			</header>
 
-			<div className="flex-1">
+			<div className="flex flex-1 flex-col">
 				<Outlet />
 			</div>
 
-			<footer className="bg-[#080a10] text-slate-100">
-				<div className="mx-auto w-full max-w-6xl px-6 py-12 sm:px-10 sm:py-14">
+			<footer className="border-t border-border bg-muted/40 text-foreground">
+				<div className="mx-auto w-full max-w-[1680px] px-4 py-10 sm:px-8 sm:py-12 lg:px-10">
 					<div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
 						<div>
 							<Link
@@ -118,7 +154,7 @@ export function SiteLayout() {
 								/>
 								Graph Simulator
 							</Link>
-							<p className="mt-6 text-sm text-slate-400">
+							<p className="mt-6 text-sm text-muted-foreground">
 								© {new Date().getFullYear()} Graph Simulator
 							</p>
 						</div>
@@ -149,12 +185,12 @@ export function SiteLayout() {
 							</FooterLink>
 						</FooterColumn>
 					</div>
-					<div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-slate-800 pt-6 text-xs text-slate-400">
+					<div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6 text-xs text-muted-foreground">
 						<p>Graphe non orienté, construit dans votre navigateur.</p>
 						<button
 							type="button"
 							onClick={() => setCookieNoticeOpen(true)}
-							className="transition-colors hover:text-white"
+							className="transition-colors hover:text-foreground"
 						>
 							Informations sur les cookies
 						</button>
@@ -218,7 +254,9 @@ function FooterColumn({
 			<h2 className="text-xs font-semibold uppercase tracking-[0.16em]">
 				{title}
 			</h2>
-			<ul className="mt-5 space-y-3 text-sm text-slate-400">{children}</ul>
+			<ul className="mt-5 space-y-3 text-sm text-muted-foreground">
+				{children}
+			</ul>
 		</section>
 	);
 }
@@ -229,7 +267,7 @@ function FooterLink({ href, children }: { href: string; children: ReactNode }) {
 		<li>
 			<a
 				href={href}
-				className="transition-colors hover:text-white"
+				className="transition-colors hover:text-foreground"
 				{...(isExternal ? { target: "_blank", rel: "noreferrer" } : {})}
 			>
 				{children}

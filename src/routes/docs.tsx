@@ -29,6 +29,10 @@ const copy: Record<
 				title: "Importer et télécharger",
 				body: "Les boutons du simulateur chargent ou téléchargent un fichier JSON. L’import vérifie les sommets et les arêtes avant de remplacer le graphe.",
 			},
+			{
+				title: "Installer l’application",
+				body: "Sur un navigateur compatible, utilisez le bouton Installer ou le menu du navigateur. Après le chargement du site et de ses ressources, le simulateur peut aussi s’ouvrir hors ligne.",
+			},
 		],
 		format: "Format JSON",
 		back: "Ouvrir le simulateur",
@@ -53,6 +57,10 @@ const copy: Record<
 				title: "Import and download",
 				body: "Use the simulator buttons to load or download a JSON file. The importer checks the vertices and edges before replacing the graph.",
 			},
+			{
+				title: "Install the app",
+				body: "In a supported browser, use the Install button or the browser menu. Once the site and its resources have loaded, the simulator can also open offline.",
+			},
 		],
 		format: "JSON format",
 		back: "Open the simulator",
@@ -71,7 +79,7 @@ function DocsPage() {
 		typeof activeSection === "number" ? content.sections[activeSection] : null;
 
 	return (
-		<main className="mx-auto w-full max-w-6xl px-6 py-12 sm:px-10 sm:py-16">
+		<main className="w-full px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16">
 			<header className="flex flex-wrap items-end justify-between gap-5 border-b border-border pb-6">
 				<div>
 					<p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">

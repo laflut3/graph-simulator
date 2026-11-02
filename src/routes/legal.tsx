@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 function LegalPage() {
 	return (
-		<main className="mx-auto w-full max-w-4xl px-6 py-12 sm:px-10 sm:py-16">
+		<main className="w-full px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16">
 			<header className="border-b border-border pb-6">
 				<p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
 					Graph Simulator
@@ -64,6 +64,11 @@ function LegalPage() {
 							dans les réglages du navigateur.
 						</p>
 						<p>
+							Le service worker met en cache l’application et les ressources
+							chargées pour permettre une ouverture hors ligne. Il ne stocke pas
+							le graphe ni les fichiers JSON importés.
+						</p>
+						<p>
 							Aucun outil de publicité, d’analyse d’audience ou de profilage
 							n’est intégré à l’application. L’infrastructure d’hébergement est
 							administrée par l’éditeur. Les journaux techniques du serveur
@@ -95,10 +100,9 @@ function LegalPage() {
 					<div className="mt-4 space-y-4 text-sm leading-6 text-muted-foreground">
 						<p>
 							Le simulateur n’utilise actuellement aucun cookie publicitaire ou
-							de mesure d’audience. Il utilise le stockage local pour mémoriser
-							le thème et le stockage de session pour masquer le bandeau
-							d’information après fermeture. Vous pouvez effacer ces données
-							depuis les réglages de votre navigateur.
+							de mesure d’audience. Le thème est gardé dans le stockage local ;
+							le bandeau est masqué pour l’onglet courant. Le cache hors ligne
+							ne contient que les fichiers de l’application, jamais le graphe.
 						</p>
 						<p>
 							Si des traceurs soumis au consentement sont ajoutés, leur finalité

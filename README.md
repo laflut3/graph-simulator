@@ -6,6 +6,8 @@ Application web pour créer et étudier des graphes non orientés simples. La pa
 
 La navigation comprend l’accueil (`/`), le simulateur (`/simulator`), la documentation bilingue (`/docs`) et les informations légales (`/legal`). Le thème peut suivre le système ou être fixé en clair ou en sombre.
 
+Le site est installable comme PWA dans les navigateurs compatibles. Après chargement de l’application et de ses ressources, le service worker les garde en cache pour une ouverture hors ligne. En production, le site doit être servi sur HTTPS.
+
 ### Lancer le projet
 
 ```bash
@@ -40,6 +42,8 @@ pnpm build
 Web app for creating and studying simple undirected graphs. The home page introduces the project. The simulator lets you add vertices and edges, inspect connected components and cycles, and import or download a JSON configuration. In-app documentation is available in French and English.
 
 Navigation includes the home page (`/`), simulator (`/simulator`), bilingual documentation (`/docs`), and legal information (`/legal`). The theme can follow the system or be set to light or dark.
+
+The site can be installed as a PWA in supported browsers. After the app and its resources load, the service worker caches them for offline use. Production deployments must use HTTPS.
 
 ### Run the project
 

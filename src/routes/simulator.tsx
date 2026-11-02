@@ -79,7 +79,7 @@ function SimulatorPage() {
 		setGraph((current) => removeEdge(current, edge));
 
 	return (
-		<main className="mx-auto w-full max-w-6xl px-6 py-12 text-foreground sm:px-10 sm:py-16">
+		<main className="w-full px-4 py-10 text-foreground sm:px-8 sm:py-12 lg:px-10 lg:py-16">
 			<header className="mb-14 border-b border-border pb-8 sm:mb-16">
 				<div className="mb-6 flex flex-wrap items-center justify-between gap-3">
 					<p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
