@@ -25,6 +25,18 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/docs" />
   </url>
   <url>
+    <loc>https://graph.fleothing.com/en-us/lessons</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/lessons" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/lessons" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/lessons" />
+  </url>
+  <url>
+    <loc>https://graph.fleothing.com/fr-fr/lessons</loc>
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/lessons" />
+    <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/lessons" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://graph.fleothing.com/en-us/lessons" />
+  </url>
+  <url>
     <loc>https://graph.fleothing.com/en-us/legal</loc>
     <xhtml:link rel="alternate" hreflang="en-US" href="https://graph.fleothing.com/en-us/legal" />
     <xhtml:link rel="alternate" hreflang="fr-FR" href="https://graph.fleothing.com/fr-fr/legal" />

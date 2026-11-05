@@ -121,7 +121,7 @@ const copy: Record<
 			},
 			{
 				title: "Installer l’application",
-				body: "Sur un navigateur compatible, utilisez le bouton Installer ou le menu du navigateur. Après le chargement du site et de ses ressources, le simulateur peut aussi s’ouvrir hors ligne.",
+				body: "Sur un navigateur compatible, utilisez le bouton Installer ou le menu du navigateur. Après leur premier chargement en ligne, le simulateur et les synthèses de cours peuvent aussi s’ouvrir hors ligne.",
 			},
 			{
 				title: "Choisir la langue",
@@ -157,7 +157,7 @@ const copy: Record<
 			},
 			{
 				title: "Install the app",
-				body: "In a supported browser, use the Install button or the browser menu. Once the site and its resources have loaded, the simulator can also open offline.",
+				body: "In a supported browser, use the Install button or the browser menu. After their first online load, the simulator and lesson summaries can also open offline.",
 			},
 			{
 				title: "Choose a language",

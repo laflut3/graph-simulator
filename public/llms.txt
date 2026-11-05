@@ -10,9 +10,11 @@ The site is available in English and French. Each language has a stable URL. The
 
 - English home: https://graph.fleothing.com/en-us/
 - English interactive simulator: https://graph.fleothing.com/en-us/simulator
+- English graph theory lessons: https://graph.fleothing.com/en-us/lessons
 - English documentation: https://graph.fleothing.com/en-us/docs
 - French home: https://graph.fleothing.com/fr-fr/
 - French interactive simulator: https://graph.fleothing.com/fr-fr/simulator
+- French graph theory lessons: https://graph.fleothing.com/fr-fr/lessons
 - French documentation: https://graph.fleothing.com/fr-fr/docs
 - English legal information: https://graph.fleothing.com/en-us/legal
 - French legal information: https://graph.fleothing.com/fr-fr/legal

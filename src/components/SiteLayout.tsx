@@ -44,7 +44,12 @@ export function SiteLayout({ children }: { children: ReactNode }) {
 			return;
 		}
 		const page = suffix.split("/").filter(Boolean)[0];
-		if (page === "simulator" || page === "docs" || page === "legal") {
+		if (
+			page === "simulator" ||
+			page === "lessons" ||
+			page === "docs" ||
+			page === "legal"
+		) {
 			void navigate({
 				to: "/$locale/$page",
 				params: { locale: localeFromLanguage(nextLanguage), page },
@@ -153,6 +158,14 @@ export function SiteLayout({ children }: { children: ReactNode }) {
 									className="inline-flex min-h-10 items-center text-muted-foreground transition-colors hover:text-foreground"
 								>
 									{text(language, "Simulator", "Simulateur")}
+								</Link>
+								<Link
+									to="/$locale/$page"
+									params={{ locale, page: "lessons" }}
+									activeProps={{ className: "text-foreground" }}
+									className="inline-flex min-h-10 items-center text-muted-foreground transition-colors hover:text-foreground"
+								>
+									{text(language, "Lessons", "Leçons")}
 								</Link>
 								<Link
 									to="/$locale/$page"

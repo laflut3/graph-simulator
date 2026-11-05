@@ -4,7 +4,7 @@ import seoContent from "./seo-content.json";
 export const siteOrigin = "https://graph.fleothing.com";
 export const siteName = seoContent.siteName;
 
-export type PublicPage = "home" | "simulator" | "docs" | "legal";
+export type PublicPage = "home" | "simulator" | "lessons" | "docs" | "legal";
 
 const pageCopy = seoContent.pages;
 
@@ -116,7 +116,7 @@ function createStructuredData(
 		});
 	}
 
-	if (page === "docs") {
+	if (page === "docs" || page === "lessons") {
 		graph.push({
 			"@type": "TechArticle",
 			"@id": `${canonical}#article`,

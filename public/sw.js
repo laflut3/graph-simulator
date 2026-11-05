@@ -1,6 +1,8 @@
-const CACHE_NAME = "graph-simulator-v2";
+const CACHE_NAME = "graph-simulator-v3";
 const APP_SHELL = [
 	"/",
+	"/en-us/lessons",
+	"/fr-fr/lessons",
 	"/favicon.svg",
 	"/graph-mark.svg",
 	"/manifest.webmanifest",

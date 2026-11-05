@@ -11,6 +11,10 @@
 				"title": "Interactive Graph Simulator | Graph Simulator",
 				"description": "Build and edit a graph in your browser. Explore neighbor lists, adjacency matrices, edge lists, components, and cycles."
 			},
+			"lessons": {
+				"title": "Graph Theory Lessons | Definitions, Spanning Trees & Traversals",
+				"description": "Study graph theory with chapter summaries, key formulas, worked examples, spanning trees, Kruskal, BFS, and DFS."
+			},
 			"docs": {
 				"title": "Graph Simulator Guide | Graph Theory Documentation",
 				"description": "Learn how to build directed and weighted graphs, read graph representations, inspect components and cycles, and import or export JSON."
@@ -28,6 +32,10 @@
 			"simulator": {
 				"title": "Simulateur de graphes interactif | Graph Simulator",
 				"description": "Créez et modifiez un graphe dans votre navigateur. Explorez listes de voisins, matrices, arêtes, composantes et cycles."
+			},
+			"lessons": {
+				"title": "Leçons de théorie des graphes | Définitions, arbres et parcours",
+				"description": "Révisez la théorie des graphes avec des synthèses par chapitre, les formules essentielles et des exemples sur les arbres couvrants, Kruskal, BFS et DFS."
 			},
 			"docs": {
 				"title": "Guide du simulateur de graphes | Théorie des graphes",
