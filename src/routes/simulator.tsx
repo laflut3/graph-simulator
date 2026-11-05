@@ -4,6 +4,7 @@ import { GraphForm } from "@/components/GraphForm";
 import { GraphInsights } from "@/components/GraphInsights";
 import { GraphRepresentationPanel } from "@/components/GraphRepresentationPanel";
 import { GraphVisualization } from "@/components/GraphVisualization";
+import { SpanningAlgorithmsPanel } from "@/components/SpanningAlgorithmsPanel";
 import { Button } from "@/components/ui/button";
 import { analyzeGraph } from "@/lib/graph/analyze";
 import { createGraph } from "@/lib/graph/create";
@@ -418,6 +419,7 @@ export function SimulatorPage() {
 						onSelectVertex={setSelectedVertex}
 					/>
 				)}
+				<SpanningAlgorithmsPanel graph={graph} />
 			</section>
 		</main>
 	);

@@ -9,6 +9,7 @@ A browser-based tool for creating and exploring directed or undirected graphs, w
 - View vertex degree, connected components, simple cycles, and selected-vertex details.
 - Compare neighbor lists, adjacency matrices, and edge lists.
 - Animate each representation's construction or debug it instruction by instruction. The trace shows loop checks, condition branches, and returns to loops; the active graph element and representation entry are highlighted in blue.
+- Build a spanning forest in edge order or run Kruskal by increasing weight, stepping through accepted and rejected edges while viewing the spanning subgraph and its total weight.
 - Import and export JSON configurations.
 - Light, dark, and system themes.
 - Installable PWA with an offline app shell.
