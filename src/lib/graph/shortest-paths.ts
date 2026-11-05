@@ -3,10 +3,20 @@ import type { Graph, Vertex } from "@/lib/graph/types";
 export type ShortestPathResult = {
 	distance: number | null;
 	path: Vertex[] | null;
+	paths: Vertex[][];
+	pathsTruncated: boolean;
 	negativeCycle: boolean;
 };
 
 type Arc = { from: Vertex; to: Vertex; weight: number };
+const MAX_SHORTEST_PATHS = 100;
+
+function equalDistance(left: number, right: number) {
+	return (
+		Math.abs(left - right) <=
+		1e-9 * Math.max(1, Math.abs(left), Math.abs(right))
+	);
+}
 
 /** Find shortest paths from one vertex using BFS or Bellman-Ford. */
 export function findShortestPaths(
@@ -33,7 +43,6 @@ export function findShortestPaths(
 	}
 
 	const distances = new Map(graph.vertices.map((vertex) => [vertex, Infinity]));
-	const previous = new Map<Vertex, Vertex>();
 	distances.set(source, 0);
 
 	if (!graph.weighted) {
@@ -44,7 +53,6 @@ export function findShortestPaths(
 			for (const arc of outgoing.get(from) ?? []) {
 				if (distances.get(arc.to) !== Infinity) continue;
 				distances.set(arc.to, (distances.get(from) ?? 0) + 1);
-				previous.set(arc.to, from);
 				queue.push(arc.to);
 			}
 		}
@@ -57,7 +65,6 @@ export function findShortestPaths(
 				const candidate = fromDistance + weight;
 				if (candidate >= (distances.get(to) ?? Infinity)) continue;
 				distances.set(to, candidate);
-				previous.set(to, from);
 				changed = true;
 			}
 			if (!changed) break;
@@ -91,22 +98,69 @@ export function findShortestPaths(
 	}
 
 	const results = new Map<Vertex, ShortestPathResult>();
+	const predecessors = new Map<Vertex, Vertex[]>();
+	for (const { from, to, weight } of arcs) {
+		const fromDistance = distances.get(from) ?? Infinity;
+		const toDistance = distances.get(to) ?? Infinity;
+		if (
+			fromDistance !== Infinity &&
+			toDistance !== Infinity &&
+			!negativeCycleReachable.has(from) &&
+			!negativeCycleReachable.has(to) &&
+			equalDistance(fromDistance + weight, toDistance)
+		) {
+			const previousVertices = predecessors.get(to) ?? [];
+			if (!previousVertices.includes(from)) previousVertices.push(from);
+			predecessors.set(to, previousVertices);
+		}
+	}
+	const enumeratePaths = (destination: Vertex) => {
+		const paths: Vertex[][] = [];
+		let pathsTruncated = false;
+		const reversedPath = [destination];
+		const visited = new Set([destination]);
+		const visit = (vertex: Vertex) => {
+			if (vertex === source) {
+				paths.push([...reversedPath].reverse());
+				if (paths.length > MAX_SHORTEST_PATHS) pathsTruncated = true;
+				return paths.length <= MAX_SHORTEST_PATHS;
+			}
+			for (const previous of predecessors.get(vertex) ?? []) {
+				if (visited.has(previous)) continue;
+				visited.add(previous);
+				reversedPath.push(previous);
+				const keepSearching = visit(previous);
+				reversedPath.pop();
+				visited.delete(previous);
+				if (!keepSearching) return false;
+			}
+			return true;
+		};
+		visit(destination);
+		if (pathsTruncated) paths.pop();
+		return { paths, pathsTruncated };
+	};
 	for (const vertex of graph.vertices) {
 		const negativeCycle = negativeCycleReachable.has(vertex);
 		const distance = distances.get(vertex) ?? Infinity;
 		if (negativeCycle || distance === Infinity) {
-			results.set(vertex, { distance: null, path: null, negativeCycle });
+			results.set(vertex, {
+				distance: null,
+				path: null,
+				paths: [],
+				pathsTruncated: false,
+				negativeCycle,
+			});
 			continue;
 		}
-		const path = [vertex];
-		let current = vertex;
-		while (current !== source) {
-			const parent = previous.get(current);
-			if (parent === undefined) break;
-			path.unshift(parent);
-			current = parent;
-		}
-		results.set(vertex, { distance, path, negativeCycle });
+		const { paths, pathsTruncated } = enumeratePaths(vertex);
+		results.set(vertex, {
+			distance,
+			path: paths[0] ?? null,
+			paths,
+			pathsTruncated,
+			negativeCycle,
+		});
 	}
 	return results;
 }

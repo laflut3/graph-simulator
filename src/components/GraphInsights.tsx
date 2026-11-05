@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import type { GraphAnalysis } from "@/lib/graph/analyze";
-import { findShortestPaths } from "@/lib/graph/shortest-paths";
+import {
+	findShortestPaths,
+	type ShortestPathResult,
+} from "@/lib/graph/shortest-paths";
 import type { Graph, Vertex } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
 
@@ -20,7 +23,9 @@ export function GraphInsights({
 	const [language] = useLanguage();
 	const shortestPaths = useMemo(
 		() =>
-			selectedVertex ? findShortestPaths(graph, selectedVertex) : new Map(),
+			selectedVertex
+				? findShortestPaths(graph, selectedVertex)
+				: new Map<Vertex, ShortestPathResult>(),
 		[graph, selectedVertex],
 	);
 	const { directed, vertices, edges } = graph;
@@ -283,8 +288,24 @@ export function GraphInsights({
 																"Affected by a reachable negative cycle",
 																"Affecté par un cycle négatif accessible",
 															)
-														: (route?.path?.join(" → ") ??
-															text(language, "No path", "Aucun chemin"))}
+														: route?.paths.length
+															? route.paths.length > 1
+																? route.paths.map((path) => (
+																		<p key={path.join(" → ")}>
+																			{path.join(" → ")}
+																		</p>
+																	))
+																: route.path?.join(" → ")
+															: text(language, "No path", "Aucun chemin")}
+													{route?.pathsTruncated && (
+														<p className="mt-1 text-xs">
+															{text(
+																language,
+																"First 100 routes shown.",
+																"100 premiers chemins affichés.",
+															)}
+														</p>
+													)}
 												</td>
 											</tr>
 										);

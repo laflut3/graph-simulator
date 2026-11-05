@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { findShortestPaths } from "@/lib/graph/shortest-paths";
+import {
+	findShortestPaths,
+	type ShortestPathResult,
+} from "@/lib/graph/shortest-paths";
 import type { Graph } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
 
@@ -10,7 +13,10 @@ export function ShortestPathFinder({ graph }: { graph: Graph }) {
 		graph.vertices[1] ?? graph.vertices[0] ?? "",
 	);
 	const results = useMemo(
-		() => (source ? findShortestPaths(graph, source) : new Map()),
+		() =>
+			source
+				? findShortestPaths(graph, source)
+				: new Map<string, ShortestPathResult>(),
 		[graph, source],
 	);
 	const result = results.get(destination);
@@ -102,11 +108,40 @@ export function ShortestPathFinder({ graph }: { graph: Graph }) {
 							<div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
 								<div className="min-w-0">
 									<p className="text-xs text-muted-foreground">
-										{text(language, "Shortest route", "Chemin le plus court")}
+										{result.paths.length > 1
+											? text(
+													language,
+													`Shortest routes (${result.paths.length}${result.pathsTruncated ? "+" : ""})`,
+													`Plus courts chemins (${result.paths.length}${result.pathsTruncated ? "+" : ""})`,
+												)
+											: text(
+													language,
+													"Shortest route",
+													"Chemin le plus court",
+												)}
 									</p>
-									<p className="mt-1 break-words font-mono text-sm">
-										{result.path.join(" → ")}
-									</p>
+									{result.paths.length > 1 ? (
+										<ol className="mt-1 space-y-1 font-mono text-sm">
+											{result.paths.map((path) => (
+												<li key={path.join(" → ")} className="break-words">
+													{path.join(" → ")}
+												</li>
+											))}
+										</ol>
+									) : (
+										<p className="mt-1 break-words font-mono text-sm">
+											{result.path.join(" → ")}
+										</p>
+									)}
+									{result.pathsTruncated && (
+										<p className="mt-1 text-xs text-muted-foreground">
+											{text(
+												language,
+												"Showing the first 100 shortest routes.",
+												"Les 100 premiers plus courts chemins sont affichés.",
+											)}
+										</p>
+									)}
 								</div>
 								<div>
 									<p className="text-xs text-muted-foreground">
