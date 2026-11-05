@@ -1,5 +1,12 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type ChangeEvent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { GraphForm } from "@/components/GraphForm";
 import { GraphInsights } from "@/components/GraphInsights";
 import { GraphRepresentationPanel } from "@/components/GraphRepresentationPanel";
@@ -14,7 +21,7 @@ import {
 	type GraphConstructionStep,
 	type GraphRepresentation,
 } from "@/lib/graph/representation";
-import type { GraphEdge, Vertex } from "@/lib/graph/types";
+import type { Graph, GraphEdge, Vertex } from "@/lib/graph/types";
 import { addVertex, removeVertex } from "@/lib/graph/vertices";
 import { text, useLanguage } from "@/lib/i18n";
 
@@ -46,6 +53,7 @@ export function SimulatorPage() {
 		debugMode: boolean;
 		representation: GraphRepresentation;
 	} | null>(null);
+	const [algorithmGraph, setAlgorithmGraph] = useState<Graph | null>(null);
 	const [configMessage, setConfigMessage] = useState("");
 	const [configError, setConfigError] = useState("");
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -71,7 +79,19 @@ export function SimulatorPage() {
 			// Keep the graph usable when browser storage is full or disabled.
 		}
 	}, [graph, graphLoaded]);
-	const analysis = useMemo(() => analyzeGraph(graph), [graph]);
+	const displayedGraph =
+		algorithmGraph ?? construction?.steps[construction.index]?.graph ?? graph;
+	const displayedAnalysis = useMemo(
+		() => analyzeGraph(displayedGraph),
+		[displayedGraph],
+	);
+	const handleAlgorithmGraphChange = useCallback((nextGraph: Graph | null) => {
+		setAlgorithmGraph(nextGraph);
+		if (nextGraph) {
+			setConstruction(null);
+			setSelectedVertex(null);
+		}
+	}, []);
 	const runRepresentation = (
 		selected: GraphRepresentation,
 		debugMode = false,
@@ -102,7 +122,6 @@ export function SimulatorPage() {
 	}, [construction?.playing]);
 
 	const currentStep = construction?.steps[construction.index];
-	const displayedGraph = currentStep?.graph ?? graph;
 	const stepConstruction = (direction: -1 | 1) => {
 		setConstruction((run) => {
 			if (!run) return null;
@@ -288,7 +307,7 @@ export function SimulatorPage() {
 						{text(language, "Graph", "Graphe")}
 					</h2>
 					<span className="text-xs text-muted-foreground">
-						{construction
+						{construction || algorithmGraph
 							? `${displayedGraph.vertices.length}/${graph.vertices.length} ${text(language, "vertices", "sommets")} · ${displayedGraph.edges.length}/${graph.edges.length} ${text(language, "edges", "arêtes")}`
 							: `${graph.vertices.length} ${text(language, "vertices", "sommets")} · ${graph.edges.length} ${text(language, "edges", "arêtes")}`}
 					</span>
@@ -383,17 +402,20 @@ export function SimulatorPage() {
 				<div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
 					<GraphVisualization
 						{...displayedGraph}
-						analysis={analysis}
-						selectedVertex={construction ? null : selectedVertex}
+						analysis={displayedAnalysis}
+						selectedVertex={
+							construction || algorithmGraph ? null : selectedVertex
+						}
 						onSelectVertex={setSelectedVertex}
 						layoutVertices={graph.vertices}
-						showEmptyCanvas={Boolean(construction)}
-						interactive={!construction}
+						showEmptyCanvas={Boolean(construction || algorithmGraph)}
+						interactive={!construction && !algorithmGraph}
 						currentVertex={currentStep?.currentVertex}
 						currentEdge={currentStep?.currentEdge}
 					/>
 					<GraphRepresentationPanel
 						graph={graph}
+						onAlgorithmGraphChange={handleAlgorithmGraphChange}
 						selected={representation}
 						onSelect={setRepresentation}
 						onPlay={runRepresentation}
@@ -412,8 +434,8 @@ export function SimulatorPage() {
 				</div>
 				{!construction && (
 					<GraphInsights
-						graph={graph}
-						analysis={analysis}
+						graph={displayedGraph}
+						analysis={displayedAnalysis}
 						selectedVertex={selectedVertex}
 						onSelectVertex={setSelectedVertex}
 					/>

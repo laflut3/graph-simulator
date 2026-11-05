@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import { GraphVisualization } from "@/components/GraphVisualization";
+import { useEffect, useMemo, useState } from "react";
 import { analyzeGraph } from "@/lib/graph/analyze";
 import {
 	buildSpanningSteps,
@@ -9,11 +8,20 @@ import {
 import type { Graph } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
 
-export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
+export function SpanningAlgorithmsPanel({
+	graph,
+	onDisplayGraph,
+}: {
+	graph: Graph;
+	onDisplayGraph: (graph: Graph | null) => void;
+}) {
 	const [language] = useLanguage();
 	const [algorithm, setAlgorithm] =
 		useState<SpanningAlgorithm>("spanning-tree");
 	const [index, setIndex] = useState(-1);
+	const [executionMode, setExecutionMode] = useState<
+		"idle" | "running" | "paused" | "debug"
+	>("idle");
 	const steps = useMemo(
 		() => buildSpanningSteps(graph, algorithm),
 		[graph, algorithm],
@@ -22,7 +30,10 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 	const pseudocode = getSpanningPseudocode(algorithm);
 	const componentLabels =
 		step?.componentLabels ?? graph.vertices.map((vertex) => [vertex, vertex]);
-	const result = step?.graph ?? { ...graph, edges: [] };
+	const result = useMemo(
+		() => step?.graph ?? { ...graph, edges: [] },
+		[graph, step],
+	);
 	const analysis = useMemo(() => analyzeGraph(result), [result]);
 	const complete = index === steps.length - 1 && steps.length > 0;
 	const connected =
@@ -35,6 +46,23 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 		"spanning-tree": text(language, "Spanning forest", "Forêt couvrante"),
 		kruskal: "Kruskal",
 	};
+	useEffect(() => {
+		onDisplayGraph(result);
+	}, [onDisplayGraph, result]);
+	useEffect(() => () => onDisplayGraph(null), [onDisplayGraph]);
+	useEffect(() => {
+		if (executionMode !== "running") return;
+		const timer = window.setInterval(() => {
+			if (index >= steps.length - 1) {
+				setExecutionMode("paused");
+				return;
+			}
+			const nextIndex = index + 1;
+			setIndex(nextIndex);
+			if (nextIndex >= steps.length - 1) setExecutionMode("paused");
+		}, 550);
+		return () => window.clearInterval(timer);
+	}, [executionMode, index, steps.length]);
 
 	return (
 		<div className="min-w-0">
@@ -80,6 +108,7 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 						onChange={(event) => {
 							setAlgorithm(event.target.value as SpanningAlgorithm);
 							setIndex(-1);
+							setExecutionMode("idle");
 						}}
 						className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-background px-3 text-sm sm:max-w-xs"
 					>
@@ -93,28 +122,71 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 					</select>
 					<button
 						type="button"
-						className="min-h-10 rounded-lg border border-border px-3 text-sm disabled:opacity-50"
-						disabled={index < 0}
-						onClick={() => setIndex(Math.max(-1, index - 1))}
+						className="min-h-10 rounded-lg bg-primary px-3 text-sm text-primary-foreground disabled:opacity-50"
+						disabled={graph.directed || !graph.edges.length}
+						onClick={() => {
+							if (index >= steps.length - 1) setIndex(-1);
+							setExecutionMode("running");
+						}}
 					>
-						{text(language, "Previous", "Précédent")}
+						{text(language, "Run", "Exécuter")}
 					</button>
 					<button
 						type="button"
-						className="min-h-10 rounded-lg bg-primary px-3 text-sm text-primary-foreground disabled:opacity-50"
-						disabled={complete || graph.directed || !graph.edges.length}
-						onClick={() => setIndex(Math.min(steps.length - 1, index + 1))}
+						className="min-h-10 rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 text-sm text-blue-700 hover:bg-blue-500/10 dark:text-blue-300"
+						aria-pressed={executionMode === "debug"}
+						disabled={graph.directed || !graph.edges.length}
+						onClick={() => setExecutionMode("debug")}
 					>
-						{index < 0
-							? text(language, "Start", "Démarrer")
-							: text(language, "Next edge", "Arête suivante")}
+						{text(language, "Debug", "Déboguer")}
 					</button>
+					{executionMode === "debug" && (
+						<>
+							<button
+								type="button"
+								className="min-h-10 rounded-lg border border-border px-3 text-sm disabled:opacity-50"
+								disabled={index < 0}
+								onClick={() => setIndex(Math.max(-1, index - 1))}
+							>
+								{text(language, "Previous", "Précédent")}
+							</button>
+							<button
+								type="button"
+								className="min-h-10 rounded-lg border border-border px-3 text-sm disabled:opacity-50"
+								disabled={complete}
+								onClick={() => setIndex(Math.min(steps.length - 1, index + 1))}
+							>
+								{text(language, "Next", "Suivant")}
+							</button>
+						</>
+					)}
+					{executionMode === "running" && (
+						<button
+							type="button"
+							className="min-h-10 rounded-lg border border-border px-3 text-sm"
+							onClick={() => setExecutionMode("paused")}
+						>
+							{text(language, "Pause", "Pause")}
+						</button>
+					)}
+					{executionMode === "paused" && (
+						<button
+							type="button"
+							className="min-h-10 rounded-lg border border-border px-3 text-sm"
+							onClick={() => setExecutionMode("running")}
+						>
+							{text(language, "Resume", "Reprendre")}
+						</button>
+					)}
 					<button
 						type="button"
 						className="min-h-10 rounded-lg border border-border px-3 text-sm"
-						onClick={() => setIndex(-1)}
+						onClick={() => {
+							setExecutionMode("idle");
+							setIndex(-1);
+						}}
 					>
-						{text(language, "Reset", "Réinitialiser")}
+						{text(language, "Stop", "Arrêter")}
 					</button>
 				</div>
 			</header>
@@ -164,15 +236,6 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 										: ""}
 								</p>
 							)}
-							<GraphVisualization
-								{...result}
-								analysis={analysis}
-								selectedVertex={null}
-								onSelectVertex={() => {}}
-								interactive={false}
-								layoutVertices={graph.vertices}
-								showEmptyCanvas
-							/>
 							<p className="mt-3 text-sm" aria-live="polite">
 								{index < 0
 									? text(

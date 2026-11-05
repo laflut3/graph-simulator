@@ -13,6 +13,7 @@ import { text, useLanguage } from "@/lib/i18n";
 
 type Props = {
 	graph: Graph;
+	onAlgorithmGraphChange: (graph: Graph | null) => void;
 	selected: GraphRepresentation;
 	onSelect: (representation: GraphRepresentation) => void;
 	onPlay: (representation: GraphRepresentation) => void;
@@ -64,6 +65,7 @@ function DebugBugIcon() {
 
 export function GraphRepresentationPanel({
 	graph,
+	onAlgorithmGraphChange,
 	selected,
 	onSelect,
 	onPlay,
@@ -178,7 +180,11 @@ export function GraphRepresentationPanel({
 			</header>
 
 			{mode === "algorithm" ? (
-				<SpanningAlgorithmsPanel graph={graph} />
+				<SpanningAlgorithmsPanel
+					key={JSON.stringify(graph)}
+					graph={graph}
+					onDisplayGraph={onAlgorithmGraphChange}
+				/>
 			) : (
 				<div className="min-h-52 p-4 sm:p-5">
 					<p className="mb-3 font-mono text-xs text-muted-foreground">
