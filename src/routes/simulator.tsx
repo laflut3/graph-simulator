@@ -412,7 +412,7 @@ export function SimulatorPage() {
 				</div>
 				{!construction && (
 					<GraphInsights
-						directed={graph.directed}
+						graph={graph}
 						analysis={analysis}
 						selectedVertex={selectedVertex}
 						onSelectVertex={setSelectedVertex}

@@ -109,7 +109,7 @@ const copy: Record<
 			},
 			{
 				title: "Composantes et cycles",
-				body: "Une composante regroupe les sommets reliés ; pour un graphe orienté, les composantes affichées sont faibles et ignorent le sens des arcs. Le degré entrant et le degré sortant comptent respectivement les arcs qui arrivent au sommet et ceux qui en partent. Un cycle simple revient à son départ en respectant le sens des arcs.",
+				body: "Une composante regroupe les sommets reliés ; pour un graphe orienté, les composantes affichées sont faibles et ignorent le sens des arcs. Les informations du graphe précisent aussi s’il est un arbre, une forêt ou un arbre couvrant. Un arbre est connexe et sans cycle ; une forêt est sans cycle. Le degré entrant et le degré sortant comptent respectivement les arcs qui arrivent au sommet et ceux qui en partent. Un cycle simple revient à son départ en respectant le sens des arcs.",
 			},
 			{
 				title: "Représentations et algorithmes",
@@ -145,7 +145,7 @@ const copy: Record<
 			},
 			{
 				title: "Components and cycles",
-				body: "A component groups connected vertices; for directed graphs, the displayed weak components ignore arc direction. In-degree and out-degree count arcs entering and leaving a vertex. A simple cycle returns to its start while following arc directions.",
+				body: "A component groups connected vertices; for directed graphs, the displayed weak components ignore arc direction. Graph information also tells you whether the graph is a tree, a forest, or a spanning tree. A tree is connected and acyclic; a forest is acyclic. In-degree and out-degree count arcs entering and leaving a vertex. A simple cycle returns to its start while following arc directions.",
 			},
 			{
 				title: "Representations and algorithms",

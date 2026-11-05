@@ -1,21 +1,31 @@
 import type { GraphAnalysis } from "@/lib/graph/analyze";
-import type { Vertex } from "@/lib/graph/types";
+import type { Graph, Vertex } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
 
 type Props = {
-	directed: boolean;
+	graph: Graph;
 	analysis: GraphAnalysis;
 	selectedVertex: Vertex | null;
 	onSelectVertex: (vertex: Vertex | null) => void;
 };
 
 export function GraphInsights({
-	directed,
+	graph,
 	analysis,
 	selectedVertex,
 	onSelectVertex,
 }: Props) {
 	const [language] = useLanguage();
+	const { directed, vertices, edges } = graph;
+	const isAcyclic =
+		analysis.cycles.length === 0 &&
+		!edges.some((edge) => edge.first === edge.second);
+	const isTree =
+		!directed &&
+		vertices.length > 0 &&
+		isAcyclic &&
+		analysis.components.length === 1;
+	const isForest = !directed && isAcyclic;
 	const componentIndex = analysis.components.findIndex((component) =>
 		component.includes(selectedVertex ?? ""),
 	);
@@ -100,6 +110,46 @@ export function GraphInsights({
 					</p>
 				)}
 			</section>
+			<section
+				aria-label={text(language, "Graph structure", "Structure du graphe")}
+				className="col-span-full rounded-xl border border-border bg-muted/20 p-4 sm:p-5"
+			>
+				<h2 className="text-sm font-medium">
+					{text(language, "Graph structure", "Structure du graphe")}
+				</h2>
+				<div className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+					<StructureProperty
+						label={text(language, "Tree", "Arbre")}
+						value={directed ? null : isTree}
+						language={language}
+					/>
+					<StructureProperty
+						label={text(language, "Forest", "Forêt")}
+						value={directed ? null : isForest}
+						language={language}
+					/>
+					<StructureProperty
+						label={text(language, "Spanning vertices", "Sommets couvrants")}
+						value={true}
+						detail={text(
+							language,
+							"All vertices in this graph are included.",
+							"Tous les sommets du graphe analysé sont présents.",
+						)}
+						language={language}
+					/>
+					<StructureProperty
+						label={text(language, "Spanning tree", "Arbre couvrant")}
+						value={directed ? null : isTree}
+						detail={text(
+							language,
+							"A spanning tree keeps every vertex and has no cycles.",
+							"Un arbre couvrant conserve tous les sommets et ne contient aucun cycle.",
+						)}
+						language={language}
+					/>
+				</div>
+			</section>
 
 			{selectedVertex !== null && (
 				<section
@@ -169,6 +219,36 @@ export function GraphInsights({
 					</div>
 				</section>
 			)}
+		</div>
+	);
+}
+
+function StructureProperty({
+	label,
+	value,
+	detail,
+	language,
+}: {
+	label: string;
+	value: boolean | null;
+	detail?: string;
+	language: "en" | "fr";
+}) {
+	return (
+		<div className="min-w-0">
+			<p className="text-xs text-muted-foreground">{label}</p>
+			<p className="mt-1 font-medium">
+				{value === null
+					? text(
+							language,
+							"Not applicable to directed graphs",
+							"Non défini pour un graphe orienté",
+						)
+					: value
+						? text(language, "Yes", "Oui")
+						: text(language, "No", "Non")}
+			</p>
+			{detail && <p className="mt-1 text-xs text-muted-foreground">{detail}</p>}
 		</div>
 	);
 }
