@@ -50,7 +50,6 @@ const lessons: Record<"en" | "fr", LessonChapter[]> = {
 						"f=O(g) ⇔ ∃C,n₀>0, ∀n≥n₀ : f(n)≤Cg(n)",
 						"f=Ω(g) ⇔ ∃c,n₀>0, ∀n≥n₀ : cg(n)≤f(n)",
 						"f=Θ(g) ⇔ ∃c,C,n₀>0, ∀n≥n₀ : cg(n)≤f(n)≤Cg(n)",
-						"f=O(g) : f≤Cg · f=Ω(g) : cg≤f · f=Θ(g) : cg≤f≤Cg, pour n assez grand",
 					],
 					example:
 						"Pour V = {A, B, C} et E = {AB, AC}, la liste de voisins donne A:{B,C}, B:{A}, C:{A}. Dans la matrice, A relie B et C ; la matrice est symétrique.",
@@ -409,6 +408,13 @@ export function LessonsPage() {
 	const chapters = lessons[language];
 	const [selectedChapter, setSelectedChapter] = useState(0);
 	const chapter = chapters[selectedChapter] ?? chapters[0];
+	const changeChapter = (index: number) => {
+		setSelectedChapter(index);
+		document.getElementById("lesson-content")?.scrollIntoView({
+			behavior: "smooth",
+			block: "start",
+		});
+	};
 
 	return (
 		<main className="w-full px-4 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
@@ -427,8 +433,8 @@ export function LessonsPage() {
 					<p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
 						{text(
 							language,
-							"Key definitions, formulas, algorithms, and worked examples from Chapters 1–3.",
-							"Définitions, formules, algorithmes et exemples résolus des chapitres 1 à 3.",
+							"Three chapters, organized into short topics with formulas, worked examples, and algorithm notes.",
+							"Trois chapitres organisés en notions courtes : formules, exemples résolus et algorithmes.",
 						)}
 					</p>
 				</div>
@@ -441,91 +447,247 @@ export function LessonsPage() {
 				</Link>
 			</header>
 
-			<div className="mt-7 grid items-start gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8">
+			<div className="mt-7 grid items-start gap-5 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-8">
 				<nav
 					aria-label={text(language, "Chapters", "Chapitres")}
-					className="flex gap-2 overflow-x-auto pb-1 lg:sticky lg:top-4 lg:flex-col lg:overflow-visible"
+					className="flex snap-x gap-2 overflow-x-auto pb-2 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-2rem)] lg:snap-none lg:flex-col lg:overflow-y-auto lg:pr-1"
 				>
-					{chapters.map((item, index) => (
-						<button
-							key={item.title}
-							type="button"
-							aria-current={selectedChapter === index ? "page" : undefined}
-							onClick={() => setSelectedChapter(index)}
-							className={`shrink-0 rounded-lg border px-3 py-3 text-left text-sm transition-colors ${selectedChapter === index ? "border-foreground/15 bg-muted font-medium text-foreground" : "border-transparent text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`}
-						>
-							<span className="mr-2 font-mono text-[11px] opacity-60">
-								{String(index + 1).padStart(2, "0")}
-							</span>
-							{item.title}
-						</button>
-					))}
+					<p className="hidden px-2 pb-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground lg:block">
+						{text(language, "Study path", "Parcours du cours")}
+					</p>
+					{chapters.map((item, index) => {
+						const selected = selectedChapter === index;
+						return (
+							<div
+								key={item.title}
+								className={`min-w-64 snap-start rounded-xl border p-2 lg:min-w-0 ${selected ? "border-primary/30 bg-primary/5" : "border-border bg-background"}`}
+							>
+								<button
+									type="button"
+									aria-current={selected ? "step" : undefined}
+									onClick={() => changeChapter(index)}
+									className="flex min-h-14 w-full items-start gap-3 rounded-lg p-2 text-left outline-none transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring"
+								>
+									<span
+										className={`grid size-8 shrink-0 place-items-center rounded-md font-mono text-xs ${selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+									>
+										{String(index + 1).padStart(2, "0")}
+									</span>
+									<span className="min-w-0">
+										<span className="block text-[11px] text-muted-foreground">
+											{text(
+												language,
+												`Chapter ${index + 1}`,
+												`Chapitre ${index + 1}`,
+											)}
+										</span>
+										<span className="mt-0.5 block text-sm font-medium leading-5 text-foreground">
+											{item.title.split(" · ")[1]}
+										</span>
+										<span className="mt-1 block text-xs leading-5 text-muted-foreground">
+											{item.strapline}
+										</span>
+									</span>
+								</button>
+								{selected && (
+									<div className="border-t border-border/70 px-2 pb-2 pt-2">
+										<p className="mb-1 px-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+											{text(language, "In this chapter", "Dans ce chapitre")}
+										</p>
+										{item.sections.map((section, sectionIndex) => (
+											<a
+												key={section.title}
+												href={`#chapter-${index + 1}-section-${sectionIndex + 1}`}
+												className="flex min-h-9 items-center gap-2 rounded-md px-1 text-xs leading-4 text-muted-foreground outline-none hover:bg-muted/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+											>
+												<span className="font-mono text-[10px] opacity-60">
+													{sectionIndex + 1}.
+												</span>
+												<span>{section.title}</span>
+											</a>
+										))}
+									</div>
+								)}
+							</div>
+						);
+					})}
 				</nav>
 
-				<div className="min-w-0">
-					<section className="rounded-xl border border-border bg-muted/10 p-5 sm:p-7">
-						<p className="font-mono text-xs text-muted-foreground">
-							{text(
-								language,
-								`CHAPTER ${selectedChapter + 1}`,
-								`CHAPITRE ${selectedChapter + 1}`,
-							)}
-						</p>
-						<h2 className="mt-2 text-2xl font-medium tracking-tight">
-							{chapter.title}
-						</h2>
-						<p className="mt-2 text-sm text-muted-foreground">
-							{chapter.strapline}
-						</p>
+				<div id="lesson-content" className="min-w-0 scroll-mt-4">
+					<section className="overflow-hidden rounded-2xl border border-border bg-muted/20">
+						<div className="flex flex-wrap items-end justify-between gap-5 p-5 sm:p-7">
+							<div className="min-w-0">
+								<p className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+									{text(
+										language,
+										`Chapter ${selectedChapter + 1} of ${chapters.length}`,
+										`Chapitre ${selectedChapter + 1} sur ${chapters.length}`,
+									)}
+								</p>
+								<h2 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">
+									{chapter.title.split(" · ")[1]}
+								</h2>
+								<p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+									{chapter.strapline}
+								</p>
+							</div>
+							<div className="rounded-lg border border-border bg-background px-3 py-2 text-xs">
+								<span className="font-mono text-foreground">
+									{chapter.sections.length}
+								</span>
+								<span className="ml-2 text-muted-foreground">
+									{text(language, "topics", "notions")}
+								</span>
+							</div>
+						</div>
+						<div className="h-1 bg-border" aria-hidden="true">
+							<div
+								className="h-full bg-primary"
+								style={{
+									width: `${((selectedChapter + 1) / chapters.length) * 100}%`,
+								}}
+							/>
+						</div>
 					</section>
 
-					<div className="mt-4 space-y-4">
+					<div className="mt-5 space-y-5">
 						{chapter.sections.map((section, index) => (
 							<article
 								key={section.title}
-								className="rounded-xl border border-border p-5 sm:p-6"
+								id={`chapter-${selectedChapter + 1}-section-${index + 1}`}
+								className="scroll-mt-6 rounded-2xl border border-border bg-background p-5 sm:p-7"
 							>
-								<p className="font-mono text-[11px] text-muted-foreground">
-									{text(
-										language,
-										`SECTION ${selectedChapter + 1}.${index + 1}`,
-										`PARTIE ${selectedChapter + 1}.${index + 1}`,
-									)}
-								</p>
-								<h3 className="mt-2 text-lg font-medium">{section.title}</h3>
-								<p className="mt-2 text-sm leading-6 text-muted-foreground">
+								<div className="flex items-start gap-3">
+									<span className="grid size-8 shrink-0 place-items-center rounded-md bg-muted font-mono text-xs text-muted-foreground">
+										{String(index + 1).padStart(2, "0")}
+									</span>
+									<div className="min-w-0">
+										<p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+											{text(
+												language,
+												`Topic ${selectedChapter + 1}.${index + 1}`,
+												`Notion ${selectedChapter + 1}.${index + 1}`,
+											)}
+										</p>
+										<h3 className="mt-1 text-lg font-semibold tracking-tight sm:text-xl">
+											{section.title}
+										</h3>
+									</div>
+								</div>
+								<p className="mt-4 max-w-4xl text-sm leading-7 text-muted-foreground">
 									{section.intro}
 								</p>
 								{section.formulas && (
-									<ul className="mt-4 grid gap-2">
-										{section.formulas.map((formula) => (
-											<li
-												key={formula}
-												className="overflow-x-auto rounded-md bg-muted/50 px-3 py-2 font-mono text-xs leading-5 text-foreground sm:text-sm"
-											>
-												{formula}
-											</li>
-										))}
-									</ul>
-								)}
-								{section.example && (
-									<div className="mt-4 rounded-lg border border-border bg-background p-4">
-										<h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-											{text(language, "Worked example", "Exemple résolu")}
-										</h4>
-										<p className="mt-2 text-sm leading-6">{section.example}</p>
+									<div className="mt-5">
+										<div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+											<h4 className="text-xs font-semibold uppercase tracking-wide">
+												{text(
+													language,
+													"Key ideas & formulas",
+													"Repères & formules",
+												)}
+											</h4>
+											<p className="text-[11px] text-muted-foreground">
+												{text(
+													language,
+													"Definitions · rules · complexity",
+													"Définitions · règles · complexité",
+												)}
+											</p>
+										</div>
+										<ul className="grid gap-2 sm:grid-cols-2">
+											{section.formulas.map((formula, formulaIndex) => {
+												const notation = isMathematicalNotation(formula);
+												return (
+													<li
+														key={formula}
+														className="flex min-w-0 items-start gap-3 rounded-lg border border-border bg-muted/20 p-3"
+													>
+														<span className="mt-px font-mono text-[10px] text-muted-foreground">
+															{String(formulaIndex + 1).padStart(2, "0")}
+														</span>
+														<p
+															className={`min-w-0 [overflow-wrap:anywhere] text-sm leading-6 ${notation ? "font-mono text-[12px] sm:text-[13px]" : "text-foreground"}`}
+														>
+															{formula}
+														</p>
+													</li>
+												);
+											})}
+										</ul>
 									</div>
 								)}
+								{section.example && (
+									<aside className="mt-5 rounded-xl border border-primary/20 bg-primary/5 p-4 sm:p-5">
+										<h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-foreground">
+											<span
+												className="grid size-6 place-items-center rounded-md bg-primary/10 font-mono text-primary"
+												aria-hidden="true"
+											>
+												=
+											</span>
+											{text(language, "Worked example", "Exemple résolu")}
+										</h4>
+										<p className="mt-3 text-sm leading-7 text-foreground">
+											{section.example}
+										</p>
+									</aside>
+								)}
 								{section.note && (
-									<p className="mt-4 border-l-2 border-foreground/20 pl-3 text-sm leading-6 text-muted-foreground">
-										{section.note}
-									</p>
+									<aside className="mt-4 rounded-lg border-l-2 border-border bg-muted/20 px-4 py-3">
+										<p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+											{text(language, "Remember", "À retenir")}
+										</p>
+										<p className="mt-1 text-sm leading-6 text-muted-foreground">
+											{section.note}
+										</p>
+									</aside>
 								)}
 							</article>
 						))}
 					</div>
+
+					<nav
+						aria-label={text(
+							language,
+							"Chapter navigation",
+							"Navigation des chapitres",
+						)}
+						className="mt-6 flex justify-between gap-3 border-t border-border pt-5"
+					>
+						<button
+							type="button"
+							disabled={selectedChapter === 0}
+							onClick={() => changeChapter(selectedChapter - 1)}
+							className="min-h-11 rounded-lg border border-border px-4 text-left text-sm hover:bg-muted disabled:invisible"
+						>
+							<span className="block text-[10px] uppercase tracking-wide text-muted-foreground">
+								← {text(language, "Previous", "Précédent")}
+							</span>
+							<span className="mt-1 block font-medium">
+								{chapters[selectedChapter - 1]?.title.split(" · ")[1]}
+							</span>
+						</button>
+						<button
+							type="button"
+							disabled={selectedChapter === chapters.length - 1}
+							onClick={() => changeChapter(selectedChapter + 1)}
+							className="min-h-11 rounded-lg border border-border px-4 text-right text-sm hover:bg-muted disabled:invisible"
+						>
+							<span className="block text-[10px] uppercase tracking-wide text-muted-foreground">
+								{text(language, "Next", "Suivant")} →
+							</span>
+							<span className="mt-1 block font-medium">
+								{chapters[selectedChapter + 1]?.title.split(" · ")[1]}
+							</span>
+						</button>
+					</nav>
 				</div>
 			</div>
 		</main>
 	);
+}
+
+function isMathematicalNotation(value: string) {
+	return /[=⇔→←≤≥⊆ΣΘΩℝ∞∅]|\b(?:O|Ω|Θ)\(/.test(value);
 }

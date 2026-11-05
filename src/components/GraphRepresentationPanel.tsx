@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { SpanningAlgorithmsPanel } from "@/components/SpanningAlgorithmsPanel";
+import { GraphAlgorithmsPanel } from "@/components/GraphAlgorithmsPanel";
 import {
 	createAdjacencyMatrix,
 	createNeighborLists,
@@ -180,7 +180,7 @@ export function GraphRepresentationPanel({
 			</header>
 
 			{mode === "algorithm" ? (
-				<SpanningAlgorithmsPanel
+				<GraphAlgorithmsPanel
 					key={JSON.stringify(graph)}
 					graph={graph}
 					onDisplayGraph={onAlgorithmGraphChange}
