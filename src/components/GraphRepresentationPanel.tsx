@@ -371,14 +371,16 @@ export function GraphRepresentationPanel({
 				</section>
 			)}
 
-			<footer className="border-t border-border px-4 py-3 sm:px-5">
-				<p className="text-xs text-muted-foreground">
-					{text(language, "Time complexity", "Complexité algorithmique")}
-					<span className="ml-2 font-mono text-foreground">
-						{representationComplexity[selected]}
-					</span>
-				</p>
-			</footer>
+			{mode === "representation" && (
+				<footer className="border-t border-border px-4 py-3 sm:px-5">
+					<p className="text-xs text-muted-foreground">
+						{text(language, "Time complexity", "Complexité algorithmique")}
+						<span className="ml-2 font-mono text-foreground">
+							{representationComplexity[selected]}
+						</span>
+					</p>
+				</footer>
+			)}
 		</section>
 	);
 }

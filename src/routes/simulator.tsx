@@ -11,6 +11,7 @@ import { GraphForm } from "@/components/GraphForm";
 import { GraphInsights } from "@/components/GraphInsights";
 import { GraphRepresentationPanel } from "@/components/GraphRepresentationPanel";
 import { GraphVisualization } from "@/components/GraphVisualization";
+import { ShortestPathFinder } from "@/components/ShortestPathFinder";
 import { Button } from "@/components/ui/button";
 import { analyzeGraph } from "@/lib/graph/analyze";
 import { createGraph } from "@/lib/graph/create";
@@ -433,12 +434,17 @@ export function SimulatorPage() {
 					/>
 				</div>
 				{!construction && (
-					<GraphInsights
-						graph={displayedGraph}
-						analysis={displayedAnalysis}
-						selectedVertex={selectedVertex}
-						onSelectVertex={setSelectedVertex}
-					/>
+					<>
+						<GraphInsights
+							graph={displayedGraph}
+							analysis={displayedAnalysis}
+							selectedVertex={selectedVertex}
+							onSelectVertex={setSelectedVertex}
+						/>
+						<div className="-mx-4 mt-3 px-4 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10">
+							<ShortestPathFinder graph={displayedGraph} />
+						</div>
+					</>
 				)}
 			</section>
 		</main>
