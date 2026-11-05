@@ -3,6 +3,7 @@ import { GraphVisualization } from "@/components/GraphVisualization";
 import { analyzeGraph } from "@/lib/graph/analyze";
 import {
 	buildSpanningSteps,
+	getSpanningPseudocode,
 	type SpanningAlgorithm,
 } from "@/lib/graph/spanning";
 import type { Graph } from "@/lib/graph/types";
@@ -18,6 +19,9 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 		[graph, algorithm],
 	);
 	const step = steps[index];
+	const pseudocode = getSpanningPseudocode(algorithm);
+	const componentLabels =
+		step?.componentLabels ?? graph.vertices.map((vertex) => [vertex, vertex]);
 	const result = step?.graph ?? { ...graph, edges: [] };
 	const analysis = useMemo(() => analyzeGraph(result), [result]);
 	const complete = index === steps.length - 1 && steps.length > 0;
@@ -33,19 +37,16 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 	};
 
 	return (
-		<section
-			aria-labelledby="spanning-title"
-			className="mt-6 rounded-2xl border border-border bg-card/40 shadow-sm sm:mt-8"
-		>
+		<div className="min-w-0">
 			<header className="space-y-3 border-b border-border bg-muted/20 p-4 sm:p-5">
 				<div>
-					<h2 id="spanning-title" className="text-sm font-semibold">
+					<h3 className="text-sm font-semibold">
 						{text(
 							language,
 							"Algorithms · spanning subgraphs",
 							"Algorithmes · sous-graphes couvrants",
 						)}
-					</h2>
+					</h3>
 					<p className="mt-1 text-xs text-muted-foreground">
 						{text(
 							language,
@@ -53,6 +54,21 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 							"Conservez tous les sommets et sélectionnez des arêtes sans créer de cycle.",
 						)}
 					</p>
+					{algorithm === "kruskal" && (
+						<p className="mt-1 text-xs text-muted-foreground">
+							{graph.weighted
+								? text(
+										language,
+										"Edges are sorted by their actual weights in increasing order.",
+										"Les arêtes sont triées par poids réel croissant.",
+									)
+								: text(
+										language,
+										"This graph is unweighted, so every edge uses weight 1.",
+										"Ce graphe n’est pas pondéré ; chaque arête reçoit le poids 1.",
+									)}
+						</p>
+					)}
 				</div>
 				<div className="flex flex-wrap items-center gap-2">
 					<label className="sr-only" htmlFor="spanning-algorithm">
@@ -111,115 +127,207 @@ export function SpanningAlgorithmsPanel({ graph }: { graph: Graph }) {
 					)}
 				</p>
 			) : (
-				<div className="grid gap-4 p-4 sm:p-5 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,0.75fr)]">
-					<div className="min-w-0">
-						<div
-							className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"
-							aria-live="polite"
-						>
-							<span>
+				<>
+					<div className="grid gap-4 p-4 sm:p-5">
+						<div className="min-w-0">
+							<div
+								className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground"
+								aria-live="polite"
+							>
+								<span>
+									{index < 0
+										? text(
+												language,
+												"No edges processed yet.",
+												"Aucune arête traitée pour le moment.",
+											)
+										: text(
+												language,
+												`Edge ${index + 1} / ${steps.length}: ${step?.accepted ? "kept" : "rejected"}`,
+												`Arête ${index + 1} / ${steps.length} : ${step?.accepted ? "retenue" : "rejetée"}`,
+											)}
+								</span>
+								<span>
+									{result.vertices.length}{" "}
+									{text(language, "vertices", "sommets")} ·{" "}
+									{result.edges.length} {text(language, "edges", "arêtes")}
+								</span>
+							</div>
+							{step && (
+								<p
+									className="mb-3 rounded-md bg-muted/40 px-2 py-1.5 font-mono text-xs"
+									aria-live="polite"
+								>
+									{step.edge.first} — {step.edge.second}
+									{graph.weighted || algorithm === "kruskal"
+										? ` · ${text(language, "weight", "poids")} ${step.edge.weight ?? 1}`
+										: ""}
+								</p>
+							)}
+							<GraphVisualization
+								{...result}
+								analysis={analysis}
+								selectedVertex={null}
+								onSelectVertex={() => {}}
+								interactive={false}
+								layoutVertices={graph.vertices}
+								showEmptyCanvas
+							/>
+							<p className="mt-3 text-sm" aria-live="polite">
 								{index < 0
 									? text(
 											language,
-											"No edges processed yet.",
-											"Aucune arête traitée pour le moment.",
+											"The subgraph will appear here as edges are processed.",
+											"Le sous-graphe apparaîtra ici au fil du traitement des arêtes.",
 										)
-									: text(
-											language,
-											`Edge ${index + 1} / ${steps.length}: ${step?.accepted ? "kept" : "rejected"}`,
-											`Arête ${index + 1} / ${steps.length} : ${step?.accepted ? "retenue" : "rejetée"}`,
-										)}
-							</span>
-							<span>
-								{result.vertices.length} {text(language, "vertices", "sommets")}{" "}
-								· {result.edges.length} {text(language, "edges", "arêtes")}
-							</span>
+									: step?.accepted
+										? text(
+												language,
+												"Kept: this edge joins two different components.",
+												"Retenue : cette arête relie deux composantes différentes.",
+											)
+										: text(
+												language,
+												"Rejected: this edge would create a cycle.",
+												"Rejetée : cette arête créerait un cycle.",
+											)}
+							</p>
 						</div>
-						<GraphVisualization
-							{...result}
-							analysis={analysis}
-							selectedVertex={null}
-							onSelectVertex={() => {}}
-							interactive={false}
-							layoutVertices={graph.vertices}
-							showEmptyCanvas
-						/>
-						<p className="mt-3 text-sm" aria-live="polite">
-							{index < 0
-								? text(
-										language,
-										"The subgraph will appear here as edges are processed.",
-										"Le sous-graphe apparaîtra ici au fil du traitement des arêtes.",
-									)
-								: step?.accepted
+						<aside className="rounded-xl border border-border bg-background p-4">
+							<h3 className="text-sm font-medium">
+								{complete && connected
+									? text(language, "Spanning tree", "Arbre couvrant")
+									: text(language, "Current subgraph", "Sous-graphe courant")}
+							</h3>
+							<p className="mt-1 text-xs text-muted-foreground">
+								{complete && !connected
 									? text(
 											language,
-											"Kept: this edge joins two different components.",
-											"Retenue : cette arête relie deux composantes différentes.",
+											"The input is disconnected; the result is a spanning forest.",
+											"Le graphe initial n’est pas connexe ; le résultat est une forêt couvrante.",
 										)
-									: text(
-											language,
-											"Rejected: this edge would create a cycle.",
-											"Rejetée : cette arête créerait un cycle.",
-										)}
-						</p>
-					</div>
-					<aside className="rounded-xl border border-border bg-background p-4">
-						<h3 className="text-sm font-medium">
-							{complete && connected
-								? text(language, "Spanning tree", "Arbre couvrant")
-								: text(language, "Current subgraph", "Sous-graphe courant")}
-						</h3>
-						<p className="mt-1 text-xs text-muted-foreground">
-							{complete && !connected
-								? text(
-										language,
-										"The input is disconnected; the result is a spanning forest.",
-										"Le graphe initial n’est pas connexe ; le résultat est une forêt couvrante.",
-									)
-								: complete && connected
-									? text(
-											language,
-											"All vertices are connected with no cycles.",
-											"Tous les sommets sont reliés sans cycle.",
-										)
-									: text(
-											language,
-											"The subgraph contains every original vertex and only the accepted edges.",
-											"Le sous-graphe contient tous les sommets initiaux et uniquement les arêtes retenues.",
-										)}
-						</p>
-						<dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-							<div>
-								<dt className="text-xs text-muted-foreground">
-									{text(language, "Components", "Composantes")}
-								</dt>
-								<dd className="mt-1 font-mono">{analysis.components.length}</dd>
-							</div>
-							<div>
-								<dt className="text-xs text-muted-foreground">
-									{text(language, "Edges", "Arêtes")}
-								</dt>
-								<dd className="mt-1 font-mono">
-									{result.edges.length} /{" "}
-									{Math.max(
-										0,
-										result.vertices.length - analysis.components.length,
-									)}
-								</dd>
-							</div>
-							{algorithm === "kruskal" && (
-								<div className="col-span-2">
+									: complete && connected
+										? text(
+												language,
+												"All vertices are connected with no cycles.",
+												"Tous les sommets sont reliés sans cycle.",
+											)
+										: text(
+												language,
+												"The subgraph contains every original vertex and only the accepted edges.",
+												"Le sous-graphe contient tous les sommets initiaux et uniquement les arêtes retenues.",
+											)}
+							</p>
+							<dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+								<div>
 									<dt className="text-xs text-muted-foreground">
-										{text(language, "Total weight", "Poids total")}
+										{text(language, "Components", "Composantes")}
 									</dt>
-									<dd className="mt-1 font-mono">{weight}</dd>
+									<dd className="mt-1 font-mono">
+										{analysis.components.length}
+									</dd>
 								</div>
-							)}
-						</dl>
-					</aside>
-				</div>
+								<div>
+									<dt className="text-xs text-muted-foreground">
+										{text(language, "Edges", "Arêtes")}
+									</dt>
+									<dd className="mt-1 font-mono">
+										{result.edges.length} /{" "}
+										{Math.max(
+											0,
+											result.vertices.length - analysis.components.length,
+										)}
+									</dd>
+								</div>
+								{algorithm === "kruskal" && (
+									<div className="col-span-2">
+										<dt className="text-xs text-muted-foreground">
+											{text(language, "Total weight", "Poids total")}
+										</dt>
+										<dd className="mt-1 font-mono">{weight}</dd>
+									</div>
+								)}
+							</dl>
+						</aside>
+					</div>
+					<div className="grid gap-4 border-t border-border p-4 sm:p-5 lg:grid-cols-2">
+						<section
+							aria-labelledby="spanning-pseudocode-title"
+							className="min-w-0"
+						>
+							<h4
+								id="spanning-pseudocode-title"
+								className="mb-3 text-xs font-semibold"
+							>
+								{text(language, "Pseudocode", "Pseudo-code")}
+							</h4>
+							<ol className="space-y-1 font-mono text-[11px] leading-5">
+								{pseudocode.map((line, lineIndex) => (
+									<li
+										key={line}
+										aria-current={
+											step?.codeLine === lineIndex + 1 ? "step" : undefined
+										}
+										className={`grid grid-cols-[1.5rem_minmax(0,1fr)] gap-2 rounded px-2 py-0.5 ${step?.codeLine === lineIndex + 1 ? "construction-item-active text-foreground" : "text-muted-foreground"}`}
+									>
+										<span className="select-none text-right opacity-60">
+											{lineIndex + 1}
+										</span>
+										<code className="whitespace-pre-wrap">{line}</code>
+									</li>
+								))}
+							</ol>
+						</section>
+						<section
+							aria-labelledby="component-array-title"
+							className="min-w-0"
+						>
+							<h4
+								id="component-array-title"
+								className="mb-3 text-xs font-semibold"
+							>
+								{text(
+									language,
+									"Component array · comp",
+									"Tableau des composantes · comp",
+								)}
+							</h4>
+							<p className="mb-2 text-[11px] text-muted-foreground">
+								{text(
+									language,
+									"One entry per vertex; equal labels mean the vertices are already connected in the selected subgraph.",
+									"Une entrée par sommet ; des étiquettes égales indiquent que les sommets sont déjà reliés dans le sous-graphe sélectionné.",
+								)}
+							</p>
+							<div className="max-h-44 overflow-auto rounded-lg border border-border">
+								<table className="w-full text-left font-mono text-xs">
+									<thead className="sticky top-0 bg-muted text-muted-foreground">
+										<tr>
+											<th className="px-3 py-2 font-medium">
+												{text(language, "Vertex", "Sommet")}
+											</th>
+											<th className="px-3 py-2 font-medium">comp[vertex]</th>
+										</tr>
+									</thead>
+									<tbody>
+										{componentLabels.map(([vertex, label]) => (
+											<tr
+												key={vertex}
+												className="border-t border-border even:bg-muted/30"
+											>
+												<th scope="row" className="px-3 py-1.5 font-medium">
+													{vertex}
+												</th>
+												<td className="px-3 py-1.5">{label}</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						</section>
+					</div>
+				</>
 			)}
-		</section>
+		</div>
 	);
 }
