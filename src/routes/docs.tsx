@@ -105,7 +105,7 @@ const copy: Record<
 			},
 			{
 				title: "Lire la visualisation",
-				body: "Cliquez sur un sommet, ou sélectionnez-le au clavier avec Entrée ou Espace. Le panneau sous le dessin indique son degré, sa composante connexe et les cycles simples qui le traversent.",
+				body: "Cliquez sur un sommet, ou sélectionnez-le au clavier avec Entrée ou Espace. Le panneau sous le dessin indique son degré, sa composante connexe, les cycles simples qui le traversent et les plus courts chemins depuis ce sommet vers tous les autres, avec distance et chemin. Les graphes non pondérés utilisent un parcours en largeur et le nombre d’arêtes ; les graphes pondérés utilisent Bellman–Ford et la somme des poids, y compris les poids négatifs. Les sommets inaccessibles et ceux affectés par un cycle négatif sont signalés.",
 			},
 			{
 				title: "Composantes et cycles",
@@ -113,7 +113,7 @@ const copy: Record<
 			},
 			{
 				title: "Représentations et algorithmes",
-				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes dans le menu, puis lancez la représentation ou déboguez-la pas à pas. Basculez vers Algorithme pour afficher le sous-graphe de travail, puis choisissez Exécuter pour l’animation ou Déboguer pour avancer manuellement. La forêt couvrante est construite en ordre d’arêtes ; Kruskal trie les poids réels croissants, y compris négatifs. Le pseudo-code actif et le tableau comp sont visibles pendant l’exécution ; les arêtes qui créeraient un cycle sont rejetées. Kruskal affiche aussi le poids total. Un graphe non connexe produit une forêt couvrante. Ces algorithmes sont disponibles pour les graphes non orientés. En revenant à Représentation, le graphe configuré réapparaît. En orienté, les listes montrent les voisins sortants et la matrice n’est pas symétrique ; en pondéré, la matrice contient les poids et ∞ indique l’absence d’arête. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Les étapes actives sont surlignées en bleu. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
+				body: "Choisissez les listes de voisins, la matrice ou la liste d’arêtes dans le menu, puis lancez la représentation ou déboguez-la pas à pas. Basculez vers Algorithme pour afficher le sous-graphe de travail, puis choisissez Exécuter pour l’animation ou Déboguer pour avancer manuellement. La forêt couvrante est construite en ordre d’arêtes ; Kruskal trie les poids réels croissants, y compris négatifs, et affiche les listes avant et après le tri. Le pseudo-code actif et le tableau comp sont visibles pendant l’exécution ; les arêtes qui créeraient un cycle sont rejetées. Kruskal affiche aussi le poids total. Un graphe non connexe produit une forêt couvrante. Ces algorithmes sont disponibles pour les graphes non orientés. En revenant à Représentation, le graphe configuré réapparaît. En orienté, les listes montrent les voisins sortants et la matrice n’est pas symétrique ; en pondéré, la matrice contient les poids et ∞ indique l’absence d’arête. Chaque test de boucle, branche de condition et retour à la boucle apparaît dans la trace. Les étapes actives sont surlignées en bleu. Complexité : Θ(|V| + |E|) pour les listes et arêtes, Θ(|V|²) pour la matrice.",
 			},
 			{
 				title: "Importer et télécharger",
@@ -141,7 +141,7 @@ const copy: Record<
 			},
 			{
 				title: "Read the visualization",
-				body: "Click a vertex, or focus it and press Enter or Space. The panel below the drawing shows its degree, connected component, and the simple cycles that include it.",
+				body: "Click a vertex, or focus it and press Enter or Space. The panel below the drawing shows its degree, connected component, simple cycles, and shortest paths from that vertex to every other vertex, including each distance and route. Unweighted graphs use breadth-first search and edge count; weighted graphs use Bellman–Ford and total weight, including negative weights. Unreachable vertices and vertices affected by a negative cycle are identified.",
 			},
 			{
 				title: "Components and cycles",
@@ -149,7 +149,7 @@ const copy: Record<
 			},
 			{
 				title: "Representations and algorithms",
-				body: "Choose neighbor lists, the matrix, or the edge list from the menu, then run the representation or debug it one step at a time. Switch to Algorithm to show the working subgraph, then choose Run for animation or Debug to step through it manually. The spanning forest is built in edge order; Kruskal sorts actual weights in increasing order, including negative weights. Active pseudocode and the comp array stay visible during execution; edges that would create a cycle are rejected. Kruskal also shows the total weight. A disconnected input produces a spanning forest. These algorithms are available for undirected graphs. Switch back to Representation to restore the configured graph. Directed neighbor lists show outgoing neighbors and their matrix is not symmetric; weighted matrices contain edge weights and use ∞ for a missing edge. The trace shows every loop check, condition branch, and return to a loop, with active steps highlighted in blue. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
+				body: "Choose neighbor lists, the matrix, or the edge list from the menu, then run the representation or debug it one step at a time. Switch to Algorithm to show the working subgraph, then choose Run for animation or Debug to step through it manually. The spanning forest is built in edge order; Kruskal sorts actual weights in increasing order, including negative weights, and shows the edge list before and after sorting. Active pseudocode and the comp array stay visible during execution; edges that would create a cycle are rejected. Kruskal also shows the total weight. A disconnected input produces a spanning forest. These algorithms are available for undirected graphs. Switch back to Representation to restore the configured graph. Directed neighbor lists show outgoing neighbors and their matrix is not symmetric; weighted matrices contain edge weights and use ∞ for a missing edge. The trace shows every loop check, condition branch, and return to a loop, with active steps highlighted in blue. Complexity: Θ(|V| + |E|) for lists and edges, Θ(|V|²) for the matrix.",
 			},
 			{
 				title: "Import and download",

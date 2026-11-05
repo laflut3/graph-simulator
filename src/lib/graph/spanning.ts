@@ -42,27 +42,29 @@ export function getSpanningPseudocode(algorithm: SpanningAlgorithm) {
 	return algorithm === "kruskal" ? kruskalCodeLines : spanningTreeCodeLines;
 }
 
+export function sortEdgesByWeight(graph: Graph): GraphEdge[] {
+	return [...graph.edges].sort((a, b) => {
+		const [aFirst, aSecond] = [a.first, a.second].sort((x, y) =>
+			x.localeCompare(y, "en", { numeric: true }),
+		);
+		const [bFirst, bSecond] = [b.first, b.second].sort((x, y) =>
+			x.localeCompare(y, "en", { numeric: true }),
+		);
+		return (
+			(a.weight ?? 1) - (b.weight ?? 1) ||
+			aFirst.localeCompare(bFirst, "en", { numeric: true }) ||
+			aSecond.localeCompare(bSecond, "en", { numeric: true })
+		);
+	});
+}
+
 /** Build a spanning forest, recording the partial subgraph after each edge. */
 export function buildSpanningSteps(
 	graph: Graph,
 	algorithm: SpanningAlgorithm,
 ): SpanningStep[] {
-	const edges = [...graph.edges];
-	if (algorithm === "kruskal") {
-		edges.sort((a, b) => {
-			const [aFirst, aSecond] = [a.first, a.second].sort((x, y) =>
-				x.localeCompare(y, "en", { numeric: true }),
-			);
-			const [bFirst, bSecond] = [b.first, b.second].sort((x, y) =>
-				x.localeCompare(y, "en", { numeric: true }),
-			);
-			return (
-				(a.weight ?? 1) - (b.weight ?? 1) ||
-				aFirst.localeCompare(bFirst, "en", { numeric: true }) ||
-				aSecond.localeCompare(bSecond, "en", { numeric: true })
-			);
-		});
-	}
+	const edges =
+		algorithm === "kruskal" ? sortEdgesByWeight(graph) : [...graph.edges];
 	const labels = new Map(graph.vertices.map((vertex) => [vertex, vertex]));
 	const selected: GraphEdge[] = [];
 	let components = graph.vertices.length;

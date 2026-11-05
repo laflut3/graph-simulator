@@ -1,4 +1,6 @@
+import { useMemo } from "react";
 import type { GraphAnalysis } from "@/lib/graph/analyze";
+import { findShortestPaths } from "@/lib/graph/shortest-paths";
 import type { Graph, Vertex } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
 
@@ -16,6 +18,11 @@ export function GraphInsights({
 	onSelectVertex,
 }: Props) {
 	const [language] = useLanguage();
+	const shortestPaths = useMemo(
+		() =>
+			selectedVertex ? findShortestPaths(graph, selectedVertex) : new Map(),
+		[graph, selectedVertex],
+	);
 	const { directed, vertices, edges } = graph;
 	const isAcyclic =
 		analysis.cycles.length === 0 &&
@@ -215,6 +222,75 @@ export function GraphInsights({
 											.join(" ; ")
 									: text(language, "None", "Aucun")}
 							</p>
+						</div>
+					</div>
+					<div className="mt-5 border-t border-border pt-4">
+						<h3 className="text-sm font-medium">
+							{text(
+								language,
+								`Shortest paths from ${selectedVertex}`,
+								`Plus courts chemins depuis ${selectedVertex}`,
+							)}
+						</h3>
+						<div className="mt-3 overflow-x-auto rounded-lg border border-border">
+							<table className="w-full min-w-[32rem] text-left text-sm">
+								<caption className="sr-only">
+									{text(
+										language,
+										`Shortest paths from ${selectedVertex} to every vertex`,
+										`Plus courts chemins de ${selectedVertex} vers chaque sommet`,
+									)}
+								</caption>
+								<thead className="bg-muted/60 text-xs text-muted-foreground">
+									<tr>
+										<th scope="col" className="px-3 py-2 font-medium">
+											{text(language, "Destination", "Destination")}
+										</th>
+										<th scope="col" className="px-3 py-2 font-medium">
+											{graph.weighted
+												? text(language, "Total weight", "Poids total")
+												: text(language, "Number of edges", "Nombre d’arêtes")}
+										</th>
+										<th scope="col" className="px-3 py-2 font-medium">
+											{text(language, "Shortest path", "Chemin le plus court")}
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									{vertices.map((vertex) => {
+										const route = shortestPaths.get(vertex);
+										return (
+											<tr
+												key={vertex}
+												className="border-t border-border even:bg-muted/20"
+											>
+												<th
+													scope="row"
+													className="whitespace-nowrap px-3 py-2 font-medium"
+												>
+													{vertex}
+												</th>
+												<td className="whitespace-nowrap px-3 py-2 font-mono">
+													{route?.negativeCycle
+														? "−∞"
+														: (route?.distance ??
+															text(language, "Unreachable", "Inaccessible"))}
+												</td>
+												<td className="break-words px-3 py-2 text-muted-foreground">
+													{route?.negativeCycle
+														? text(
+																language,
+																"Affected by a reachable negative cycle",
+																"Affecté par un cycle négatif accessible",
+															)
+														: (route?.path?.join(" → ") ??
+															text(language, "No path", "Aucun chemin"))}
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</section>

@@ -4,6 +4,7 @@ import {
 	buildSpanningSteps,
 	getSpanningPseudocode,
 	type SpanningAlgorithm,
+	sortEdgesByWeight,
 } from "@/lib/graph/spanning";
 import type { Graph } from "@/lib/graph/types";
 import { text, useLanguage } from "@/lib/i18n";
@@ -28,6 +29,7 @@ export function SpanningAlgorithmsPanel({
 	);
 	const step = steps[index];
 	const pseudocode = getSpanningPseudocode(algorithm);
+	const sortedEdges = useMemo(() => sortEdgesByWeight(graph), [graph]);
 	const componentLabels =
 		step?.componentLabels ?? graph.vertices.map((vertex) => [vertex, vertex]);
 	const result = useMemo(
@@ -200,6 +202,57 @@ export function SpanningAlgorithmsPanel({
 				</p>
 			) : (
 				<>
+					{algorithm === "kruskal" && graph.weighted && (
+						<section
+							aria-label={text(
+								language,
+								"Kruskal edge sorting",
+								"Tri des arêtes de Kruskal",
+							)}
+							className="grid gap-4 border-b border-border p-4 sm:grid-cols-2 sm:p-5"
+						>
+							<div className="min-w-0">
+								<h4 className="mb-2 text-xs font-semibold">
+									{text(language, "Before sorting", "Avant le tri")}
+								</h4>
+								<ol className="max-h-36 space-y-1 overflow-y-auto font-mono text-xs text-muted-foreground">
+									{graph.edges.map((edge, edgeIndex) => (
+										<li
+											key={`${edge.first}-${edge.second}`}
+											className="flex justify-between gap-3"
+										>
+											<span>
+												{edgeIndex + 1}. {edge.first} — {edge.second}
+											</span>
+											<span>{edge.weight ?? 1}</span>
+										</li>
+									))}
+								</ol>
+							</div>
+							<div className="min-w-0">
+								<h4 className="mb-2 text-xs font-semibold">
+									{text(
+										language,
+										"After sorting · increasing weight",
+										"Après le tri · poids croissant",
+									)}
+								</h4>
+								<ol className="max-h-36 space-y-1 overflow-y-auto font-mono text-xs">
+									{sortedEdges.map((edge, edgeIndex) => (
+										<li
+											key={`${edge.first}-${edge.second}`}
+											className="flex justify-between gap-3"
+										>
+											<span>
+												{edgeIndex + 1}. {edge.first} — {edge.second}
+											</span>
+											<span>{edge.weight ?? 1}</span>
+										</li>
+									))}
+								</ol>
+							</div>
+						</section>
+					)}
 					<div className="grid gap-4 p-4 sm:p-5">
 						<div className="min-w-0">
 							<div
